@@ -15,6 +15,11 @@ public partial class CharacterWizardWindow : Window
         IReadOnlyList<ComboBox> Pickers,
         IReadOnlyList<TextBox>? Amounts = null);
 
+    private sealed record SelectedModule(
+        LifePathModule Module,
+        int Occurrence,
+        bool IsStage4 = false);
+
     public CharacterWizardWindow()
     {
         InitializeComponent();
@@ -23,11 +28,13 @@ public partial class CharacterWizardWindow : Window
         LateChildhoodPicker.ItemsSource = LifePathCatalog.LateChildhoods;
         SchoolPicker.ItemsSource = LifePathCatalog.EducationSchools;
         RealLifePicker.ItemsSource = LifePathCatalog.RealLifeModules;
+        SecondRealLifePicker.ItemsSource = LifePathCatalog.RealLifeModules;
         AffiliationPicker.SelectedIndex = 0;
         ChildhoodPicker.SelectedIndex = 0;
         LateChildhoodPicker.SelectedIndex = 0;
         SchoolPicker.SelectedIndex = -1;
         RealLifePicker.SelectedIndex = -1;
+        SecondRealLifePicker.SelectedIndex = -1;
         Loaded += (_, _) => RefreshModules();
     }
 
@@ -89,6 +96,10 @@ public partial class CharacterWizardWindow : Window
             RealLifePicker.SelectedItem = realLife;
             BuildChoiceControls();
             UpdatePreview();
+            SecondRealLifePicker.SelectedItem = realLife;
+            BuildChoiceControls();
+            UpdatePreview();
+            SecondRealLifePicker.SelectedIndex = -1;
         }
         RealLifePicker.SelectedIndex = -1;
         BuildChoiceControls();
@@ -105,6 +116,8 @@ public partial class CharacterWizardWindow : Window
     private LifePathModule? SelectedAdvancedField => AdvancedFieldPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedSpecialistField => SpecialistFieldPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedRealLife => RealLifePicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedSecondRealLife =>
+        SecondRealLifePicker.SelectedItem as LifePathModule;
 
     private void ModuleSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -124,6 +137,8 @@ public partial class CharacterWizardWindow : Window
         LateChildhoodDescription.Text = lateChildhood?.Description ?? "";
         SchoolDescription.Text = school?.Description ?? "";
         RealLifeDescription.Text = SelectedRealLife?.Description ?? "";
+        SecondRealLifeDescription.Text =
+            SelectedSecondRealLife?.Description ?? "";
 
         SubAffiliationPicker.ItemsSource = affiliation?.SubAffiliations ?? [];
         SubAffiliationPanel.Visibility = SubAffiliationPicker.Items.Count > 0
@@ -154,6 +169,8 @@ public partial class CharacterWizardWindow : Window
     {
         if (!IsLoaded || refreshing) return;
         RealLifeDescription.Text = SelectedRealLife?.Description ?? "";
+        SecondRealLifeDescription.Text =
+            SelectedSecondRealLife?.Description ?? "";
         BuildChoiceControls();
         UpdatePreview();
     }
@@ -194,8 +211,9 @@ public partial class CharacterWizardWindow : Window
             ChoicesPanel.Children.Clear();
             choiceControls.Clear();
 
-            foreach (var module in SelectedModules())
+            foreach (var selectedModule in SelectedModuleEntries())
             {
+                var module = selectedModule.Module;
                 foreach (var choice in module.Choices)
                 {
                     var header = new TextBlock
@@ -253,7 +271,8 @@ public partial class CharacterWizardWindow : Window
                             amounts.Add(amount);
                             ChoicesPanel.Children.Add(row);
                         }
-                        choiceControls[Key(module, choice)] = new ChoiceInput(controls, amounts);
+                        choiceControls[Key(selectedModule, choice)] =
+                            new ChoiceInput(controls, amounts);
                         continue;
                     }
 
@@ -270,7 +289,8 @@ public partial class CharacterWizardWindow : Window
                         controls.Add(picker);
                         ChoicesPanel.Children.Add(picker);
                     }
-                    choiceControls[Key(module, choice)] = new ChoiceInput(controls);
+                    choiceControls[Key(selectedModule, choice)] =
+                        new ChoiceInput(controls);
                 }
             }
         }
@@ -359,7 +379,7 @@ public partial class CharacterWizardWindow : Window
         if (module is null) return "";
         var choice = module.Choices.FirstOrDefault(item => item.Id == choiceId);
         if (choice is null ||
-            !choiceControls.TryGetValue(Key(module, choice), out var input))
+            !choiceControls.TryGetValue(Key(module, choice, 0), out var input))
         {
             return "";
         }
@@ -439,24 +459,26 @@ public partial class CharacterWizardWindow : Window
         character.BasicSchool = SelectedBasicField?.Name ?? "";
         character.AdvancedSchool = SelectedAdvancedField?.Name ?? "";
         character.SpecialSchool = SelectedSpecialistField?.Name ?? "";
-        character.RealLife = SelectedRealLife?.Name ?? "";
+        character.RealLife =
+            SelectedSecondRealLife?.Name ?? SelectedRealLife?.Name ?? "";
         var phenotype = GetSelectedChoice(SelectedChildhood, "phenotype");
         if (phenotype.Length > 0) character.Phenotype = phenotype;
 
-        var modules = SelectedModules().ToArray();
-        foreach (var module in modules)
+        var selectedModules = SelectedModuleEntries().ToArray();
+        var modules = selectedModules.Select(entry => entry.Module).ToArray();
+        foreach (var selectedModule in selectedModules)
         {
-            LifePathEngine.Apply(character, CreateSelection(module));
-        }
-        if (character.RealLife.StartsWith("Clan Warrior Washout - ",
-                StringComparison.Ordinal))
-        {
-            character.ClanCaste =
-                character.RealLife["Clan Warrior Washout - ".Length..];
-        }
-        if (character.RealLife == "Dark Caste")
-        {
-            character.ClanCaste = "Dark Caste";
+            var module = selectedModule.Module;
+            var selection = CreateSelection(selectedModule);
+            if (selectedModule.IsStage4)
+            {
+                LifePathEngine.ApplyStage4(character, selection);
+                ApplyCareerState(character, module.Name);
+            }
+            else
+            {
+                LifePathEngine.Apply(character, selection);
+            }
         }
         LifePathEngine.ApplyAffiliationContext(character, affiliation, childhood, language);
         LifePathEngine.ApplyAffiliationContext(character, affiliation, lateChildhood, language);
@@ -469,10 +491,10 @@ public partial class CharacterWizardWindow : Window
         {
             LifePathEngine.ApplyAffiliationContext(character, affiliation, field, language);
         }
-        if (SelectedRealLife is not null)
+        foreach (var career in selectedModules.Where(entry => entry.IsStage4))
         {
             LifePathEngine.ApplyAffiliationContext(
-                character, affiliation, SelectedRealLife, language);
+                character, affiliation, career.Module, language);
         }
         LifePathEngine.ApplyModuleAccounting(character, modules);
         character.Notes =
@@ -485,17 +507,19 @@ public partial class CharacterWizardWindow : Window
             $"\nBasic Field: {character.BasicSchool}" +
             $"\nAdvanced Field: {character.AdvancedSchool}" +
             $"\nSpecialist Field: {character.SpecialSchool}" +
-            $"\nReal Life: {character.RealLife}";
+            $"\nCareers: {string.Join(" -> ", character.RealLifeHistory)}";
         return character;
     }
 
-    private ModuleSelection CreateSelection(LifePathModule module)
+    private ModuleSelection CreateSelection(SelectedModule selectedModule)
     {
+        var module = selectedModule.Module;
         var choices = new Dictionary<string, IReadOnlyList<string>>();
         var allocations = new Dictionary<string, IReadOnlyList<ChoiceAllocation>>();
         foreach (var choice in module.Choices)
         {
-            if (!choiceControls.TryGetValue(Key(module, choice), out var input))
+            if (!choiceControls.TryGetValue(
+                    Key(selectedModule, choice), out var input))
             {
                 throw new InvalidOperationException(
                     $"{module.Name}: choices are still loading. Please try again.");
@@ -526,20 +550,58 @@ public partial class CharacterWizardWindow : Window
 
     private IEnumerable<LifePathModule> SelectedModules()
     {
-        if (SelectedAffiliation is not null) yield return SelectedAffiliation;
-        if (SelectedSubAffiliation is not null) yield return SelectedSubAffiliation;
-        if (SelectedCaste is not null) yield return SelectedCaste;
-        if (SelectedChildhood is not null) yield return SelectedChildhood;
-        if (SelectedLateChildhood is not null) yield return SelectedLateChildhood;
-        if (SelectedSchool is not null) yield return SelectedSchool;
-        if (SelectedBasicField is not null) yield return SelectedBasicField;
-        if (SelectedAdvancedField is not null) yield return SelectedAdvancedField;
-        if (SelectedSpecialistField is not null) yield return SelectedSpecialistField;
-        if (SelectedRealLife is not null) yield return SelectedRealLife;
+        return SelectedModuleEntries().Select(entry => entry.Module);
     }
 
-    private static string Key(LifePathModule module, ModuleChoice choice) =>
-        $"{module.Id}:{choice.Id}";
+    private IEnumerable<SelectedModule> SelectedModuleEntries()
+    {
+        var occurrences = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (var entry in new[]
+                 {
+                     (SelectedAffiliation, false),
+                     (SelectedSubAffiliation, false),
+                     (SelectedCaste, false),
+                     (SelectedChildhood, false),
+                     (SelectedLateChildhood, false),
+                     (SelectedSchool, false),
+                     (SelectedBasicField, false),
+                     (SelectedAdvancedField, false),
+                     (SelectedSpecialistField, false),
+                     (SelectedRealLife, true),
+                     (SelectedSecondRealLife, true)
+                 })
+        {
+            if (entry.Item1 is null) continue;
+            occurrences.TryGetValue(entry.Item1.Id, out var occurrence);
+            yield return new SelectedModule(entry.Item1, occurrence, entry.Item2);
+            occurrences[entry.Item1.Id] = occurrence + 1;
+        }
+    }
+
+    private static void ApplyCareerState(Character character, string career)
+    {
+        if (career.StartsWith("Clan Warrior Washout - ",
+                StringComparison.Ordinal))
+        {
+            character.ClanCaste =
+                career["Clan Warrior Washout - ".Length..];
+        }
+        if (career == "Dark Caste")
+        {
+            character.ClanCaste = "Dark Caste";
+        }
+    }
+
+    private static string Key(
+        SelectedModule module,
+        ModuleChoice choice) =>
+        Key(module.Module, choice, module.Occurrence);
+
+    private static string Key(
+        LifePathModule module,
+        ModuleChoice choice,
+        int occurrence) =>
+        $"{module.Id}:{occurrence}:{choice.Id}";
 
     private void Create_Click(object sender, RoutedEventArgs e)
     {

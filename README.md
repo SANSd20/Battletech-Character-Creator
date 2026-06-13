@@ -10,6 +10,8 @@ The new Create flow includes affiliations, early and late childhood, higher
 education, basic, advanced, and specialist education fields, and the first
 46 Stage 4 real-life module variants. Module effects and choices are implemented
 in the Core library so the remaining Stage 4 modules can reuse the same engine.
+The wizard supports two ordered careers, including legal repeat modules and
+career-to-career prerequisites.
 
 Rules are verified against *A Time of War: The BattleTech RPG, Corrected Third
 Printing*. See `docs/RULES_SOURCE.md` for the authoritative page map and

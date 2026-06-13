@@ -90,11 +90,12 @@ single-affiliation model does not yet add their required birth affiliation and
 its XP cost. The order's own 50 XP cost and effects are preserved.
 
 Selecting Dark Caste changes the final Clan caste to Dark Caste. The current
-single-Stage-4 wizard treats that selection as the act of leaving Clan society.
-The Clan Organized Crime path is available for loaded or future multi-Stage-4
-characters already marked as Dark Caste; the current wizard cannot select both
-Dark Caste and Organized Crime in one creation pass.
-Solaris Insider repeat penalties are not yet represented because the wizard
-currently records only one Stage 4 module.
-Solaris VII Games repeat penalties and qualification through a prior Tour of
-Duty likewise require the planned multi-Stage-4 model.
+wizard treats that selection as the act of leaving Clan society. A second
+career may follow it, including the Clan Dark Caste Organized Crime path.
+
+Characters preserve an ordered Stage 4 career history in the legacy file
+format. The rules engine applies only Skill and Flexible XP when a repeatable
+module is selected again, rejects non-repeatable modules, and recognizes prior
+Tour of Duty and Dark Caste careers for later prerequisites. The creation
+wizard exposes two ordered Stage 4 career selectors, including repeated
+careers where the module permits them.

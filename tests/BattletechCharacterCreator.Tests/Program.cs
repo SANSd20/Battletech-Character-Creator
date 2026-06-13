@@ -513,6 +513,23 @@ static void CheckRealLifeModules()
         "A repeated Stage 4 module must not award fixed Trait XP.");
     Assert(repeatedAgitator.Skills.Count > 0,
         "A repeated Stage 4 module must still award Skill and Flexible XP.");
+    var nonRepeatableCareer = LifePathCatalog.RealLifeModules.Single(module =>
+        module.Name == "Postgraduate Studies");
+    var nonRepeatableCareerRejected = false;
+    try
+    {
+        var returningGraduate = new Character();
+        returningGraduate.RealLifeHistory.Add(nonRepeatableCareer.Name);
+        LifePathEngine.ApplyStage4(returningGraduate, new ModuleSelection(
+            nonRepeatableCareer,
+            new Dictionary<string, IReadOnlyList<string>>()));
+    }
+    catch (InvalidOperationException)
+    {
+        nonRepeatableCareerRejected = true;
+    }
+    Assert(nonRepeatableCareerRejected,
+        "A non-repeatable Stage 4 module must reject a second selection.");
 
     var covertModules = LifePathCatalog.RealLifeModules
         .Where(module => module.Id.StartsWith("real-covert-", StringComparison.Ordinal))
@@ -1179,6 +1196,28 @@ static void CheckRealLifeModules()
     Assert(gladiator.Traits.Count(trait =>
             trait.Name is "Custom Vehicle" or "Design Quirk" or "Equipped") == 3,
         "Solaris VII Games must apply all three selected arena assets.");
+    var veteranGladiator = new Character
+    {
+        Affiliation = "Federated Suns",
+        RealLife = solarisGames.Name
+    };
+    veteranGladiator.RealLifeHistory.Add("Tour of Duty - Inner Sphere");
+    veteranGladiator.RealLifeHistory.Add(solarisGames.Name);
+    Assert(!PrerequisiteRules.Evaluate(veteranGladiator)
+            .Any(issue => issue.Category == "Training"),
+        "A prior Tour of Duty must satisfy Solaris VII Games training.");
+
+    var careerHistoryCriminal = new Character
+    {
+        Affiliation = "Invading Clan",
+        RealLife = "Organized Crime - Clan Dark Caste"
+    };
+    careerHistoryCriminal.RealLifeHistory.Add("Dark Caste");
+    careerHistoryCriminal.RealLifeHistory.Add(
+        "Organized Crime - Clan Dark Caste");
+    Assert(!PrerequisiteRules.Evaluate(careerHistoryCriminal)
+            .Any(issue => issue.Category == "Caste"),
+        "A prior Dark Caste career must unlock Clan Organized Crime.");
 
     var untrainedGladiator = new Character
     {
