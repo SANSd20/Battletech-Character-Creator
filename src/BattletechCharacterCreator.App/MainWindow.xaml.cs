@@ -17,8 +17,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private CharacterSummary summary;
     private IReadOnlyList<PrerequisiteIssue> prerequisiteIssues = [];
 
-    public MainWindow()
+    public MainWindow() : this(new Character())
     {
+    }
+
+    public MainWindow(Character initialCharacter)
+    {
+        character = initialCharacter;
         var resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
         Catalog = ResourceCatalog.Load(resourcePath);
         summary = CharacterRules.Calculate(character);

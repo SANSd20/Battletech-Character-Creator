@@ -24,6 +24,20 @@ public partial class App : Application
             return;
         }
 
-        new MainWindow().Show();
+        if (e.Args.Contains("--smoke-start", StringComparer.Ordinal))
+        {
+            var start = new StartWindow();
+            start.Loaded += (_, _) => start.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    start.Close();
+                    Shutdown(0);
+                });
+            start.Show();
+            return;
+        }
+
+        new StartWindow().Show();
     }
 }
