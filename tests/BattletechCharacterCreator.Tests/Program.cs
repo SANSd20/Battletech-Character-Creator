@@ -1,5 +1,6 @@
 using BattletechCharacterCreator.Core.Models;
 using BattletechCharacterCreator.Core.Persistence;
+using BattletechCharacterCreator.Core.Resources;
 using BattletechCharacterCreator.Core.Rules;
 using BattletechCharacterCreator.Core.LifePath;
 
@@ -42,6 +43,8 @@ Assert(loaded.BirthAffiliation == character.BirthAffiliation &&
     loaded.BirthSubAffiliation == character.BirthSubAffiliation,
     "Order birth affiliation details must round-trip.");
 
+CheckResourceCatalog();
+
 Assert(CharacterRules.AttributeValue(99) == 1, "Sub-100 attributes have value 1.");
 Assert(CharacterRules.AttributeValue(400) == 4, "Attribute XP converts to its value.");
 Assert(CharacterRules.LinkModifier(7) == 1, "Attribute values convert to link modifiers.");
@@ -69,6 +72,42 @@ Console.WriteLine("All migration tests passed.");
 static void Assert(bool condition, string message)
 {
     if (!condition) throw new InvalidOperationException(message);
+}
+
+static void CheckResourceCatalog()
+{
+    var resources = Path.Combine(AppContext.BaseDirectory, "Resources");
+    var catalog = ResourceCatalog.Load(resources);
+    Assert(catalog.Equipment.Count == 187,
+        "All 187 legacy equipment entries must be imported.");
+    Assert(catalog.Weapons.Count == 209,
+        "All 209 legacy weapon entries must be imported.");
+    Assert(catalog.Skills.Count == 92 &&
+        catalog.Traits.Count == 76 &&
+        catalog.Careers.Count == 26,
+        "Skill, trait, and career reference catalogs must be complete.");
+    Assert(catalog.SkillDescriptions.Count == 92 &&
+        catalog.TraitDescriptions.Count == 56,
+        "All available skill and trait descriptions must be imported.");
+    Assert(catalog.Equipment.Any(item =>
+            item.Category == "persarmor" &&
+            item.Name == "Flak/Jacket" &&
+            item.Armor == "1/5/1/3") &&
+        catalog.Weapons.Any(item =>
+            item.Category == "archmelee" &&
+            item.Name == "Katana" &&
+            item.Skill == "Melee Weapons"),
+        "Equipment and weapon fields must retain their source values.");
+    Assert(catalog.Skills.Single(item =>
+            item.Name == "Animal Handling/Riding").Subskills.Contains("Riding") &&
+        catalog.Skills.Single(item =>
+            item.Name == "Acting").Description.Contains("Acting Skill"),
+        "Skill descriptions and subskills must be linked to their entries.");
+    Assert(catalog.Traits.Single(item =>
+            item.Name == "Alternate ID").Reference == "p.108" &&
+        catalog.Traits.Single(item =>
+            item.Name == "Ambidextrous").Description.Contains("both hands"),
+        "Trait references and descriptions must be linked to their entries.");
 }
 
 static void CheckSample(

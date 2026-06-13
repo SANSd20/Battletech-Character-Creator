@@ -7,6 +7,12 @@
     <ProjectReference Include="..\..\src\BattletechCharacterCreator.Core\BattletechCharacterCreator.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\resource\*.dat">
+      <Link>Resources\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="..\..\newchar.btcc" Link="Samples\newchar.btcc" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\test.btcc" Link="Samples\test.btcc" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\lisa.btcc" Link="Samples\lisa.btcc" CopyToOutputDirectory="PreserveNewest" />

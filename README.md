@@ -14,6 +14,8 @@ The wizard supports two ordered careers, including legal repeat modules and
 career-to-career prerequisites.
 ComStar and Word of Blake characters also select a full-cost birth affiliation.
 All 68 corrected Stage 0 sub-affiliation XP packages are included.
+The legacy equipment, weapon, skill, trait, career, subskill, and description
+catalogs are imported as structured .NET data for the editor.
 
 Rules are verified against *A Time of War: The BattleTech RPG, Corrected Third
 Printing*. See `docs/RULES_SOURCE.md` for the authoritative page map and
