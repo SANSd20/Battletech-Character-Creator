@@ -29,6 +29,20 @@
                     <TextBlock x:Name="AffiliationDescription" TextWrapping="Wrap"
                                Foreground="#555555" Margin="0,3,12,8"/>
 
+                    <StackPanel x:Name="BirthAffiliationPanel">
+                        <TextBlock Text="Birth affiliation"/>
+                        <ComboBox x:Name="BirthAffiliationPicker" DisplayMemberPath="Name"
+                                  SelectionChanged="BirthAffiliationSelectionChanged"/>
+                        <TextBlock x:Name="BirthAffiliationDescription" TextWrapping="Wrap"
+                                   Foreground="#555555" Margin="0,3,12,8"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="BirthSubAffiliationPanel">
+                        <TextBlock Text="Birth sub-affiliation"/>
+                        <ComboBox x:Name="BirthSubAffiliationPicker" DisplayMemberPath="Name"
+                                  SelectionChanged="DependentSelectionChanged"/>
+                    </StackPanel>
+
                     <StackPanel x:Name="SubAffiliationPanel">
                         <TextBlock Text="Sub-affiliation"/>
                         <ComboBox x:Name="SubAffiliationPicker" DisplayMemberPath="Name"

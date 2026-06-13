@@ -12,6 +12,7 @@ education, basic, advanced, and specialist education fields, and the first
 in the Core library so the remaining Stage 4 modules can reuse the same engine.
 The wizard supports two ordered careers, including legal repeat modules and
 career-to-career prerequisites.
+ComStar and Word of Blake characters also select a full-cost birth affiliation.
 
 Rules are verified against *A Time of War: The BattleTech RPG, Corrected Third
 Printing*. See `docs/RULES_SOURCE.md` for the authoritative page map and

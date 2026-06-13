@@ -21,6 +21,8 @@ character.Weapons.Add(new WeaponItem
     AmmoCost = "5", AmmoMass = "0.25", Notes = "Burst 5", Count = "1"
 });
 character.RealLife = "Solaris VII Games";
+character.BirthAffiliation = "Federated Suns";
+character.BirthSubAffiliation = "Crucis March";
 character.RealLifeHistory.Add("Tour of Duty - Inner Sphere");
 character.RealLifeHistory.Add("Solaris VII Games");
 
@@ -36,6 +38,9 @@ Assert(loaded.Equipment.Single().Notes == "p.292", "All seven equipment fields m
 Assert(loaded.Weapons.Single().Notes == "Burst 5", "All eleven weapon fields must round-trip.");
 Assert(loaded.RealLifeHistory.SequenceEqual(character.RealLifeHistory),
     "Stage 4 career history must round-trip in order.");
+Assert(loaded.BirthAffiliation == character.BirthAffiliation &&
+    loaded.BirthSubAffiliation == character.BirthSubAffiliation,
+    "Order birth affiliation details must round-trip.");
 
 Assert(CharacterRules.AttributeValue(99) == 1, "Sub-100 attributes have value 1.");
 Assert(CharacterRules.AttributeValue(400) == 4, "Attribute XP converts to its value.");
@@ -718,6 +723,27 @@ static void CheckRealLifeModules()
         comStarAffiliation.ProtocolSkill == "Protocol/ComStar" &&
         wordAffiliation.ProtocolSkill == "Protocol/Word of Blake",
         "ComStar and Word of Blake order affiliations must use the corrected 50 XP cost.");
+    var fedSunsBirth = LifePathCatalog.Affiliations
+        .Single(module => module.Id == "fed-suns");
+    var orderCharacter = new Character
+    {
+        Affiliation = "ComStar",
+        BirthAffiliation = fedSunsBirth.Name
+    };
+    LifePathEngine.Apply(orderCharacter, SelectDefaults(fedSunsBirth));
+    LifePathEngine.Apply(orderCharacter, SelectDefaults(comStarAffiliation));
+    Assert(LifePathEngine.CalculateModuleCost(
+            [fedSunsBirth, comStarAffiliation]) ==
+        LifePathEngine.UniversalModuleCost +
+        fedSunsBirth.ModuleCost + comStarAffiliation.ModuleCost,
+        "Order characters must pay the full birth and Order affiliation costs.");
+    Assert(orderCharacter.Attributes.Single(attribute =>
+            attribute.Name == "WIL").Value == 85 &&
+        orderCharacter.Attributes.Single(attribute =>
+            attribute.Name == "INT").Value == 125 &&
+        orderCharacter.PreAttributes.Any(attribute =>
+            attribute.Name == "INT" && attribute.Value == 400),
+        "Order characters must receive full effects from both affiliations.");
 
     var comStarService = LifePathCatalog.RealLifeModules
         .Single(module => module.Id == "real-comstar-service");

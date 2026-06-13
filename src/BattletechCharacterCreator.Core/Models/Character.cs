@@ -7,6 +7,8 @@ public sealed class Character
     public string Name { get; set; } = "New Character";
     public string Affiliation { get; set; } = "";
     public string SubAffiliation { get; set; } = "";
+    public string BirthAffiliation { get; set; } = "";
+    public string BirthSubAffiliation { get; set; } = "";
     public string ClanCaste { get; set; } = "";
     public string ClanTrainingField { get; set; } = "";
     public string EarlyChildhood { get; set; } = "";

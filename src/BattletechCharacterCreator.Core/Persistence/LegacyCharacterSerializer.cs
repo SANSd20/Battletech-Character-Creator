@@ -78,6 +78,8 @@ public static class LegacyCharacterSerializer
         WriteValue(writer, "name", c.Name);
         WriteValue(writer, "aff", c.Affiliation);
         WriteValue(writer, "subaff", c.SubAffiliation);
+        WriteValue(writer, "birthaff", c.BirthAffiliation);
+        WriteValue(writer, "birthsubaff", c.BirthSubAffiliation);
         WriteValue(writer, "clancaste", c.ClanCaste);
         WriteValue(writer, "clantraining", c.ClanTrainingField);
         WriteValue(writer, "earlychild", c.EarlyChildhood);
@@ -144,6 +146,8 @@ public static class LegacyCharacterSerializer
             case "name": c.Name = value; break;
             case "aff": c.Affiliation = value; break;
             case "subaff": c.SubAffiliation = value; break;
+            case "birthaff": c.BirthAffiliation = value; break;
+            case "birthsubaff": c.BirthSubAffiliation = value; break;
             case "clancaste": c.ClanCaste = value; break;
             case "clantraining": c.ClanTrainingField = value; break;
             case "earlychild": c.EarlyChildhood = value; break;

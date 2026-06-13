@@ -85,9 +85,9 @@ Each implemented module includes its corrected cost, time, fixed awards,
 specialty choices, flexible-XP restrictions, affiliation context, and currently
 enforceable prerequisites.
 
-ComStar and Word of Blake order affiliations are available, but the wizard's
-single-affiliation model does not yet add their required birth affiliation and
-its XP cost. The order's own 50 XP cost and effects are preserved.
+ComStar and Word of Blake characters select a separate birth affiliation.
+Unlike an ordinary affiliation change, both modules retain their full XP cost
+and effects, as required by the corrected printing.
 
 Selecting Dark Caste changes the final Clan caste to Dark Caste. The current
 wizard treats that selection as the act of leaving Clan society. A second
