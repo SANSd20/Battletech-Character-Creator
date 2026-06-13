@@ -157,9 +157,37 @@ static void CheckExpandedLifePaths()
         .SelectMany(module => module.SubAffiliations ?? [])
         .ToArray();
     Assert(allSubAffiliations.Length == 68,
-        "Every legacy sub-affiliation must be available.");
+        "All 68 corrected sub-affiliations must be available.");
     Assert(allSubAffiliations.All(module => module.Effects.Count > 0 || module.Choices.Count > 0),
-        "Every sub-affiliation must provide its legacy modifiers.");
+        "Every sub-affiliation must provide its corrected modifiers.");
+    var correctedNames = new[]
+    {
+        "Capellan March", "Crucis March", "Draconis March", "Outback",
+        "Capellan Commonality", "Liao Commonality", "Sian Commonality",
+        "St. Ives Commonality", "Victoria Commonality", "Azami",
+        "Benjamin District", "Dieron District",
+        "New Samarkand (Galedon) District", "Pesht District",
+        "Marik Commonwealth", "Principality of Regulus", "Duchy of Oriente",
+        "Duchy of Andurien", "Other FWL Worlds", "Alarion Province",
+        "Bolan Province", "Coventry Province", "Donegal Province",
+        "Skye Province", "Clan War Expatriate", "Ghost Bear Dominion",
+        "Fiefdom of Randis", "Franklin Fiefs", "Mica Majority",
+        "Niops Association", "Rim Collection", "Circinus Federation",
+        "Magistracy of Canopus", "Marian Hegemony", "Outworlds Alliance",
+        "Taurian Concordat", "Hanseatic League", "Castilian Principalities",
+        "Umayyad Caliphate", "JàrnFòlk", "Diamond Shark", "Ghost Bear",
+        "Hell's Horses", "Jade Falcon", "Nova Cat", "Snow Raven", "Wolf",
+        "Blood Spirit", "Cloud Cobra", "Coyote", "Fire Mandrill",
+        "Goliath Scorpion", "Ice Hellion", "Star Adder", "Steel Viper",
+        "Belter", "Lunar Citizen", "Martian Citizen",
+        "Outer System Citizen", "Terran Citizen", "Venusian Citizen",
+        "Antallos", "Astrokaszy", "Generic", "Mercenary", "Pirate",
+        "Spacer", "Tortuga"
+    };
+    Assert(correctedNames.Length == 68 &&
+        correctedNames.All(name => allSubAffiliations.Any(module =>
+            module.Name == name)),
+        "The catalog must match the complete corrected sub-affiliation inventory.");
 
     CheckSubAffiliation("fed-suns", "Capellan March", "WIL", 40, "Connections", 25);
     CheckSubAffiliation("major-periphery", "Taurian Concordat", "WIL", 150,
@@ -169,6 +197,63 @@ static void CheckExpandedLifePaths()
     CheckSubAffiliation("terran", "Terran Citizen", "EDG", -100, "Connections", 100);
     CheckSubAffiliation("independent", "Spacer", "DEX", 10,
         "G-Tolerance", 20);
+
+    var stIves = FindSubAffiliation("capellan", "St. Ives Commonality");
+    Assert(!stIves.Effects.Any(effect => effect.Name == "Connections"),
+        "St. Ives must not receive the legacy Connections award.");
+    var azami = FindSubAffiliation("draconis", "Azami");
+    Assert(azami.Effects.Any(effect =>
+            effect.Target == EffectTarget.Attribute &&
+            effect.Name == "WIL" && effect.Xp == 190) &&
+        !azami.Effects.Any(effect => effect.Name == "Thick-Skinned"),
+        "Azami modifiers must match the corrected printing.");
+
+    var minorPeriphery = LifePathCatalog.Affiliations
+        .Single(module => module.Id == "minor-periphery");
+    var majorPeriphery = LifePathCatalog.Affiliations
+        .Single(module => module.Id == "major-periphery");
+    var deepPeriphery = LifePathCatalog.Affiliations
+        .Single(module => module.Id == "deep-periphery");
+    Assert(minorPeriphery.Choices.Single(choice => choice.Id == "flex") is
+        { Xp: 25, Count: 3, FixedFlexibleSelections: true } &&
+        majorPeriphery.ModuleCost == 100 &&
+        majorPeriphery.Choices.Single(choice => choice.Id == "flex") is
+        { Xp: 15, Count: 3, FixedFlexibleSelections: true } &&
+        deepPeriphery.Choices.Single(choice => choice.Id == "flex") is
+        { Xp: 10, Count: 2, FixedFlexibleSelections: true },
+        "Periphery affiliation-wide flexible pools must match the corrected tables.");
+    Assert(FindSubAffiliation("major-periphery", "Circinus Federation")
+            .Choices.Single(choice => choice.Id == "skills").Xp == 20 &&
+        FindSubAffiliation("deep-periphery", "Hanseatic League").Effects.Any(effect =>
+            effect.Name == "Compulsion/Distrust Lyrans" && effect.Xp == -20),
+        "Major and Deep Periphery sub-affiliation corrections must be preserved.");
+
+    Assert(FindSubAffiliation("invading-clan", "Wolf")
+            .Choices.Single(choice => choice.Id == "skills") is
+        { Xp: 10, Count: 2 } &&
+        FindSubAffiliation("homeworld-clan", "Fire Mandrill").Choices.Count == 5 &&
+        FindSubAffiliation("homeworld-clan", "Star Adder")
+            .Choices.Single(choice => choice.Id == "compulsion").Xp == -60,
+        "Clan selectable awards must match the corrected printing.");
+
+    var lunar = FindSubAffiliation("terran", "Lunar Citizen");
+    var venusian = FindSubAffiliation("terran", "Venusian Citizen");
+    Assert(lunar.Effects.Any(effect =>
+            effect.Name == "WIL" && effect.Xp == 65) &&
+        lunar.Choices.Any(choice =>
+            choice.Id == "technician" && choice.Xp == 5) &&
+        venusian.Effects.Any(effect =>
+            effect.Name == "WIL" && effect.Xp == 110) &&
+        !venusian.Effects.Any(effect => effect.Name == "Thick-Skinned"),
+        "Terran sub-affiliation values must match the corrected printing.");
+
+    var astrokaszy = FindSubAffiliation("independent", "Astrokaszy");
+    var generic = FindSubAffiliation("independent", "Generic");
+    Assert(astrokaszy.Effects.Any(effect =>
+            effect.Name == "WIL" && effect.Xp == 25) &&
+        astrokaszy.Choices.Single(choice => choice.Id == "skills").Xp == 15 &&
+        generic.Choices.Single(choice => choice.Id == "skills").Count == 4,
+        "Independent sub-affiliation awards must match the corrected printing.");
 
     var street = LifePathCatalog.Childhoods.Single(module => module.Id == "street");
     var character = LifePathEngine.CreateBase("Mara", "Language/English");
@@ -204,6 +289,14 @@ static void CheckExpandedLifePaths()
             .Any(issue => issue.Category == "Affiliation"),
         "Trueborn Creche must require a Clan affiliation.");
 }
+
+static LifePathModule FindSubAffiliation(
+    string affiliationId,
+    string subAffiliationName) =>
+    LifePathCatalog.Affiliations
+        .Single(module => module.Id == affiliationId)
+        .SubAffiliations!
+        .Single(module => module.Name == subAffiliationName);
 
 static void CheckSubAffiliation(
     string affiliationId,

@@ -50,6 +50,14 @@ values, prerequisites, choices, terminology, or stage behavior disagree.
 11. Repeating the same Stage 4 module awards only its Skill and Flexible XP;
     its Attribute and Trait XP apply only on the first selection.
 
+## Stage 0 Audit
+
+All 68 sub-affiliations in the corrected printing are represented by name and
+their fixed and selectable XP awards have been audited against printed pages
+64-73. Affiliation-wide flexible XP for Minor Periphery, Major Periphery State,
+and Deep Periphery is also implemented. Restrictions described only in module
+notes remain part of the ongoing prerequisite audit.
+
 ## Stage 4 Progress
 
 The corrected Stage 4 catalog currently includes:
