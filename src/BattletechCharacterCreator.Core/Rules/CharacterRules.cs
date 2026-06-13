@@ -1,0 +1,210 @@
+using BattletechCharacterCreator.Core.Models;
+
+namespace BattletechCharacterCreator.Core.Rules;
+
+public static class CharacterRules
+{
+    private static readonly int[] SkillThresholds = [30, 50, 80, 120, 170, 230, 300, 380, 470, 570];
+
+    private static readonly Dictionary<string, (int Min, int Max)> TraitLimits = new(StringComparer.Ordinal)
+    {
+        ["Alternate ID"] = (0, 2),
+        ["Animal Antipathy"] = (-1, 0),
+        ["Animal Empathy"] = (0, 1),
+        ["Attractive"] = (0, 2),
+        ["Bloodmark"] = (-5, 0),
+        ["Combat Paralysis"] = (-4, 0),
+        ["Combat Sense"] = (0, 4),
+        ["Connections"] = (1, 10),
+        ["Custom Vehicle"] = (0, 6),
+        ["Dark Secret"] = (-5, 0),
+        ["Dependent"] = (-2, 0),
+        ["Design Quirk"] = (-5, 5),
+        ["Enemy"] = (-10, 0),
+        ["Equipped"] = (-1, 8),
+        ["Extra Income"] = (-10, 10),
+        ["Fast Learner"] = (0, 3),
+        ["Fit"] = (0, 2),
+        ["G-Tolerance"] = (0, 1),
+        ["Glass Jaw"] = (-3, 0),
+        ["Good Hearing"] = (0, 1),
+        ["Good Vision"] = (0, 1),
+        ["Gregarious"] = (0, 1),
+        ["Gremlins"] = (-3, 0),
+        ["Handicap"] = (-5, -1),
+        ["Illiterate"] = (-1, 0),
+        ["Impatient"] = (-1, 0),
+        ["Implant/Prosthetic"] = (0, 6),
+        ["In For Life"] = (-3, 0),
+        ["Introvert"] = (-1, 0),
+        ["Lost Limb"] = (-5, -1),
+        ["Pain Resistance"] = (0, 3),
+        ["Patient"] = (0, 1),
+        ["Phenotype"] = (0, 0),
+        ["Poison Resistance"] = (0, 2),
+        ["Poor Hearing"] = (-5, -1),
+        ["Poor Vision"] = (-9, -2),
+        ["Property"] = (0, 10),
+        ["Rank"] = (0, 15),
+        ["Reputation"] = (-5, 5),
+        ["Sixth Sense"] = (0, 4),
+        ["Slow Learner"] = (-3, 0),
+        ["Tech Empathy"] = (0, 3),
+        ["Thick-Skinned"] = (0, 1),
+        ["Thin-Skinned"] = (-1, 0),
+        ["TDS"] = (-1, 0),
+        ["Unattractive"] = (-1, 0),
+        ["Unlucky"] = (-10, -2),
+        ["Vehicle"] = (0, 12),
+        ["Wealth"] = (-1, 10)
+    };
+
+    public static CharacterSummary Calculate(Character character, int startingXp = 5000)
+    {
+        var attributeXp = character.Attributes.Sum(item => item.Value);
+        var skillXp = character.Skills.Sum(item => item.Value);
+        var traitXp = character.Traits.Sum(item => item.Value);
+        var spentXp = attributeXp + skillXp + traitXp;
+
+        var strength = FindValue(character.Attributes, "STR");
+        var reflexes = FindValue(character.Attributes, "RFL");
+        var walk = AttributeValue(strength) + AttributeValue(reflexes);
+        var run = 10 + walk + SkillLevel(FindValue(character.Skills, "Running"), character.Traits);
+        var climb = DivideRoundUp(walk, 2) +
+            SkillLevel(FindValue(character.Skills, "Climbing"), character.Traits);
+        var crawl = DivideRoundUp(walk, 4);
+        var swim = walk + SkillLevel(FindValue(character.Skills, "Swimming"), character.Traits);
+
+        var wealthXp = FindValue(character.Traits, "Wealth");
+        var wealthLevel = TraitLevel("Wealth", wealthXp);
+        var startingCBills = StartingCBills(wealthLevel) + character.CBillModifier;
+        var inventoryCost = character.Equipment.Sum(item => ParseNumber(item.Cost)) +
+            character.Weapons.Sum(item => ParseNumber(item.Cost));
+        var inventoryMass = character.Equipment.Sum(item => ParseDecimal(item.Mass)) +
+            character.Weapons.Sum(item => ParseDecimal(item.Mass));
+        var capacity = CarryingCapacity(strength);
+
+        return new CharacterSummary(
+            attributeXp,
+            skillXp,
+            traitXp,
+            spentXp,
+            startingXp - spentXp - character.GmXpModifier,
+            wealthLevel,
+            startingCBills - inventoryCost,
+            capacity,
+            inventoryMass,
+            capacity - inventoryMass,
+            walk,
+            run,
+            run * 2,
+            climb,
+            crawl,
+            swim);
+    }
+
+    public static int AttributeValue(int xp) => xp < 100 ? 1 : xp / 100;
+
+    public static int LinkModifier(int attributeValue) => attributeValue switch
+    {
+        <= 1 => -2,
+        <= 3 => -1,
+        <= 6 => 0,
+        <= 9 => 1,
+        _ => 2
+    };
+
+    public static decimal CarryingCapacity(int strengthXp) => strengthXp switch
+    {
+        < 100 => 0.1m,
+        < 200 => 5m,
+        < 300 => 10m,
+        < 400 => 15m,
+        < 500 => 20m,
+        < 600 => 30m,
+        < 700 => 40m,
+        < 800 => 55m,
+        < 900 => 70m,
+        < 1000 => 85m,
+        _ => 100m
+    };
+
+    public static int SkillLevel(int xp, IEnumerable<NamedValue> traits)
+    {
+        var multiplier = 1.0;
+        if (FindValue(traits, "Fast Learner") >= 300) multiplier -= 0.2;
+        if (FindValue(traits, "Slow Learner") <= -300) multiplier += 0.2;
+
+        var level = 0;
+        foreach (var threshold in SkillThresholds)
+        {
+            if (xp < Math.Floor(threshold * multiplier)) break;
+            level++;
+        }
+        return level;
+    }
+
+    public static int TraitLevel(string name, int xp)
+    {
+        var level = (int)Math.Floor(xp / 100m);
+        if (name.StartsWith("Citizenship", StringComparison.Ordinal)) return Math.Clamp(level, 0, 2);
+        if (name.StartsWith("Compulsion", StringComparison.Ordinal)) return Math.Clamp(level, -5, 0);
+        if (name.StartsWith("Exceptional Attribute", StringComparison.Ordinal)) return Math.Clamp(level, 0, 2);
+        if (name.StartsWith("Title", StringComparison.Ordinal)) return Math.Clamp(level, 3, 10);
+        if (name.StartsWith("Natural Aptitude", StringComparison.Ordinal))
+        {
+            return level >= 5 ? 5 : level >= 3 ? 3 : 0;
+        }
+        if (name == "Design Quirk/Rumble Seat") return 0;
+        return TraitLimits.TryGetValue(name, out var limits)
+            ? Math.Clamp(level, limits.Min, limits.Max)
+            : level;
+    }
+
+    public static int StartingCBills(int wealthLevel) => wealthLevel switch
+    {
+        <= -1 => 100,
+        0 => 1_000,
+        1 => 2_500,
+        2 => 5_000,
+        3 => 10_000,
+        4 => 25_000,
+        5 => 50_000,
+        6 => 100_000,
+        7 => 250_000,
+        8 => 500_000,
+        9 => 1_000_000,
+        _ => 2_000_000
+    };
+
+    private static int FindValue(IEnumerable<NamedValue> values, string name) =>
+        values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;
+
+    private static int DivideRoundUp(int value, int divisor) =>
+        (int)Math.Ceiling(value / (double)divisor);
+
+    private static int ParseNumber(string value) =>
+        int.TryParse(value, out var parsed) ? parsed : 0;
+
+    private static decimal ParseDecimal(string value) =>
+        decimal.TryParse(value, System.Globalization.NumberStyles.Number,
+            System.Globalization.CultureInfo.InvariantCulture, out var parsed) ? parsed : 0m;
+}
+
+public sealed record CharacterSummary(
+    int AttributeXp,
+    int SkillXp,
+    int TraitXp,
+    int SpentXp,
+    int FreeXp,
+    int WealthLevel,
+    int RemainingCBills,
+    decimal CarryingCapacity,
+    decimal InventoryMass,
+    decimal RemainingCapacity,
+    int Walk,
+    int Run,
+    int Sprint,
+    int Climb,
+    int Crawl,
+    int Swim);

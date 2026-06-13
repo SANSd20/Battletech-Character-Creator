@@ -1,0 +1,152 @@
+<Window x:Class="BattletechCharacterCreator.App.CharacterWizardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Create Character" Width="920" Height="720"
+        MinWidth="760" MinHeight="580" WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Click="Cancel_Click">Cancel</Button>
+            <Button Click="Create_Click" IsDefault="True">Create Character</Button>
+        </StackPanel>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="360"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="Identity" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="Name"/>
+                    <TextBox x:Name="CharacterName" Text="New Character"/>
+
+                    <TextBlock Text="Affiliation" Margin="0,8,0,0"/>
+                    <ComboBox x:Name="AffiliationPicker" DisplayMemberPath="Name"
+                              SelectionChanged="ModuleSelectionChanged"/>
+                    <TextBlock x:Name="AffiliationDescription" TextWrapping="Wrap"
+                               Foreground="#555555" Margin="0,3,12,8"/>
+
+                    <StackPanel x:Name="SubAffiliationPanel">
+                        <TextBlock Text="Sub-affiliation"/>
+                        <ComboBox x:Name="SubAffiliationPicker" DisplayMemberPath="Name"
+                                  SelectionChanged="DependentSelectionChanged"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="CastePanel">
+                        <TextBlock Text="Clan caste"/>
+                        <ComboBox x:Name="CastePicker" DisplayMemberPath="Name"
+                                  SelectionChanged="DependentSelectionChanged"/>
+                    </StackPanel>
+
+                    <TextBlock Text="Primary language"/>
+                    <ComboBox x:Name="LanguagePicker" SelectionChanged="ChoiceSelectionChanged"/>
+
+                    <TextBlock Text="Early childhood" Margin="0,8,0,0"/>
+                    <ComboBox x:Name="ChildhoodPicker" DisplayMemberPath="Name"
+                              SelectionChanged="ModuleSelectionChanged"/>
+                    <TextBlock x:Name="ChildhoodDescription" TextWrapping="Wrap"
+                               Foreground="#555555" Margin="0,3,12,8"/>
+
+                    <TextBlock Text="Late childhood" Margin="0,8,0,0"/>
+                    <ComboBox x:Name="LateChildhoodPicker" DisplayMemberPath="Name"
+                              SelectionChanged="ModuleSelectionChanged"/>
+                    <TextBlock x:Name="LateChildhoodDescription" TextWrapping="Wrap"
+                               Foreground="#555555" Margin="0,3,12,8"/>
+
+                    <TextBlock Text="Education (optional)" Margin="0,8,0,0"/>
+                    <ComboBox x:Name="SchoolPicker" DisplayMemberPath="Name"
+                              SelectionChanged="SchoolSelectionChanged"/>
+                    <TextBlock x:Name="SchoolDescription" TextWrapping="Wrap"
+                               Foreground="#555555" Margin="0,3,12,8"/>
+
+                    <StackPanel x:Name="BasicFieldPanel">
+                        <TextBlock Text="Basic field"/>
+                        <ComboBox x:Name="BasicFieldPicker" DisplayMemberPath="Name"
+                                  SelectionChanged="DependentSelectionChanged"/>
+                    </StackPanel>
+                    <StackPanel x:Name="AdvancedFieldPanel">
+                        <TextBlock Text="Advanced field (optional)"/>
+                        <ComboBox x:Name="AdvancedFieldPicker" DisplayMemberPath="Name"
+                                  SelectionChanged="AdvancedFieldSelectionChanged"/>
+                    </StackPanel>
+                    <StackPanel x:Name="SpecialistFieldPanel">
+                        <TextBlock Text="Third field: advanced or specialist (optional)"/>
+                        <ComboBox x:Name="SpecialistFieldPicker" DisplayMemberPath="Name"
+                                  SelectionChanged="DependentSelectionChanged"/>
+                    </StackPanel>
+
+                    <TextBlock Text="Real life (optional)" Margin="0,8,0,0"/>
+                    <ComboBox x:Name="RealLifePicker" DisplayMemberPath="Name"
+                              SelectionChanged="RealLifeSelectionChanged"/>
+                    <TextBlock x:Name="RealLifeDescription" TextWrapping="Wrap"
+                               Foreground="#555555" Margin="0,3,12,8"/>
+
+                    <TextBlock Text="Required choices" FontSize="20" FontWeight="SemiBold"
+                               Margin="0,12,0,8"/>
+                    <StackPanel x:Name="ChoicesPanel"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.ColumnSpan="2" Text="Preview" FontSize="20"
+                               FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Grid.Row="1" Text="Module cost"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="ModuleCost"/>
+                    <TextBlock Grid.Row="2" Text="Allocated XP"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SpentXp"/>
+                    <TextBlock Grid.Row="3" Text="Free XP"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="FreeXp" FontWeight="Bold"/>
+                </Grid>
+
+                <TabControl Grid.Row="2">
+                    <TabItem Header="Attributes">
+                        <DataGrid x:Name="PreviewAttributes" AutoGenerateColumns="False"
+                                  IsReadOnly="True" CanUserAddRows="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Attribute" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <TabItem Header="Skills">
+                        <DataGrid x:Name="PreviewSkills" AutoGenerateColumns="False"
+                                  IsReadOnly="True" CanUserAddRows="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Skill" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <TabItem Header="Traits">
+                        <DataGrid x:Name="PreviewTraits" AutoGenerateColumns="False"
+                                  IsReadOnly="True" CanUserAddRows="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Trait" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

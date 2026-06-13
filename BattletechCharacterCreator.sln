@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattletechCharacterCreator.Core", "src\BattletechCharacterCreator.Core\BattletechCharacterCreator.Core.csproj", "{15F7205C-E139-48B2-B5A3-1E34A59827A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattletechCharacterCreator.App", "src\BattletechCharacterCreator.App\BattletechCharacterCreator.App.csproj", "{480E6E4B-10A1-4826-8237-35FE7255484D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattletechCharacterCreator.Tests", "tests\BattletechCharacterCreator.Tests\BattletechCharacterCreator.Tests.csproj", "{F33CF8CD-6732-49DA-B7E7-990BA1598660}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{15F7205C-E139-48B2-B5A3-1E34A59827A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15F7205C-E139-48B2-B5A3-1E34A59827A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15F7205C-E139-48B2-B5A3-1E34A59827A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15F7205C-E139-48B2-B5A3-1E34A59827A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{480E6E4B-10A1-4826-8237-35FE7255484D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{480E6E4B-10A1-4826-8237-35FE7255484D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{480E6E4B-10A1-4826-8237-35FE7255484D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{480E6E4B-10A1-4826-8237-35FE7255484D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F33CF8CD-6732-49DA-B7E7-990BA1598660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F33CF8CD-6732-49DA-B7E7-990BA1598660}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F33CF8CD-6732-49DA-B7E7-990BA1598660}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F33CF8CD-6732-49DA-B7E7-990BA1598660}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

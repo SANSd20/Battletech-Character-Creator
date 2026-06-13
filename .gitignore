@@ -1,0 +1,17 @@
+*.pro.user*
+bin/
+obj/
+.vs/
+*.user
+.appdata/
+.dotnet-home/
+debug/
+*.o
+*.exe
+Makefile
+Makefile.*
+object_script.*
+ui_*.h
+qrc_*.cpp
+msvcr*.dll
+t
