@@ -22,6 +22,21 @@
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="Foreground" Value="#555551"/>
         </Style>
+        <Style x:Key="XpButton" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="1,0"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style x:Key="XpRow" TargetType="DataGridRow">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsShort}" Value="True">
+                    <Setter Property="Background" Value="#FFF0D2"/>
+                    <Setter Property="ToolTip" Value="{Binding TargetText}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -183,7 +198,8 @@
                 </ScrollViewer>
             </Border>
 
-            <TabControl Grid.Column="1" Margin="18,14,18,18">
+            <TabControl x:Name="EditorTabs" Grid.Column="1" Margin="18,14,18,18"
+                        SelectionChanged="EditorTabs_SelectionChanged">
                 <TabItem Header="Summary">
                     <Grid Margin="14">
                         <Grid.RowDefinitions>
@@ -350,43 +366,184 @@
                 </TabItem>
 
                 <TabItem Header="Attributes">
-                    <DataGrid ItemsSource="{Binding Attributes}" AutoGenerateColumns="False"
-                              CanUserAddRows="False" Margin="8"
-                              CellEditEnding="DataGrid_CellEditEnding">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Attribute" Binding="{Binding Name}" IsReadOnly="True" Width="*"/>
-                            <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="140"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <Grid Margin="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="92"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Spend XP in 5-point increments. Highlighted rows have unmet prerequisites."
+                                       Foreground="#555551"
+                                       VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" BorderBrush="#A7A7A2"
+                                    BorderThickness="1" Padding="6,3">
+                                <StackPanel>
+                                    <TextBlock Text="FREE XP" Style="{StaticResource MetricLabel}"/>
+                                    <TextBlock Text="{Binding Summary.FreeXp}"
+                                               FontFamily="{StaticResource MontserratBlack}"
+                                               FontSize="17"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        <DataGrid x:Name="AttributesGrid" Grid.Row="2"
+                                  ItemsSource="{Binding AttributeRows}"
+                                  AutoGenerateColumns="False" CanUserAddRows="False"
+                                  IsReadOnly="True" RowStyle="{StaticResource XpRow}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Attribute" Binding="{Binding Name}"
+                                                    Width="*" MinWidth="280"/>
+                                <DataGridTextColumn Header="Value" Binding="{Binding Level}"
+                                                    Width="90" MinWidth="90"/>
+                                <DataGridTextColumn Header="Target" Binding="{Binding TargetText}"
+                                                    Width="150" MinWidth="150"/>
+                                <DataGridTemplateColumn Header="XP" Width="155" MinWidth="155">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="−" Style="{StaticResource XpButton}"
+                                                        ToolTip="Remove 5 XP" Tag="{Binding}"
+                                                        Click="DecreaseXp_Click"/>
+                                                <TextBlock Text="{Binding Xp}" Width="62"
+                                                           TextAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           FontWeight="SemiBold"/>
+                                                <Button Content="+" Style="{StaticResource XpButton}"
+                                                        ToolTip="Add 5 XP" Tag="{Binding}"
+                                                        Click="IncreaseXp_Click"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Skills">
                     <DockPanel Margin="8">
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <ComboBox x:Name="SkillPicker" ItemsSource="{Binding Catalog.SkillNames}" Width="300"/>
-                            <Button Click="AddSkill_Click">Add</Button>
-                            <Button Click="RemoveSkill_Click">Remove</Button>
-                        </StackPanel>
-                        <DataGrid x:Name="SkillsGrid" ItemsSource="{Binding Skills}" AutoGenerateColumns="False"
-                                  CellEditEnding="DataGrid_CellEditEnding">
+                        <Grid DockPanel.Dock="Top" Margin="0,0,0,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="230"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="92"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox x:Name="SkillPicker" ItemsSource="{Binding Catalog.SkillNames}" Width="285"/>
+                                <Button Click="AddSkill_Click">Add</Button>
+                                <Button Click="RemoveSkill_Click">Remove</Button>
+                            </StackPanel>
+                            <TextBox Grid.Column="2"
+                                     Text="{Binding SkillFilter, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Filter skills"
+                                     VerticalContentAlignment="Center"/>
+                            <Border Grid.Column="4" BorderBrush="#A7A7A2"
+                                    BorderThickness="1" Padding="6,2">
+                                <StackPanel>
+                                    <TextBlock Text="FREE XP" Style="{StaticResource MetricLabel}"/>
+                                    <TextBlock Text="{Binding Summary.FreeXp}"
+                                               FontFamily="{StaticResource MontserratBlack}"
+                                               FontSize="16"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        <DataGrid x:Name="SkillsGrid" ItemsSource="{Binding SkillRowsView}"
+                                  AutoGenerateColumns="False" CanUserAddRows="False"
+                                  IsReadOnly="True" RowStyle="{StaticResource XpRow}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Skill" Binding="{Binding Name}" Width="*"/>
-                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="140"/>
+                                <DataGridTextColumn Header="Skill" Binding="{Binding Name}"
+                                                    Width="*" MinWidth="280"/>
+                                <DataGridTextColumn Header="Level" Binding="{Binding Level}"
+                                                    Width="80" MinWidth="80"/>
+                                <DataGridTextColumn Header="Target" Binding="{Binding TargetText}"
+                                                    Width="150" MinWidth="150"/>
+                                <DataGridTemplateColumn Header="XP" Width="155" MinWidth="155">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="−" Style="{StaticResource XpButton}"
+                                                        ToolTip="Remove 5 XP" Tag="{Binding}"
+                                                        Click="DecreaseXp_Click"/>
+                                                <TextBlock Text="{Binding Xp}" Width="62"
+                                                           TextAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           FontWeight="SemiBold"/>
+                                                <Button Content="+" Style="{StaticResource XpButton}"
+                                                        ToolTip="Add 5 XP" Tag="{Binding}"
+                                                        Click="IncreaseXp_Click"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                     </DockPanel>
                 </TabItem>
                 <TabItem Header="Traits">
                     <DockPanel Margin="8">
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <ComboBox x:Name="TraitPicker" ItemsSource="{Binding Catalog.TraitNames}" Width="300"/>
-                            <Button Click="AddTrait_Click">Add</Button>
-                            <Button Click="RemoveTrait_Click">Remove</Button>
-                        </StackPanel>
-                        <DataGrid x:Name="TraitsGrid" ItemsSource="{Binding Traits}" AutoGenerateColumns="False"
-                                  CellEditEnding="DataGrid_CellEditEnding">
+                        <Grid DockPanel.Dock="Top" Margin="0,0,0,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="230"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="92"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox x:Name="TraitPicker" ItemsSource="{Binding Catalog.TraitNames}" Width="285"/>
+                                <Button Click="AddTrait_Click">Add</Button>
+                                <Button Click="RemoveTrait_Click">Remove</Button>
+                            </StackPanel>
+                            <TextBox Grid.Column="2"
+                                     Text="{Binding TraitFilter, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Filter traits"
+                                     VerticalContentAlignment="Center"/>
+                            <Border Grid.Column="4" BorderBrush="#A7A7A2"
+                                    BorderThickness="1" Padding="6,2">
+                                <StackPanel>
+                                    <TextBlock Text="FREE XP" Style="{StaticResource MetricLabel}"/>
+                                    <TextBlock Text="{Binding Summary.FreeXp}"
+                                               FontFamily="{StaticResource MontserratBlack}"
+                                               FontSize="16"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        <DataGrid x:Name="TraitsGrid" ItemsSource="{Binding TraitRowsView}"
+                                  AutoGenerateColumns="False" CanUserAddRows="False"
+                                  IsReadOnly="True" RowStyle="{StaticResource XpRow}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Trait" Binding="{Binding Name}" Width="*"/>
-                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="140"/>
+                                <DataGridTextColumn Header="Trait" Binding="{Binding Name}"
+                                                    Width="*" MinWidth="280"/>
+                                <DataGridTextColumn Header="Level" Binding="{Binding Level}"
+                                                    Width="80" MinWidth="80"/>
+                                <DataGridTextColumn Header="Target" Binding="{Binding TargetText}"
+                                                    Width="150" MinWidth="150"/>
+                                <DataGridTemplateColumn Header="XP" Width="155" MinWidth="155">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="−" Style="{StaticResource XpButton}"
+                                                        ToolTip="Remove 5 XP" Tag="{Binding}"
+                                                        Click="DecreaseXp_Click"/>
+                                                <TextBlock Text="{Binding Xp}" Width="62"
+                                                           TextAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           FontWeight="SemiBold"/>
+                                                <Button Content="+" Style="{StaticResource XpButton}"
+                                                        ToolTip="Add 5 XP" Tag="{Binding}"
+                                                        Click="IncreaseXp_Click"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                     </DockPanel>

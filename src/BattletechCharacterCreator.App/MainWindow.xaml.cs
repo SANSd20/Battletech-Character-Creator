@@ -1,8 +1,10 @@
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -22,6 +24,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private IReadOnlyList<PrerequisiteIssue> prerequisiteIssues = [];
     private string ruleStatus = "";
     private Brush ruleStatusBrush = Brushes.DarkGreen;
+    private string skillFilter = "";
+    private string traitFilter = "";
+
+    public ObservableCollection<XpEditorRow> AttributeRows { get; } = [];
+    public ObservableCollection<XpEditorRow> SkillRows { get; } = [];
+    public ObservableCollection<XpEditorRow> TraitRows { get; } = [];
+    public ICollectionView SkillRowsView { get; }
+    public ICollectionView TraitRowsView { get; }
 
     public MainWindow() : this(new Character())
     {
@@ -33,6 +43,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
         Catalog = ResourceCatalog.Load(resourcePath);
         summary = CharacterRules.Calculate(character);
+        SkillRowsView = CollectionViewSource.GetDefaultView(SkillRows);
+        SkillRowsView.Filter = MatchesSkillFilter;
+        TraitRowsView = CollectionViewSource.GetDefaultView(TraitRows);
+        TraitRowsView.Filter = MatchesTraitFilter;
         DataContext = this;
         InitializeComponent();
         UpdateFileStatus();
@@ -114,11 +128,28 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public int CharacterHeight { get => Character.Height; set => Character.Height = value; }
     public int Weight { get => Character.Weight; set => Character.Weight = value; }
     public string Notes { get => Character.Notes; set => Character.Notes = value; }
-    public object Attributes => Character.Attributes;
-    public object Skills => Character.Skills;
-    public object Traits => Character.Traits;
     public object Equipment => Character.Equipment;
     public object Weapons => Character.Weapons;
+    public string SkillFilter
+    {
+        get => skillFilter;
+        set
+        {
+            skillFilter = value ?? "";
+            OnPropertyChanged();
+            SkillRowsView.Refresh();
+        }
+    }
+    public string TraitFilter
+    {
+        get => traitFilter;
+        set
+        {
+            traitFilter = value ?? "";
+            OnPropertyChanged();
+            TraitRowsView.Refresh();
+        }
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -136,10 +167,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     public void SmokeXpAllocation()
     {
-        var bod = Character.Attributes.Single(item => item.Name == "BOD");
         var originalFreeXp = Summary.FreeXp;
-        bod.Value = 300;
-        Recalculate();
+        var bod = AttributeRows.Single(item => item.Name == "BOD");
+        var required = 300 - bod.Xp;
+        if (!AdjustXp(bod, required, false))
+        {
+            throw new InvalidOperationException(
+                "Editor XP allocation rejected an affordable Attribute increase.");
+        }
         if (Summary.FreeXp != originalFreeXp - 75 ||
             PrerequisiteIssues.Any(issue =>
                 issue.Category == "Attribute" && issue.Name == "BOD"))
@@ -147,6 +182,33 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             throw new InvalidOperationException(
                 "Editor XP allocation did not update totals and prerequisites.");
         }
+
+        var beforeRejectedSpend = bod.Xp;
+        if (AdjustXp(bod, Summary.FreeXp + 5, false) ||
+            bod.Xp != beforeRejectedSpend)
+        {
+            throw new InvalidOperationException(
+                "Editor XP allocation allowed spending beyond Free XP.");
+        }
+
+        SkillFilter = "Gunnery";
+        if (SkillRowsView.Cast<XpEditorRow>()
+            .Any(item => !item.Name.Contains("Gunnery",
+                StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException(
+                "Editor Skill filtering returned an unrelated row.");
+        }
+        SkillFilter = "";
+    }
+
+    public void SelectTabForCapture(string name)
+    {
+        EditorTabs.SelectedItem = EditorTabs.Items
+            .Cast<TabItem>()
+            .FirstOrDefault(tab => string.Equals(
+                tab.Header?.ToString(), name, StringComparison.OrdinalIgnoreCase));
+        ApplyXpGridColumnWidths();
     }
 
     private void New_Click(object sender, RoutedEventArgs e)
@@ -245,9 +307,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void RemoveSkill_Click(object sender, RoutedEventArgs e)
     {
-        if (SkillsGrid.SelectedItem is NamedValue item)
+        if (SkillsGrid.SelectedItem is XpEditorRow item)
         {
-            Character.Skills.Remove(item);
+            Character.Skills.Remove(item.Source);
             Recalculate();
         }
     }
@@ -264,11 +326,62 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void RemoveTrait_Click(object sender, RoutedEventArgs e)
     {
-        if (TraitsGrid.SelectedItem is NamedValue item)
+        if (TraitsGrid.SelectedItem is XpEditorRow item)
         {
-            Character.Traits.Remove(item);
+            Character.Traits.Remove(item.Source);
             Recalculate();
         }
+    }
+
+    private void IncreaseXp_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: XpEditorRow row })
+        {
+            AdjustXp(row, 5, true);
+        }
+    }
+
+    private void DecreaseXp_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: XpEditorRow row })
+        {
+            AdjustXp(row, -5, true);
+        }
+    }
+
+    private bool AdjustXp(XpEditorRow row, int delta, bool showMessage)
+    {
+        if (delta > 0 && Summary.FreeXp < delta)
+        {
+            if (showMessage)
+            {
+                MessageBox.Show(this,
+                    $"This change needs {delta} XP, but only {Summary.FreeXp} XP remains.",
+                    "Not enough Free XP",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            return false;
+        }
+
+        var minimum = row.Kind == XpKind.Trait ? -1000 : 0;
+        var next = row.Source.Value + delta;
+        if (next < minimum)
+        {
+            if (showMessage)
+            {
+                MessageBox.Show(this,
+                    row.Kind == XpKind.Trait
+                        ? "Trait XP cannot be reduced below -1000."
+                        : $"{row.Kind} XP cannot be reduced below zero.",
+                    "XP limit",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            return false;
+        }
+
+        row.Source.Value = next;
+        Recalculate();
+        return true;
     }
 
     private void Recalculate_Click(object sender, RoutedEventArgs e) => Recalculate();
@@ -277,6 +390,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         Summary = CharacterRules.Calculate(Character);
         PrerequisiteIssues = PrerequisiteRules.Evaluate(Character);
+        RebuildXpRows();
         var blocking = PrerequisiteIssues.Count(issue =>
             issue.Category == "Affiliation");
         RuleStatus = blocking > 0
@@ -294,12 +408,91 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         OnPropertyChanged(nameof(SubAffiliation));
     }
 
+    private void RebuildXpRows()
+    {
+        AttributeRows.Clear();
+        SkillRows.Clear();
+        TraitRows.Clear();
+
+        foreach (var item in Character.Attributes)
+        {
+            AttributeRows.Add(CreateXpRow(item, XpKind.Attribute));
+        }
+        foreach (var item in Character.Skills.OrderBy(item => item.Name))
+        {
+            SkillRows.Add(CreateXpRow(item, XpKind.Skill));
+        }
+        foreach (var item in Character.Traits.OrderBy(item => item.Name))
+        {
+            TraitRows.Add(CreateXpRow(item, XpKind.Trait));
+        }
+        SkillRowsView.Refresh();
+        TraitRowsView.Refresh();
+    }
+
+    private XpEditorRow CreateXpRow(NamedValue item, XpKind kind)
+    {
+        var category = kind.ToString();
+        var issue = PrerequisiteIssues.FirstOrDefault(candidate =>
+            candidate.Category == category && candidate.Name == item.Name);
+        var level = kind switch
+        {
+            XpKind.Attribute => CharacterRules.AttributeValue(item.Value),
+            XpKind.Skill => CharacterRules.SkillLevel(item.Value, Character.Traits),
+            XpKind.Trait => CharacterRules.TraitLevel(item.Name, item.Value),
+            _ => 0
+        };
+        return new XpEditorRow(item, kind, level, issue?.RequiredXp);
+    }
+
+    private bool MatchesSkillFilter(object item) =>
+        item is XpEditorRow row &&
+        (SkillFilter.Length == 0 ||
+         row.Name.Contains(SkillFilter, StringComparison.OrdinalIgnoreCase));
+
+    private bool MatchesTraitFilter(object item) =>
+        item is XpEditorRow row &&
+        (TraitFilter.Length == 0 ||
+         row.Name.Contains(TraitFilter, StringComparison.OrdinalIgnoreCase));
+
     private void EditorFieldChanged(object sender, KeyboardFocusChangedEventArgs e) =>
         Recalculate();
 
     private void EditorSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (IsLoaded) Recalculate();
+    }
+
+    private void EditorTabs_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded || e.Source != EditorTabs) return;
+        Dispatcher.BeginInvoke(
+            DispatcherPriority.Loaded,
+            ApplyXpGridColumnWidths);
+    }
+
+    private void ApplyXpGridColumnWidths()
+    {
+        SetXpGridColumnWidths(AttributesGrid, 90);
+        SetXpGridColumnWidths(SkillsGrid, 80);
+        SetXpGridColumnWidths(TraitsGrid, 80);
+    }
+
+    private static void SetXpGridColumnWidths(DataGrid grid, double levelWidth)
+    {
+        if (grid.Columns.Count != 4) return;
+        grid.Columns[0].MinWidth = 280;
+        grid.Columns[1].MinWidth = levelWidth;
+        grid.Columns[2].MinWidth = 150;
+        grid.Columns[3].MinWidth = 155;
+        grid.Columns[0].Width = new DataGridLength(
+            1, DataGridLengthUnitType.Star);
+        grid.Columns[1].Width = new DataGridLength(levelWidth);
+        grid.Columns[2].Width = new DataGridLength(150);
+        grid.Columns[3].Width = new DataGridLength(155);
+        grid.InvalidateMeasure();
     }
 
     private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -352,4 +545,29 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    public enum XpKind
+    {
+        Attribute,
+        Skill,
+        Trait
+    }
+
+    public sealed class XpEditorRow(
+        NamedValue source,
+        XpKind kind,
+        int level,
+        int? requiredXp)
+    {
+        public NamedValue Source { get; } = source;
+        public XpKind Kind { get; } = kind;
+        public string Name => Source.Name;
+        public int Xp => Source.Value;
+        public int Level { get; } = level;
+        public int? RequiredXp { get; } = requiredXp;
+        public bool IsShort => RequiredXp is int required && Xp < required;
+        public string TargetText => RequiredXp is int required
+            ? IsShort ? $"Need {required} XP" : "Met"
+            : "";
+    }
 }

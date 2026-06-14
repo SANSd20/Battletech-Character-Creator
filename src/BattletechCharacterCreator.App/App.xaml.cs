@@ -110,6 +110,11 @@ public partial class App : Application
         {
             var outputPath = Path.GetFullPath(
                 editorCaptureArgument["--capture-clan-editor=".Length..]);
+            var editorTabArgument = e.Args.FirstOrDefault(
+                argument => argument.StartsWith("--capture-editor-tab=",
+                    StringComparison.Ordinal));
+            var editorTab = editorTabArgument?[
+                "--capture-editor-tab=".Length..];
             var wizard = new CharacterWizardWindow();
             wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
                 DispatcherPriority.ApplicationIdle,
@@ -126,11 +131,21 @@ public partial class App : Application
                             () =>
                             {
                                 editor.SmokeSaveAndReload(characterPath);
-                                CaptureWindow(editor, outputPath);
-                                editor.Close();
-                                wizard.Close();
-                                File.Delete(characterPath);
-                                Shutdown(0);
+                                if (!string.IsNullOrWhiteSpace(editorTab))
+                                {
+                                    editor.SelectTabForCapture(editorTab);
+                                }
+                                editor.Dispatcher.BeginInvoke(
+                                    DispatcherPriority.Render,
+                                    () =>
+                                    {
+                                        editor.UpdateLayout();
+                                        CaptureWindow(editor, outputPath);
+                                        editor.Close();
+                                        wizard.Close();
+                                        File.Delete(characterPath);
+                                        Shutdown(0);
+                                    });
                             });
                         editor.Show();
                         wizard.Hide();
