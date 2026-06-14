@@ -7,6 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\BattletechCharacterCreator.Core\BattletechCharacterCreator.Core.csproj" />
+    <Resource Include="Assets\Fonts\Montserrat-Black.ttf" />
+    <Resource Include="Assets\Images\pilot6.jpg" />
     <Content Include="..\..\resource\*.dat">
       <Link>Resources\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
