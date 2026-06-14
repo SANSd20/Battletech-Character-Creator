@@ -625,7 +625,12 @@ static void CheckRealLifeModules()
             choices,
             new Dictionary<string, IReadOnlyList<ChoiceAllocation>>
             {
-                [flex.Id] = [new("DEX", 51), new("Leadership", 74)]
+                [flex.Id] =
+                [
+                    new("DEX", 30),
+                    new("DEX", 21),
+                    new("Leadership", 74)
+                ]
             }));
     }
     catch (InvalidOperationException)
@@ -633,7 +638,7 @@ static void CheckRealLifeModules()
         overAllocatedAttributeRejected = true;
     }
     Assert(overAllocatedAttributeRejected,
-        "Agitator flexible XP must enforce its 50 XP Attribute limit.");
+        "Agitator flexible XP must enforce its 50 XP Attribute limit across split rows.");
     var repeatedAgitator = new Character();
     repeatedAgitator.RealLifeHistory.Add(agitator.Name);
     var repeatedChoices = agitator.Choices

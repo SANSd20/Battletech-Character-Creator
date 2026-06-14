@@ -282,6 +282,17 @@ public static class LifePathEngine
                 $"{choice.MaximumEducationFieldSkillTargets} Education Field skill targets.");
         }
 
+        if (choice.AttributeMaximumXp is int maximum &&
+            active.Where(allocation =>
+                    ClassifyFlexibleTarget(allocation.Name) ==
+                    EffectTarget.Attribute)
+                .GroupBy(allocation => allocation.Name, StringComparer.Ordinal)
+                .Any(group => group.Sum(allocation => allocation.Xp) > maximum))
+        {
+            throw new InvalidOperationException(
+                $"{module.Name}: '{choice.Label}' allows at most {maximum} XP per Attribute.");
+        }
+
         foreach (var allocation in active)
         {
             if (!choice.Options.Contains(allocation.Name, StringComparer.Ordinal) &&
@@ -291,13 +302,6 @@ public static class LifePathEngine
                     $"{module.Name}: '{allocation.Name}' is not valid for '{choice.Label}'.");
             }
             var target = ClassifyFlexibleTarget(allocation.Name);
-            if (target == EffectTarget.Attribute &&
-                choice.AttributeMaximumXp is int maximum &&
-                allocation.Xp > maximum)
-            {
-                throw new InvalidOperationException(
-                    $"{module.Name}: '{choice.Label}' allows at most {maximum} XP per Attribute.");
-            }
             ApplyEffect(
                 character,
                 target,
@@ -329,7 +333,7 @@ public static class LifePathEngine
         }
     }
 
-    private static EffectTarget ClassifyFlexibleTarget(string name)
+    public static EffectTarget ClassifyFlexibleTarget(string name)
     {
         if (AttributeNames.Contains(name)) return EffectTarget.Attribute;
         if (TraitNames.Contains(name) ||

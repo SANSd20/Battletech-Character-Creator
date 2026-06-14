@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using BattletechCharacterCreator.Core.LifePath;
 using BattletechCharacterCreator.Core.Models;
 using BattletechCharacterCreator.Core.Resources;
@@ -19,7 +20,14 @@ public partial class CharacterWizardWindow : Window
 
     private sealed record ChoiceInput(
         IReadOnlyList<ComboBox> Pickers,
-        IReadOnlyList<TextBox>? Amounts = null);
+        IReadOnlyList<TextBox>? Amounts = null,
+        ModuleChoice? Choice = null,
+        string ModuleName = "",
+        int Step = -1,
+        TextBlock? Remaining = null,
+        TextBlock? Status = null);
+
+    private sealed record XpAdjustment(TextBox Input, int Delta);
 
     private sealed record SelectedModule(
         LifePathModule Module,
@@ -317,6 +325,11 @@ public partial class CharacterWizardWindow : Window
                 "Choose one Basic Field for the selected school.",
             _ => null
         };
+        message ??= choiceControls.Values
+            .Where(input => input.Step == step && input.Choice is not null)
+            .Select(input => EvaluateFlexibleChoice(input))
+            .FirstOrDefault(result => !result.IsValid)
+            ?.Message;
         if (message is null) return true;
 
         MessageBox.Show(this, message, "Complete this step",
@@ -681,47 +694,172 @@ public partial class CharacterWizardWindow : Window
                         var amounts = new List<TextBox>();
                         var totalXp = choiceXp;
                         var educationOptions = ResolveEducationFieldOptions(choice);
+                        var defaults = CreateDefaultFlexibleAllocations(
+                            choice, options, educationOptions);
+                        var allocator = new Border
+                        {
+                            Background = new SolidColorBrush(
+                                Color.FromRgb(246, 245, 241)),
+                            BorderBrush = new SolidColorBrush(
+                                Color.FromRgb(191, 189, 181)),
+                            BorderThickness = new Thickness(1),
+                            Padding = new Thickness(12),
+                            Margin = new Thickness(0, 4, 10, 12)
+                        };
+                        var allocatorPanel = new StackPanel();
+                        allocator.Child = allocatorPanel;
+
+                        var summary = new Grid();
+                        summary.ColumnDefinitions.Add(new ColumnDefinition());
+                        summary.ColumnDefinitions.Add(new ColumnDefinition
+                        {
+                            Width = new GridLength(90)
+                        });
+                        summary.Children.Add(new TextBlock
+                        {
+                            Text = "ALLOCATE FLEXIBLE XP",
+                            FontFamily = new FontFamily("Montserrat"),
+                            FontWeight = FontWeights.Black,
+                            FontSize = 14,
+                            VerticalAlignment = VerticalAlignment.Center
+                        });
+                        var remaining = new TextBlock
+                        {
+                            Text = totalXp.ToString(),
+                            FontFamily = new FontFamily("Montserrat"),
+                            FontWeight = FontWeights.Black,
+                            FontSize = 20,
+                            HorizontalAlignment = HorizontalAlignment.Right
+                        };
+                        var remainingPanel = new StackPanel
+                        {
+                            HorizontalAlignment = HorizontalAlignment.Right
+                        };
+                        remainingPanel.Children.Add(new TextBlock
+                        {
+                            Text = "REMAINING",
+                            FontSize = 10,
+                            HorizontalAlignment = HorizontalAlignment.Right
+                        });
+                        remainingPanel.Children.Add(remaining);
+                        Grid.SetColumn(remainingPanel, 1);
+                        summary.Children.Add(remainingPanel);
+                        allocatorPanel.Children.Add(summary);
+
+                        var rules = DescribeFlexibleRestrictions(choice);
+                        if (rules.Length > 0)
+                        {
+                            allocatorPanel.Children.Add(new TextBlock
+                            {
+                                Text = rules,
+                                TextWrapping = TextWrapping.Wrap,
+                                Foreground = new SolidColorBrush(
+                                    Color.FromRgb(82, 82, 78)),
+                                FontSize = 11,
+                                Margin = new Thickness(0, 5, 0, 8)
+                            });
+                        }
+
+                        var columnHeader = new Grid
+                        {
+                            Margin = new Thickness(0, 2, 0, 2)
+                        };
+                        columnHeader.ColumnDefinitions.Add(new ColumnDefinition());
+                        columnHeader.ColumnDefinitions.Add(new ColumnDefinition
+                        {
+                            Width = new GridLength(116)
+                        });
+                        columnHeader.Children.Add(new TextBlock
+                        {
+                            Text = "TARGET",
+                            FontSize = 10,
+                            FontWeight = FontWeights.SemiBold
+                        });
+                        var xpHeader = new TextBlock
+                        {
+                            Text = "XP",
+                            FontSize = 10,
+                            FontWeight = FontWeights.SemiBold,
+                            HorizontalAlignment = HorizontalAlignment.Center
+                        };
+                        Grid.SetColumn(xpHeader, 1);
+                        columnHeader.Children.Add(xpHeader);
+                        allocatorPanel.Children.Add(columnHeader);
+
                         for (var i = 0; i < 6; i++)
                         {
-                            var row = new Grid { Margin = new Thickness(0, 2, 12, 2) };
+                            var row = new Grid { Margin = new Thickness(0, 2, 0, 2) };
                             row.ColumnDefinitions.Add(new ColumnDefinition());
-                            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(82) });
-                            var picker = new ComboBox { ItemsSource = options };
+                            row.ColumnDefinitions.Add(new ColumnDefinition
+                            {
+                                Width = new GridLength(116)
+                            });
+                            var picker = new ComboBox
+                            {
+                                ItemsSource = options,
+                                Margin = new Thickness(0, 0, 6, 0)
+                            };
                             picker.SelectionChanged += ChoiceSelectionChanged;
-                            var defaultName = i switch
-                            {
-                                0 when choice.MinimumEducationFieldSkillXp > 0 =>
-                                    educationOptions.FirstOrDefault(),
-                                1 when choice.MinimumEducationFieldSkillXp > 0 =>
-                                    choice.Options.FirstOrDefault(),
-                                0 => options.FirstOrDefault(),
-                                _ => null
-                            };
-                            picker.SelectedItem = defaultName;
-                            var defaultXp = i switch
-                            {
-                                0 when choice.MinimumEducationFieldSkillXp > 0 =>
-                                    choice.MinimumEducationFieldSkillXp,
-                                1 when choice.MinimumEducationFieldSkillXp > 0 =>
-                                    totalXp - choice.MinimumEducationFieldSkillXp,
-                                0 => totalXp,
-                                _ => 0
-                            };
+                            picker.SelectedItem = defaults[i].Name;
                             var amount = new TextBox
                             {
-                                Text = defaultXp.ToString(),
-                                Margin = new Thickness(6, 0, 0, 0)
+                                Text = defaults[i].Xp.ToString(),
+                                Width = 48,
+                                Margin = new Thickness(2, 0, 2, 0),
+                                HorizontalContentAlignment = HorizontalAlignment.Right
                             };
-                            Grid.SetColumn(amount, 1);
+                            var xpControls = new StackPanel
+                            {
+                                Orientation = Orientation.Horizontal,
+                                HorizontalAlignment = HorizontalAlignment.Right
+                            };
+                            var subtract = new Button
+                            {
+                                Content = "−",
+                                Width = 27,
+                                Height = 27,
+                                Padding = new Thickness(0),
+                                Margin = new Thickness(0),
+                                ToolTip = "Remove 5 XP",
+                                Tag = new XpAdjustment(amount, -5)
+                            };
+                            subtract.Click += FlexibleXpAdjust_Click;
+                            var add = new Button
+                            {
+                                Content = "+",
+                                Width = 27,
+                                Height = 27,
+                                Padding = new Thickness(0),
+                                Margin = new Thickness(0),
+                                ToolTip = "Add 5 XP",
+                                Tag = new XpAdjustment(amount, 5)
+                            };
+                            add.Click += FlexibleXpAdjust_Click;
+                            xpControls.Children.Add(subtract);
+                            xpControls.Children.Add(amount);
+                            xpControls.Children.Add(add);
+                            Grid.SetColumn(xpControls, 1);
                             row.Children.Add(picker);
-                            row.Children.Add(amount);
+                            row.Children.Add(xpControls);
                             amount.TextChanged += ChoiceAmountChanged;
                             controls.Add(picker);
                             amounts.Add(amount);
-                            modulePanel.Children.Add(row);
+                            allocatorPanel.Children.Add(row);
                         }
-                        choiceControls[Key(selectedModule, choice)] =
-                            new ChoiceInput(controls, amounts);
+                        var status = new TextBlock
+                        {
+                            TextWrapping = TextWrapping.Wrap,
+                            FontWeight = FontWeights.SemiBold,
+                            FontSize = 11,
+                            Margin = new Thickness(0, 8, 0, 0)
+                        };
+                        allocatorPanel.Children.Add(status);
+                        modulePanel.Children.Add(allocator);
+                        var input = new ChoiceInput(
+                            controls, amounts, choice, module.Name,
+                            ChoiceStep(selectedModule), remaining, status);
+                        choiceControls[Key(selectedModule, choice)] = input;
+                        UpdateFlexibleChoiceStatus(input);
                         continue;
                     }
 
@@ -777,13 +915,242 @@ public partial class CharacterWizardWindow : Window
 
     private void ChoiceSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (IsLoaded && !refreshing) UpdatePreview();
+        if (IsLoaded && !refreshing)
+        {
+            UpdateFlexibleChoiceDisplays();
+            UpdatePreview();
+        }
     }
 
     private void ChoiceAmountChanged(object sender, TextChangedEventArgs e)
     {
-        if (IsLoaded && !refreshing) UpdatePreview();
+        if (IsLoaded && !refreshing)
+        {
+            UpdateFlexibleChoiceDisplays();
+            UpdatePreview();
+        }
     }
+
+    private void FlexibleXpAdjust_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: XpAdjustment adjustment }) return;
+        var current = int.TryParse(adjustment.Input.Text, out var value)
+            ? value
+            : 0;
+        adjustment.Input.Text = Math.Max(0, current + adjustment.Delta).ToString();
+        adjustment.Input.Focus();
+        adjustment.Input.SelectAll();
+    }
+
+    private void UpdateFlexibleChoiceDisplays()
+    {
+        foreach (var input in choiceControls.Values.Where(
+                     input => input.Choice is not null))
+        {
+            UpdateFlexibleChoiceStatus(input);
+        }
+    }
+
+    private void UpdateFlexibleChoiceStatus(ChoiceInput input)
+    {
+        var result = EvaluateFlexibleChoice(input);
+        if (input.Remaining is not null)
+        {
+            input.Remaining.Text = result.Remaining.ToString();
+            input.Remaining.Foreground = result.Remaining == 0
+                ? Brushes.DarkGreen
+                : result.Remaining < 0
+                    ? Brushes.Firebrick
+                    : Brushes.DarkGoldenrod;
+        }
+        if (input.Status is not null)
+        {
+            input.Status.Text = result.IsValid
+                ? "Ready. The complete pool is allocated."
+                : result.Message;
+            input.Status.Foreground = result.IsValid
+                ? Brushes.DarkGreen
+                : Brushes.Firebrick;
+        }
+    }
+
+    private FlexibleChoiceResult EvaluateFlexibleChoice(ChoiceInput input)
+    {
+        var choice = input.Choice!;
+        var requiredXp = choice.Xp * choice.Count;
+        var allocations = input.Pickers.Zip(input.Amounts ?? [])
+            .Select(pair => new
+            {
+                Name = pair.First.SelectedItem as string ?? "",
+                ValidXp = int.TryParse(pair.Second.Text, out var xp),
+                Xp = int.TryParse(pair.Second.Text, out xp) ? xp : 0
+            })
+            .ToArray();
+        if (allocations.Any(item => !item.ValidXp || item.Xp < 0))
+        {
+            return new FlexibleChoiceResult(false, requiredXp,
+                $"{input.ModuleName}: enter a non-negative XP amount.");
+        }
+        if (allocations.Any(item => item.Xp > 0 && item.Name.Length == 0))
+        {
+            return new FlexibleChoiceResult(false,
+                requiredXp - allocations.Sum(item => item.Xp),
+                $"{input.ModuleName}: choose a target for every XP amount.");
+        }
+
+        var active = allocations.Where(item => item.Xp > 0).ToArray();
+        var spent = active.Sum(item => item.Xp);
+        var remaining = requiredXp - spent;
+        if (remaining != 0)
+        {
+            var direction = remaining > 0 ? "still needs" : "is over by";
+            return new FlexibleChoiceResult(false, remaining,
+                $"{input.ModuleName}: this pool {direction} {Math.Abs(remaining)} XP.");
+        }
+
+        var attributeOrTraitXp = active
+            .Where(item => LifePathEngine.ClassifyFlexibleTarget(item.Name) is
+                EffectTarget.Attribute or EffectTarget.Trait)
+            .Sum(item => item.Xp);
+        if (attributeOrTraitXp < choice.MinimumAttributeOrTraitXp)
+        {
+            return new FlexibleChoiceResult(false, 0,
+                $"{input.ModuleName}: assign at least " +
+                $"{choice.MinimumAttributeOrTraitXp} XP to Attributes or Traits.");
+        }
+
+        if (choice.AttributeMaximumXp is int maximum)
+        {
+            var excessiveAttribute = active
+                .Where(item => LifePathEngine.ClassifyFlexibleTarget(item.Name) ==
+                    EffectTarget.Attribute)
+                .GroupBy(item => item.Name, StringComparer.Ordinal)
+                .FirstOrDefault(group => group.Sum(item => item.Xp) > maximum);
+            if (excessiveAttribute is not null)
+            {
+                return new FlexibleChoiceResult(false, 0,
+                    $"{input.ModuleName}: no Attribute may receive more than " +
+                    $"{maximum} XP from this pool.");
+            }
+        }
+
+        var educationOptions = ResolveEducationFieldOptions(choice);
+        var educationAllocations = active.Where(item =>
+            educationOptions.Contains(item.Name, StringComparer.Ordinal)).ToArray();
+        if (educationAllocations.Sum(item => item.Xp) <
+            choice.MinimumEducationFieldSkillXp)
+        {
+            return new FlexibleChoiceResult(false, 0,
+                $"{input.ModuleName}: assign at least " +
+                $"{choice.MinimumEducationFieldSkillXp} XP to selected Field skills.");
+        }
+        if (educationAllocations.Select(item => item.Name)
+                .Distinct(StringComparer.Ordinal).Count() >
+            choice.MaximumEducationFieldSkillTargets)
+        {
+            return new FlexibleChoiceResult(false, 0,
+                $"{input.ModuleName}: use no more than " +
+                $"{choice.MaximumEducationFieldSkillTargets} Field skill targets.");
+        }
+
+        return new FlexibleChoiceResult(true, 0, "");
+    }
+
+    private static string DescribeFlexibleRestrictions(ModuleChoice choice)
+    {
+        var rules = new List<string>
+        {
+            $"Divide all {choice.Xp * choice.Count} XP among the eligible targets."
+        };
+        if (choice.MinimumAttributeOrTraitXp > 0)
+        {
+            rules.Add($"At least {choice.MinimumAttributeOrTraitXp} XP must go to Attributes or Traits.");
+        }
+        if (choice.AttributeMaximumXp is int maximum)
+        {
+            rules.Add($"Maximum {maximum} XP per Attribute.");
+        }
+        if (choice.MinimumEducationFieldSkillXp > 0)
+        {
+            rules.Add($"At least {choice.MinimumEducationFieldSkillXp} XP must go to selected Field skills.");
+        }
+        if (choice.MaximumEducationFieldSkillTargets < int.MaxValue)
+        {
+            rules.Add($"Use no more than {choice.MaximumEducationFieldSkillTargets} Field skill targets.");
+        }
+        return string.Join(" ", rules);
+    }
+
+    private static IReadOnlyList<ChoiceAllocation> CreateDefaultFlexibleAllocations(
+        ModuleChoice choice,
+        IReadOnlyList<string> options,
+        IReadOnlyList<string> educationOptions)
+    {
+        var allocations = new List<ChoiceAllocation>();
+        var remaining = choice.Xp * choice.Count;
+
+        if (choice.MinimumEducationFieldSkillXp > 0 &&
+            educationOptions.FirstOrDefault() is { } educationTarget)
+        {
+            var xp = Math.Min(remaining, choice.MinimumEducationFieldSkillXp);
+            allocations.Add(new ChoiceAllocation(educationTarget, xp));
+            remaining -= xp;
+        }
+
+        if (choice.MinimumAttributeOrTraitXp > 0)
+        {
+            var alreadyAllocated = allocations
+                .Where(item => LifePathEngine.ClassifyFlexibleTarget(item.Name) is
+                    EffectTarget.Attribute or EffectTarget.Trait)
+                .Sum(item => item.Xp);
+            var needed = Math.Min(
+                remaining,
+                Math.Max(0, choice.MinimumAttributeOrTraitXp - alreadyAllocated));
+            if (needed > 0)
+            {
+                var target = options.FirstOrDefault(option =>
+                    LifePathEngine.ClassifyFlexibleTarget(option) ==
+                    EffectTarget.Trait);
+                target ??= options.FirstOrDefault(option =>
+                    LifePathEngine.ClassifyFlexibleTarget(option) ==
+                    EffectTarget.Attribute);
+                if (target is not null)
+                {
+                    allocations.Add(new ChoiceAllocation(target, needed));
+                    remaining -= needed;
+                }
+            }
+        }
+
+        if (remaining > 0)
+        {
+            var target = options.FirstOrDefault(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) !=
+                EffectTarget.Attribute);
+            target ??= options.FirstOrDefault();
+            if (target is not null)
+            {
+                allocations.Add(new ChoiceAllocation(target, remaining));
+            }
+        }
+
+        allocations = allocations
+            .Where(allocation => allocation.Xp > 0)
+            .GroupBy(allocation => allocation.Name, StringComparer.Ordinal)
+            .Select(group => new ChoiceAllocation(
+                group.Key, group.Sum(allocation => allocation.Xp)))
+            .ToList();
+        while (allocations.Count < 6)
+        {
+            allocations.Add(new ChoiceAllocation("", 0));
+        }
+        return allocations.Take(6).ToArray();
+    }
+
+    private sealed record FlexibleChoiceResult(
+        bool IsValid,
+        int Remaining,
+        string Message);
 
     private IReadOnlyList<string> ResolveChoiceOptions(ModuleChoice choice)
     {
@@ -899,6 +1266,7 @@ public partial class CharacterWizardWindow : Window
 
     private void UpdatePreview()
     {
+        UpdateFlexibleChoiceDisplays();
         try
         {
             var character = BuildCharacter();
