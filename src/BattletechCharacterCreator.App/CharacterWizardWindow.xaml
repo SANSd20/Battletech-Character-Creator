@@ -441,26 +441,107 @@
             </Grid>
 
             <Grid x:Name="Stage4Page" Visibility="Collapsed">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="430"/>
-                    <ColumnDefinition Width="28"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="STAGE 4 · CAREERS" Style="{StaticResource SectionTitle}"/>
-                        <TextBlock Text="First career (optional)" Style="{StaticResource FieldLabel}"/>
-                        <ComboBox x:Name="RealLifePicker" DisplayMemberPath="Name"
-                                  SelectionChanged="RealLifeSelectionChanged"/>
-                        <TextBlock x:Name="RealLifeDescription" TextWrapping="Wrap"
-                                   Foreground="#555555" Margin="0,8,12,12"/>
-                        <TextBlock Text="Second career (optional)" Style="{StaticResource FieldLabel}"/>
-                        <ComboBox x:Name="SecondRealLifePicker" DisplayMemberPath="Name"
-                                  SelectionChanged="RealLifeSelectionChanged"/>
-                        <TextBlock x:Name="SecondRealLifeDescription" TextWrapping="Wrap"
-                                   Foreground="#555555" Margin="0,8,12,0"/>
-                    </StackPanel>
-                </ScrollViewer>
+                <Grid Margin="0,0,474,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="18"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="STAGE 4 · CAREERS"
+                                   Style="{StaticResource SectionTitle}"
+                                   Margin="0"/>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <CheckBox x:Name="FirstCareerCheck"
+                                          Content="Add first career"
+                                          FontWeight="SemiBold"
+                                          Margin="0,0,0,6"
+                                          Checked="CareerToggleChanged"
+                                          Unchecked="CareerToggleChanged"/>
+                                <ComboBox x:Name="RealLifePicker"
+                                          DisplayMemberPath="Name"
+                                          IsEnabled="{Binding IsChecked, ElementName=FirstCareerCheck}"
+                                          SelectionChanged="RealLifeSelectionChanged"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <CheckBox x:Name="SecondCareerCheck"
+                                          Content="Add second career"
+                                          FontWeight="SemiBold"
+                                          Margin="0,0,0,6"
+                                          IsEnabled="{Binding IsChecked, ElementName=FirstCareerCheck}"
+                                          Checked="CareerToggleChanged"
+                                          Unchecked="CareerToggleChanged"/>
+                                <ComboBox x:Name="SecondRealLifePicker"
+                                          DisplayMemberPath="Name"
+                                          IsEnabled="{Binding IsChecked, ElementName=SecondCareerCheck}"
+                                          SelectionChanged="RealLifeSelectionChanged"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="96"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="Career Overview">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10,6">
+                                <StackPanel>
+                                    <TextBlock x:Name="RealLifeDescription"
+                                               TextWrapping="Wrap"
+                                               Foreground="#454545"
+                                               LineHeight="20"/>
+                                    <TextBlock x:Name="SecondRealLifeDescription"
+                                               TextWrapping="Wrap"
+                                               Foreground="#454545"
+                                               LineHeight="20"
+                                               Margin="0,10,0,0"/>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </GroupBox>
+                        <StackPanel Grid.Column="2">
+                            <Border BorderBrush="#A7A7A2"
+                                    BorderThickness="1"
+                                    Padding="7,6">
+                                <StackPanel>
+                                    <TextBlock Text="CAREER XP"
+                                               FontSize="11"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="CareerModuleCost"
+                                               FontFamily="{StaticResource MontserratBlack}"
+                                               FontSize="21"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#A7A7A2"
+                                    BorderThickness="1"
+                                    Margin="0,10,0,0"
+                                    Padding="7,6">
+                                <StackPanel>
+                                    <TextBlock Text="YEARS"
+                                               FontSize="11"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="CareerYears"
+                                               FontFamily="{StaticResource MontserratBlack}"
+                                               FontSize="21"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
             </Grid>
 
             <Grid x:Name="ReviewPage" Visibility="Collapsed">

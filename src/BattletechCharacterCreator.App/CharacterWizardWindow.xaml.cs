@@ -122,6 +122,26 @@ public partial class CharacterWizardWindow : Window
         UpdatePreview();
     }
 
+    public void SelectCareersForCapture(
+        string firstCareerId,
+        string? secondCareerId = null)
+    {
+        FirstCareerCheck.IsChecked = true;
+        RealLifePicker.SelectedItem = LifePathCatalog.RealLifeModules
+            .First(module => module.Id == firstCareerId);
+        RefreshSecondCareerOptions();
+        if (!string.IsNullOrWhiteSpace(secondCareerId))
+        {
+            SecondCareerCheck.IsChecked = true;
+            SecondRealLifePicker.SelectedItem = SecondRealLifePicker.Items
+                .Cast<LifePathModule>()
+                .First(module => module.Id == secondCareerId);
+        }
+        UpdateCareerSummary();
+        BuildChoiceControls();
+        UpdatePreview();
+    }
+
     private void Back_Click(object sender, RoutedEventArgs e)
     {
         if (currentStep > 0) ShowStep(currentStep - 1);
@@ -274,17 +294,23 @@ public partial class CharacterWizardWindow : Window
             }
         }
         EducationCheck.IsChecked = false;
+        FirstCareerCheck.IsChecked = true;
         foreach (var realLife in LifePathCatalog.RealLifeModules)
         {
             RealLifePicker.SelectedItem = realLife;
+            RefreshSecondCareerOptions();
             BuildChoiceControls();
             UpdatePreview();
-            SecondRealLifePicker.SelectedItem = realLife;
-            BuildChoiceControls();
-            UpdatePreview();
-            SecondRealLifePicker.SelectedIndex = -1;
+            if (realLife.Repeatable)
+            {
+                SecondCareerCheck.IsChecked = true;
+                SecondRealLifePicker.SelectedItem = realLife;
+                BuildChoiceControls();
+                UpdatePreview();
+                SecondCareerCheck.IsChecked = false;
+            }
         }
-        RealLifePicker.SelectedIndex = -1;
+        FirstCareerCheck.IsChecked = false;
         BuildChoiceControls();
         UpdatePreview();
     }
@@ -310,9 +336,13 @@ public partial class CharacterWizardWindow : Window
     private LifePathModule? SelectedBasicField => BasicFieldPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedAdvancedField => AdvancedFieldPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedSpecialistField => SpecialistFieldPicker.SelectedItem as LifePathModule;
-    private LifePathModule? SelectedRealLife => RealLifePicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedRealLife => FirstCareerCheck.IsChecked == true
+        ? RealLifePicker.SelectedItem as LifePathModule
+        : null;
     private LifePathModule? SelectedSecondRealLife =>
-        SecondRealLifePicker.SelectedItem as LifePathModule;
+        SecondCareerCheck.IsChecked == true
+            ? SecondRealLifePicker.SelectedItem as LifePathModule
+            : null;
     private static IReadOnlyList<LifePathModule> BirthAffiliations =>
         LifePathCatalog.Affiliations
             .Where(module => module.Id is not ("comstar" or "word-of-blake"))
@@ -339,9 +369,7 @@ public partial class CharacterWizardWindow : Window
         ChildhoodModuleCost.Text = childhood?.ModuleCost.ToString() ?? "";
         LateChildhoodDescription.Text = lateChildhood?.Description ?? "";
         LateChildhoodModuleCost.Text = lateChildhood?.ModuleCost.ToString() ?? "";
-        RealLifeDescription.Text = SelectedRealLife?.Description ?? "";
-        SecondRealLifeDescription.Text =
-            SelectedSecondRealLife?.Description ?? "";
+        UpdateCareerSummary();
         SubAffiliationPicker.ItemsSource = birthAffiliation?.SubAffiliations ?? [];
         SubAffiliationPanel.Visibility = SubAffiliationPicker.Items.Count > 0
             ? Visibility.Visible : Visibility.Collapsed;
@@ -387,11 +415,72 @@ public partial class CharacterWizardWindow : Window
     private void RealLifeSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded || refreshing) return;
-        RealLifeDescription.Text = SelectedRealLife?.Description ?? "";
-        SecondRealLifeDescription.Text =
-            SelectedSecondRealLife?.Description ?? "";
+        if (sender == RealLifePicker)
+        {
+            RefreshSecondCareerOptions();
+        }
+        UpdateCareerSummary();
         BuildChoiceControls();
         UpdatePreview();
+    }
+
+    private void CareerToggleChanged(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded || refreshing) return;
+        refreshing = true;
+        if (FirstCareerCheck.IsChecked == true &&
+            RealLifePicker.SelectedItem is null)
+        {
+            RealLifePicker.SelectedIndex = 0;
+        }
+        if (FirstCareerCheck.IsChecked != true)
+        {
+            SecondCareerCheck.IsChecked = false;
+        }
+        RefreshSecondCareerOptions();
+        if (SecondCareerCheck.IsChecked == true &&
+            SecondRealLifePicker.SelectedItem is null)
+        {
+            SecondRealLifePicker.SelectedIndex = 0;
+        }
+        refreshing = false;
+        UpdateCareerSummary();
+        BuildChoiceControls();
+        UpdatePreview();
+    }
+
+    private void RefreshSecondCareerOptions()
+    {
+        var previousId = (SecondRealLifePicker.SelectedItem as LifePathModule)?.Id;
+        var firstCareer = SelectedRealLife;
+        var options = LifePathCatalog.RealLifeModules
+            .Where(module => firstCareer is null ||
+                firstCareer.Repeatable ||
+                module.Id != firstCareer.Id)
+            .ToArray();
+        SecondRealLifePicker.ItemsSource = options;
+        SecondRealLifePicker.SelectedItem = options
+            .FirstOrDefault(module => module.Id == previousId);
+    }
+
+    private void UpdateCareerSummary()
+    {
+        var first = SelectedRealLife;
+        var second = SelectedSecondRealLife;
+        RealLifeDescription.Text = first is null
+            ? "No career selected."
+            : $"{first.Name} ({first.TimeYears} years){Environment.NewLine}{first.Description}";
+        SecondRealLifeDescription.Text = second is null
+            ? ""
+            : $"{second.Name} ({second.TimeYears} years){Environment.NewLine}{second.Description}";
+        CareerModuleCost.Text = new[] { first, second }
+            .Where(module => module is not null)
+            .Sum(module => module!.ModuleCost)
+            .ToString();
+        CareerYears.Text = new[] { first, second }
+            .Where(module => module is not null)
+            .Sum(module => module!.TimeYears)
+            .ToString();
     }
 
     private void RefreshEducationFields(LifePathModule? school)

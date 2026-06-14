@@ -97,6 +97,16 @@ public partial class App : Application
                     StringComparison.Ordinal));
             var thirdField = thirdFieldArgument?[
                 "--capture-third-field=".Length..];
+            var firstCareerArgument = e.Args.FirstOrDefault(
+                argument => argument.StartsWith("--capture-first-career=",
+                    StringComparison.Ordinal));
+            var firstCareer = firstCareerArgument?[
+                "--capture-first-career=".Length..];
+            var secondCareerArgument = e.Args.FirstOrDefault(
+                argument => argument.StartsWith("--capture-second-career=",
+                    StringComparison.Ordinal));
+            var secondCareer = secondCareerArgument?[
+                "--capture-second-career=".Length..];
             var wizard = new CharacterWizardWindow();
             wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
                 DispatcherPriority.ApplicationIdle,
@@ -114,6 +124,10 @@ public partial class App : Application
                     {
                         wizard.SelectEducationForCapture(
                             education, advancedField, thirdField);
+                    }
+                    if (!string.IsNullOrWhiteSpace(firstCareer))
+                    {
+                        wizard.SelectCareersForCapture(firstCareer, secondCareer);
                     }
                     wizard.ShowStepForCapture(wizardStep);
                     CaptureWindow(wizard, outputPath);
