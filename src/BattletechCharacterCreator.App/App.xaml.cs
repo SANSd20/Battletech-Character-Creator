@@ -78,6 +78,11 @@ public partial class App : Application
                     StringComparison.Ordinal));
             var wizardAffiliation = wizardAffiliationArgument?[
                 "--capture-affiliation=".Length..];
+            var lateChildhoodArgument = e.Args.FirstOrDefault(
+                argument => argument.StartsWith("--capture-late-childhood=",
+                    StringComparison.Ordinal));
+            var lateChildhood = lateChildhoodArgument?[
+                "--capture-late-childhood=".Length..];
             var wizard = new CharacterWizardWindow();
             wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
                 DispatcherPriority.ApplicationIdle,
@@ -86,6 +91,10 @@ public partial class App : Application
                     if (!string.IsNullOrWhiteSpace(wizardAffiliation))
                     {
                         wizard.SelectAffiliationForCapture(wizardAffiliation);
+                    }
+                    if (!string.IsNullOrWhiteSpace(lateChildhood))
+                    {
+                        wizard.SelectLateChildhoodForCapture(lateChildhood);
                     }
                     wizard.ShowStepForCapture(wizardStep);
                     CaptureWindow(wizard, outputPath);

@@ -88,6 +88,13 @@ public partial class CharacterWizardWindow : Window
         RefreshModules();
     }
 
+    public void SelectLateChildhoodForCapture(string lateChildhoodId)
+    {
+        LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
+            .First(module => module.Id == lateChildhoodId);
+        RefreshModules();
+    }
+
     private void Back_Click(object sender, RoutedEventArgs e)
     {
         if (currentStep > 0) ShowStep(currentStep - 1);
@@ -300,6 +307,7 @@ public partial class CharacterWizardWindow : Window
         ChildhoodDescription.Text = childhood?.Description ?? "";
         ChildhoodModuleCost.Text = childhood?.ModuleCost.ToString() ?? "";
         LateChildhoodDescription.Text = lateChildhood?.Description ?? "";
+        LateChildhoodModuleCost.Text = lateChildhood?.ModuleCost.ToString() ?? "";
         SchoolDescription.Text = school?.Description ?? "";
         RealLifeDescription.Text = SelectedRealLife?.Description ?? "";
         SecondRealLifeDescription.Text =

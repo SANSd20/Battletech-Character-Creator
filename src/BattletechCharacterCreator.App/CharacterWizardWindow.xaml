@@ -273,19 +273,62 @@
             </Grid>
 
             <Grid x:Name="Stage2Page" Visibility="Collapsed">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="430"/>
-                    <ColumnDefinition Width="28"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <TextBlock Text="STAGE 2 · LATE CHILDHOOD" Style="{StaticResource SectionTitle}"/>
-                    <TextBlock Text="Late childhood" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="LateChildhoodPicker" DisplayMemberPath="Name"
-                              SelectionChanged="ModuleSelectionChanged"/>
-                    <TextBlock x:Name="LateChildhoodDescription" TextWrapping="Wrap"
-                               Foreground="#555555" Margin="0,8,12,0"/>
-                </StackPanel>
+                <Grid Margin="0,0,474,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="18"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="18"/>
+                            <ColumnDefinition Width="92"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.ColumnSpan="3"
+                                   Text="STAGE 2 · LATE CHILDHOOD"
+                                   Style="{StaticResource SectionTitle}"
+                                   Margin="0"/>
+                        <StackPanel Grid.Row="2">
+                            <TextBlock Text="Late childhood"
+                                       Style="{StaticResource FieldLabel}"
+                                       Margin="0,0,0,2"/>
+                            <ComboBox x:Name="LateChildhoodPicker"
+                                      DisplayMemberPath="Name"
+                                      SelectionChanged="ModuleSelectionChanged"/>
+                        </StackPanel>
+                        <Border Grid.Row="2"
+                                Grid.Column="2"
+                                VerticalAlignment="Top"
+                                BorderBrush="#A7A7A2"
+                                BorderThickness="1"
+                                Padding="8,6">
+                            <StackPanel>
+                                <TextBlock Text="MODULE XP"
+                                           FontSize="11"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="LateChildhoodModuleCost"
+                                           FontFamily="{StaticResource MontserratBlack}"
+                                           FontSize="21"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <GroupBox Grid.Row="2" Header="Late Childhood Overview">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10,6">
+                            <TextBlock x:Name="LateChildhoodDescription"
+                                       TextWrapping="Wrap"
+                                       Foreground="#454545"
+                                       LineHeight="20"/>
+                        </ScrollViewer>
+                    </GroupBox>
+                </Grid>
             </Grid>
 
             <Grid x:Name="Stage3Page" Visibility="Collapsed">
