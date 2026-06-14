@@ -298,6 +298,7 @@ public partial class CharacterWizardWindow : Window
             ? birthAffiliation?.Description ?? ""
             : $"{affiliation?.Description}{Environment.NewLine}{birthAffiliation?.Description}";
         ChildhoodDescription.Text = childhood?.Description ?? "";
+        ChildhoodModuleCost.Text = childhood?.ModuleCost.ToString() ?? "";
         LateChildhoodDescription.Text = lateChildhood?.Description ?? "";
         SchoolDescription.Text = school?.Description ?? "";
         RealLifeDescription.Text = SelectedRealLife?.Description ?? "";
@@ -391,9 +392,10 @@ public partial class CharacterWizardWindow : Window
                 choiceGroups.Add((modulePanel, ChoiceStep(selectedModule)));
                 foreach (var choice in module.Choices)
                 {
+                    var choiceXp = choice.Xp * choice.Count;
                     var header = new TextBlock
                     {
-                        Text = $"{module.Name}: {choice.Label} ({choice.Xp:+#;-#;0} XP)",
+                        Text = $"{module.Name}: {choice.Label} ({choiceXp:+#;-#;0} XP)",
                         FontWeight = FontWeights.SemiBold,
                         Margin = new Thickness(0, 7, 0, 2)
                     };
@@ -405,7 +407,7 @@ public partial class CharacterWizardWindow : Window
                         !choice.FixedFlexibleSelections)
                     {
                         var amounts = new List<TextBox>();
-                        var totalXp = choice.Xp * choice.Count;
+                        var totalXp = choiceXp;
                         var educationOptions = ResolveEducationFieldOptions(choice);
                         for (var i = 0; i < 6; i++)
                         {
