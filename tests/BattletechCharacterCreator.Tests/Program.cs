@@ -24,6 +24,9 @@ character.Weapons.Add(new WeaponItem
 character.RealLife = "Solaris VII Games";
 character.BirthAffiliation = "Federated Suns";
 character.BirthSubAffiliation = "Crucis March";
+character.ClanCaste = "MechWarrior";
+character.ClanTrainingField = "MechWarrior";
+character.Phenotype = "Phenotype/MechWarrior";
 character.RealLifeHistory.Add("Tour of Duty - Inner Sphere");
 character.RealLifeHistory.Add("Solaris VII Games");
 
@@ -42,6 +45,10 @@ Assert(loaded.RealLifeHistory.SequenceEqual(character.RealLifeHistory),
 Assert(loaded.BirthAffiliation == character.BirthAffiliation &&
     loaded.BirthSubAffiliation == character.BirthSubAffiliation,
     "Order birth affiliation details must round-trip.");
+Assert(loaded.ClanCaste == character.ClanCaste &&
+    loaded.ClanTrainingField == character.ClanTrainingField &&
+    loaded.Phenotype == character.Phenotype,
+    "Clan caste, training, and phenotype must round-trip.");
 
 CheckResourceCatalog();
 

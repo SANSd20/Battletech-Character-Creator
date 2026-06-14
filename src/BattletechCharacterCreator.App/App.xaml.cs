@@ -58,6 +58,75 @@ public partial class App : Application
             return;
         }
 
+        if (e.Args.Contains("--smoke-clan-roundtrip", StringComparer.Ordinal))
+        {
+            var wizard = new CharacterWizardWindow();
+            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    var path = Path.Combine(
+                        Path.GetTempPath(), $"atow-clan-{Guid.NewGuid():N}.btcc");
+                    try
+                    {
+                        wizard.SmokeHomeworldClanCharacter();
+                        var editor = new MainWindow(wizard.CreatedCharacter!);
+                        editor.SmokeSaveAndReload(path);
+                        editor.Close();
+                        wizard.Close();
+                        Shutdown(0);
+                    }
+                    finally
+                    {
+                        File.Delete(path);
+                    }
+                });
+            wizard.Show();
+            return;
+        }
+
+        var editorCaptureArgument = e.Args.FirstOrDefault(
+            argument => argument.StartsWith("--capture-clan-editor=",
+                StringComparison.Ordinal));
+        if (editorCaptureArgument is not null)
+        {
+            var outputPath = Path.GetFullPath(
+                editorCaptureArgument["--capture-clan-editor=".Length..]);
+            var wizard = new CharacterWizardWindow();
+            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    var characterPath = Path.Combine(
+                        Path.GetTempPath(), $"atow-clan-{Guid.NewGuid():N}.btcc");
+                    try
+                    {
+                        wizard.SmokeHomeworldClanCharacter();
+                        var editor = new MainWindow(wizard.CreatedCharacter!);
+                        editor.Loaded += (_, _) => editor.Dispatcher.BeginInvoke(
+                            DispatcherPriority.ApplicationIdle,
+                            () =>
+                            {
+                                editor.SmokeSaveAndReload(characterPath);
+                                CaptureWindow(editor, outputPath);
+                                editor.Close();
+                                wizard.Close();
+                                File.Delete(characterPath);
+                                Shutdown(0);
+                            });
+                        editor.Show();
+                        wizard.Hide();
+                    }
+                    catch
+                    {
+                        File.Delete(characterPath);
+                        throw;
+                    }
+                });
+            wizard.Show();
+            return;
+        }
+
         if (e.Args.Contains("--smoke-start", StringComparer.Ordinal))
         {
             var start = new StartWindow();

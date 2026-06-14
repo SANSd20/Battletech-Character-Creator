@@ -79,6 +79,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public void SmokeSaveAndReload(string path)
+    {
+        var original = Character;
+        LegacyCharacterSerializer.Save(original, path);
+        var loaded = LegacyCharacterSerializer.Load(path);
+        VerifyRoundTrip(original, loaded);
+        Character = loaded;
+        currentPath = path;
+        UpdateFileStatus();
+        Recalculate();
+    }
+
     private void New_Click(object sender, RoutedEventArgs e)
     {
         Character = new Character();
@@ -211,6 +223,46 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UpdateFileStatus() =>
         FileStatus.Text = currentPath is null ? "New character" : currentPath;
+
+    private static void VerifyRoundTrip(Character expected, Character actual)
+    {
+        var sameIdentity =
+            expected.Name == actual.Name &&
+            expected.Affiliation == actual.Affiliation &&
+            expected.SubAffiliation == actual.SubAffiliation &&
+            expected.BirthAffiliation == actual.BirthAffiliation &&
+            expected.BirthSubAffiliation == actual.BirthSubAffiliation &&
+            expected.ClanCaste == actual.ClanCaste &&
+            expected.ClanTrainingField == actual.ClanTrainingField &&
+            expected.Phenotype == actual.Phenotype &&
+            expected.EarlyChildhood == actual.EarlyChildhood &&
+            expected.LateChildhood == actual.LateChildhood &&
+            expected.School == actual.School &&
+            expected.BasicSchool == actual.BasicSchool &&
+            expected.AdvancedSchool == actual.AdvancedSchool &&
+            expected.SpecialSchool == actual.SpecialSchool &&
+            expected.RealLife == actual.RealLife &&
+            expected.Notes == actual.Notes;
+        var sameCollections =
+            SameValues(expected.Attributes, actual.Attributes) &&
+            SameValues(expected.Traits, actual.Traits) &&
+            SameValues(expected.Skills, actual.Skills) &&
+            SameValues(expected.PreAttributes, actual.PreAttributes) &&
+            SameValues(expected.PreTraits, actual.PreTraits) &&
+            SameValues(expected.PreSkills, actual.PreSkills) &&
+            expected.RealLifeHistory.SequenceEqual(actual.RealLifeHistory);
+        if (!sameIdentity || !sameCollections)
+        {
+            throw new InvalidOperationException(
+                "The character changed after saving and reopening it.");
+        }
+    }
+
+    private static bool SameValues(
+        IEnumerable<NamedValue> expected,
+        IEnumerable<NamedValue> actual) =>
+        expected.Select(item => (item.Name, item.Value))
+            .SequenceEqual(actual.Select(item => (item.Name, item.Value)));
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
