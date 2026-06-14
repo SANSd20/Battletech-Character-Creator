@@ -71,6 +71,11 @@
         </Border>
 
         <Grid Grid.Column="1" Margin="32,26,32,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition x:Name="TotalsGapRow" Height="0"/>
+                <RowDefinition x:Name="TotalsRow" Height="0"/>
+            </Grid.RowDefinitions>
             <Grid x:Name="BasicInfoPage">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -231,11 +236,6 @@
             </Grid>
 
             <Grid x:Name="ReviewPage" Visibility="Collapsed">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -253,35 +253,6 @@
                     <TextBlock Grid.Column="5" Text="Free XP" Foreground="#666"/>
                     <TextBlock Grid.Column="5" x:Name="FreeXp" Margin="0,22,0,0" FontSize="20" FontWeight="Bold"/>
                 </Grid>
-                <TabControl Grid.Row="2">
-                    <TabItem Header="Attributes">
-                        <DataGrid x:Name="PreviewAttributes" AutoGenerateColumns="False"
-                                  IsReadOnly="True" CanUserAddRows="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Attribute" Binding="{Binding Name}" Width="*"/>
-                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="140"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </TabItem>
-                    <TabItem Header="Skills">
-                        <DataGrid x:Name="PreviewSkills" AutoGenerateColumns="False"
-                                  IsReadOnly="True" CanUserAddRows="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Skill" Binding="{Binding Name}" Width="*"/>
-                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="140"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </TabItem>
-                    <TabItem Header="Traits">
-                        <DataGrid x:Name="PreviewTraits" AutoGenerateColumns="False"
-                                  IsReadOnly="True" CanUserAddRows="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Trait" Binding="{Binding Name}" Width="*"/>
-                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="140"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </TabItem>
-                </TabControl>
             </Grid>
 
             <Border x:Name="ChoicesHost"
@@ -297,6 +268,66 @@
                         <StackPanel x:Name="ChoicesPanel"/>
                     </StackPanel>
                 </ScrollViewer>
+            </Border>
+
+            <Border x:Name="TotalsHost"
+                    Grid.Row="2"
+                    BorderBrush="#C9C8C3"
+                    BorderThickness="0,1,0,0"
+                    Padding="0,12,0,0"
+                    Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="CHARACTER TOTALS"
+                               FontFamily="{StaticResource MontserratBlack}"
+                               FontSize="16"
+                               Foreground="#252525"/>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <DataGrid x:Name="PreviewAttributes"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Attributes" Binding="{Binding Name}" Width="200"/>
+                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="60"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid Grid.Column="2"
+                                  x:Name="PreviewSkills"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Skills" Binding="{Binding Name}" Width="200"/>
+                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="60"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid Grid.Column="4"
+                                  x:Name="PreviewTraits"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Traits" Binding="{Binding Name}" Width="200"/>
+                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="60"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
             </Border>
         </Grid>
 

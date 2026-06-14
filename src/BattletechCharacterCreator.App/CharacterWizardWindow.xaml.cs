@@ -106,6 +106,15 @@ public partial class CharacterWizardWindow : Window
         ChoicesHost.Visibility = currentStep is >= 1 and <= 5
             ? Visibility.Visible
             : Visibility.Collapsed;
+        TotalsHost.Visibility = currentStep > 0
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        TotalsGapRow.Height = currentStep > 0
+            ? new GridLength(18)
+            : new GridLength(0);
+        TotalsRow.Height = currentStep > 0
+            ? new GridLength(225)
+            : new GridLength(0);
         UpdateChoiceGroupVisibility();
         BackButton.IsEnabled = currentStep > 0;
         NextButton.Visibility = currentStep < pages.Length - 1
@@ -117,7 +126,7 @@ public partial class CharacterWizardWindow : Window
         NextButton.IsDefault = currentStep < pages.Length - 1;
         CreateButton.IsDefault = currentStep == pages.Length - 1;
 
-        if (currentStep == pages.Length - 1) UpdatePreview();
+        if (currentStep > 0) UpdatePreview();
     }
 
     private bool ValidateStep(int step)
