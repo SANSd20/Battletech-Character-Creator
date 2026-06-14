@@ -177,13 +177,13 @@ public partial class CharacterWizardWindow : Window
             ? Visibility.Visible
             : Visibility.Collapsed;
         ChoicesHost.Width = currentStep == 1 ? 360 : 450;
-        TotalsHost.Visibility = currentStep > 1
+        TotalsHost.Visibility = currentStep is > 1 and < 6
             ? Visibility.Visible
             : Visibility.Collapsed;
-        TotalsGapRow.Height = currentStep > 1
+        TotalsGapRow.Height = currentStep is > 1 and < 6
             ? new GridLength(18)
             : new GridLength(0);
-        TotalsRow.Height = currentStep > 1
+        TotalsRow.Height = currentStep is > 1 and < 6
             ? new GridLength(225)
             : new GridLength(0);
         UpdateChoiceGroupVisibility();
@@ -313,6 +313,18 @@ public partial class CharacterWizardWindow : Window
         FirstCareerCheck.IsChecked = false;
         BuildChoiceControls();
         UpdatePreview();
+    }
+
+    public void SmokeCreateCharacter()
+    {
+        var character = BuildCharacter();
+        if (PrerequisiteRules.Evaluate(character)
+            .Any(issue => issue.Category == "Affiliation"))
+        {
+            throw new InvalidOperationException(
+                "The default wizard path has a blocking affiliation conflict.");
+        }
+        CreatedCharacter = character;
     }
 
     private LifePathModule? SelectedBirthAffiliation =>
@@ -789,11 +801,15 @@ public partial class CharacterWizardWindow : Window
             Stage0Attributes.ItemsSource = character.Attributes;
             Stage0Skills.ItemsSource = character.Skills.OrderBy(item => item.Name);
             Stage0Traits.ItemsSource = character.Traits.OrderBy(item => item.Name);
+            ReviewAttributes.ItemsSource = character.Attributes;
+            ReviewSkills.ItemsSource = character.Skills.OrderBy(item => item.Name);
+            ReviewTraits.ItemsSource = character.Traits.OrderBy(item => item.Name);
             ModuleCost.Text =
                 LifePathEngine.CalculateModuleCost(character, SelectedModules()).ToString();
             SpentXp.Text = summary.SpentXp.ToString();
             FreeXp.Text = summary.FreeXp.ToString();
             RunningFreeXp.Text = summary.FreeXp.ToString();
+            UpdateReview(character);
         }
         catch (InvalidOperationException)
         {
@@ -803,9 +819,64 @@ public partial class CharacterWizardWindow : Window
             Stage0Attributes.ItemsSource = null;
             Stage0Skills.ItemsSource = null;
             Stage0Traits.ItemsSource = null;
+            ReviewAttributes.ItemsSource = null;
+            ReviewSkills.ItemsSource = null;
+            ReviewTraits.ItemsSource = null;
+            ReviewIssues.ItemsSource = null;
+            ReviewCharacterSummary.Text = "";
+            ReviewLifePath.Text = "";
+            ReviewRuleStatus.Text = "Complete the earlier stages to review this character.";
             RunningFreeXp.Text = "";
         }
     }
+
+    private void UpdateReview(Character character)
+    {
+        var issues = PrerequisiteRules.Evaluate(character);
+        var blockingCount = issues.Count(issue => issue.Category == "Affiliation");
+        ReviewIssues.ItemsSource = issues;
+        ReviewRuleStatus.Text = blockingCount > 0
+            ? $"{blockingCount} blocking conflict(s) must be corrected."
+            : issues.Count > 0
+                ? $"{issues.Count} prerequisite warning(s) remain."
+                : "Ready to create. No unmet prerequisites found.";
+        ReviewRuleStatus.Foreground = blockingCount > 0
+            ? System.Windows.Media.Brushes.Firebrick
+            : issues.Count > 0
+                ? System.Windows.Media.Brushes.DarkGoldenrod
+                : System.Windows.Media.Brushes.DarkGreen;
+        CreateButton.IsEnabled = blockingCount == 0;
+
+        ReviewCharacterSummary.Text =
+            $"{character.Name}{Environment.NewLine}" +
+            $"{character.Sex}, age {character.Age}{Environment.NewLine}" +
+            $"Homeworld: {ValueOrDash(character.HomePlanet)}{Environment.NewLine}" +
+            $"Height / Weight: {character.Height} cm / {character.Weight} kg{Environment.NewLine}" +
+            $"Hair / Eyes: {ValueOrDash(character.HairColor)} / {ValueOrDash(character.EyeColor)}";
+
+        var affiliation = character.BirthAffiliation.Length > 0
+            ? $"{character.Affiliation} (born {character.BirthAffiliation})"
+            : character.Affiliation;
+        var education = character.School.Length == 0
+            ? "None"
+            : string.Join(" / ", new[]
+                {
+                    character.School,
+                    character.BasicSchool,
+                    character.AdvancedSchool,
+                    character.SpecialSchool
+                }.Where(value => value.Length > 0));
+        ReviewLifePath.Text =
+            $"Affiliation: {affiliation}{Environment.NewLine}" +
+            $"Sub-affiliation: {ValueOrDash(character.SubAffiliation.Length > 0 ? character.SubAffiliation : character.BirthSubAffiliation)}{Environment.NewLine}" +
+            $"Early childhood: {character.EarlyChildhood}{Environment.NewLine}" +
+            $"Late childhood: {character.LateChildhood}{Environment.NewLine}" +
+            $"Education: {education}{Environment.NewLine}" +
+            $"Careers: {(character.RealLifeHistory.Count == 0 ? "None" : string.Join(" -> ", character.RealLifeHistory))}";
+    }
+
+    private static string ValueOrDash(string value) =>
+        string.IsNullOrWhiteSpace(value) ? "-" : value;
 
     private Character BuildCharacter()
     {

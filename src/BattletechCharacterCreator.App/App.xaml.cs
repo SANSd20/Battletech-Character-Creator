@@ -20,6 +20,7 @@ public partial class App : Application
                 () =>
                 {
                     wizard.SmokeAllSelections();
+                    wizard.SmokeCreateCharacter();
                     wizard.Close();
                     Shutdown(0);
                 });

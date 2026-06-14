@@ -545,22 +545,130 @@
             </Grid>
 
             <Grid x:Name="ReviewPage" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="190"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="28"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="28"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="102"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="102"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="102"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="REVIEW CHARACTER" Style="{StaticResource SectionTitle}" Margin="0"/>
-                    <TextBlock Grid.Column="1" Text="Module cost" Foreground="#666"/>
-                    <TextBlock Grid.Column="1" x:Name="ModuleCost" Margin="0,22,0,0" FontSize="20" FontWeight="Bold"/>
-                    <TextBlock Grid.Column="3" Text="Allocated XP" Foreground="#666"/>
-                    <TextBlock Grid.Column="3" x:Name="SpentXp" Margin="0,22,0,0" FontSize="20" FontWeight="Bold"/>
-                    <TextBlock Grid.Column="5" Text="Free XP" Foreground="#666"/>
-                    <TextBlock Grid.Column="5" x:Name="FreeXp" Margin="0,22,0,0" FontSize="20" FontWeight="Bold"/>
+                    <Border Grid.Column="2" BorderBrush="#A7A7A2" BorderThickness="1" Padding="7,5">
+                        <StackPanel>
+                            <TextBlock Text="MODULE XP" FontSize="11" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="ModuleCost" FontFamily="{StaticResource MontserratBlack}"
+                                       FontSize="20" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="4" BorderBrush="#A7A7A2" BorderThickness="1" Padding="7,5">
+                        <StackPanel>
+                            <TextBlock Text="ALLOCATED XP" FontSize="11" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="SpentXp" FontFamily="{StaticResource MontserratBlack}"
+                                       FontSize="20" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="6" BorderBrush="#A7A7A2" BorderThickness="1" Padding="7,5">
+                        <StackPanel>
+                            <TextBlock Text="FREE XP" FontSize="11" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="FreeXp" FontFamily="{StaticResource MontserratBlack}"
+                                       FontSize="20" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.05*"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="1.1*"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="1.35*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="Character">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="9,5">
+                            <TextBlock x:Name="ReviewCharacterSummary"
+                                       TextWrapping="Wrap"
+                                       LineHeight="19"/>
+                        </ScrollViewer>
+                    </GroupBox>
+                    <GroupBox Grid.Column="2" Header="Life Path">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="9,5">
+                            <TextBlock x:Name="ReviewLifePath"
+                                       TextWrapping="Wrap"
+                                       LineHeight="19"/>
+                        </ScrollViewer>
+                    </GroupBox>
+                    <GroupBox Grid.Column="4" Header="Rule Check">
+                        <Grid Margin="7,4">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="7"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="ReviewRuleStatus"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"/>
+                            <DataGrid Grid.Row="2"
+                                      x:Name="ReviewIssues"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Type" Binding="{Binding Category}" Width="70"/>
+                                    <DataGridTextColumn Header="Requirement" Binding="{Binding Name}" Width="135"/>
+                                    <DataGridTextColumn Header="Need" Binding="{Binding RequiredXp}" Width="40"/>
+                                    <DataGridTextColumn Header="Have" Binding="{Binding ActualXp}" Width="40"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="145"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <DataGrid x:Name="ReviewAttributes"
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              CanUserAddRows="False" HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Attributes" Binding="{Binding Name}" Width="78"/>
+                            <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="55"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <DataGrid Grid.Column="2" x:Name="ReviewTraits"
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              CanUserAddRows="False" HeadersVisibility="Column"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Traits" Binding="{Binding Name}" Width="290"/>
+                            <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="55"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <DataGrid Grid.Column="4" x:Name="ReviewSkills"
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              CanUserAddRows="False" HeadersVisibility="Column"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Skills" Binding="{Binding Name}" Width="290"/>
+                            <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="55"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </Grid>
 
