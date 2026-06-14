@@ -59,11 +59,40 @@ public partial class App : Application
             return;
         }
 
+        var wizardCaptureArgument = e.Args.FirstOrDefault(
+            argument => argument.StartsWith("--capture-wizard=", StringComparison.Ordinal));
+        if (wizardCaptureArgument is not null)
+        {
+            var outputPath = Path.GetFullPath(
+                wizardCaptureArgument["--capture-wizard=".Length..]);
+            var wizardStepArgument = e.Args.FirstOrDefault(
+                argument => argument.StartsWith("--capture-wizard-step=",
+                    StringComparison.Ordinal));
+            var wizardStep = wizardStepArgument is not null &&
+                int.TryParse(wizardStepArgument["--capture-wizard-step=".Length..],
+                    out var requestedStep)
+                    ? requestedStep
+                    : 0;
+            var wizard = new CharacterWizardWindow();
+            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    wizard.ShowStepForCapture(wizardStep);
+                    CaptureWindow(wizard, outputPath);
+                    wizard.Close();
+                    Shutdown(0);
+                });
+            wizard.Show();
+            return;
+        }
+
         new StartWindow().Show();
     }
 
     private static void CaptureWindow(Window window, string outputPath)
     {
+        window.UpdateLayout();
         var dpi = VisualTreeHelper.GetDpi(window);
         var bitmap = new RenderTargetBitmap(
             (int)Math.Ceiling(window.ActualWidth * dpi.DpiScaleX),

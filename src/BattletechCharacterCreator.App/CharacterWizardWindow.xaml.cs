@@ -1,7 +1,9 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using BattletechCharacterCreator.Core.LifePath;
 using BattletechCharacterCreator.Core.Models;
+using BattletechCharacterCreator.Core.Resources;
 using BattletechCharacterCreator.Core.Rules;
 
 namespace BattletechCharacterCreator.App;
@@ -9,6 +11,10 @@ namespace BattletechCharacterCreator.App;
 public partial class CharacterWizardWindow : Window
 {
     private readonly Dictionary<string, ChoiceInput> choiceControls = [];
+    private readonly List<(FrameworkElement Element, int Step)> choiceGroups = [];
+    private readonly FrameworkElement[] pages;
+    private readonly TextBlock[] stepLabels;
+    private int currentStep;
     private bool refreshing;
 
     private sealed record ChoiceInput(
@@ -23,6 +29,25 @@ public partial class CharacterWizardWindow : Window
     public CharacterWizardWindow()
     {
         InitializeComponent();
+        pages =
+        [
+            BasicInfoPage, Stage0Page, Stage1Page, Stage2Page,
+            Stage3Page, Stage4Page, ReviewPage
+        ];
+        stepLabels =
+        [
+            Step0Label, Step1Label, Step2Label, Step3Label,
+            Step4Label, Step5Label, Step6Label
+        ];
+
+        var resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
+        var resources = ResourceCatalog.Load(resourcePath);
+        HomePlanetPicker.ItemsSource = resources.Planets;
+        HairColorPicker.ItemsSource = resources.HairColors;
+        EyeColorPicker.ItemsSource = resources.EyeColors;
+        SexPicker.ItemsSource = new[] { "Male", "Female" };
+        SexPicker.SelectedIndex = 0;
+
         AffiliationPicker.ItemsSource = LifePathCatalog.Affiliations;
         BirthAffiliationPicker.ItemsSource = BirthAffiliations;
         ChildhoodPicker.ItemsSource = LifePathCatalog.Childhoods;
@@ -36,10 +61,98 @@ public partial class CharacterWizardWindow : Window
         SchoolPicker.SelectedIndex = -1;
         RealLifePicker.SelectedIndex = -1;
         SecondRealLifePicker.SelectedIndex = -1;
-        Loaded += (_, _) => RefreshModules();
+        Loaded += (_, _) =>
+        {
+            RefreshModules();
+            ShowStep(0);
+        };
     }
 
     public Character? CreatedCharacter { get; private set; }
+
+    public void ShowStepForCapture(int step) => ShowStep(step);
+
+    private void Back_Click(object sender, RoutedEventArgs e)
+    {
+        if (currentStep > 0) ShowStep(currentStep - 1);
+    }
+
+    private void Next_Click(object sender, RoutedEventArgs e)
+    {
+        if (!ValidateStep(currentStep)) return;
+        if (currentStep < pages.Length - 1) ShowStep(currentStep + 1);
+    }
+
+    private void ShowStep(int step)
+    {
+        currentStep = Math.Clamp(step, 0, pages.Length - 1);
+        for (var index = 0; index < pages.Length; index++)
+        {
+            pages[index].Visibility = index == currentStep
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            stepLabels[index].Foreground = index == currentStep
+                ? System.Windows.Media.Brushes.White
+                : index < currentStep
+                    ? new System.Windows.Media.SolidColorBrush(
+                        System.Windows.Media.Color.FromRgb(168, 178, 124))
+                    : new System.Windows.Media.SolidColorBrush(
+                        System.Windows.Media.Color.FromRgb(189, 189, 185));
+            stepLabels[index].FontWeight = index == currentStep
+                ? FontWeights.Bold
+                : FontWeights.Normal;
+        }
+
+        ChoicesHost.Visibility = currentStep is >= 1 and <= 5
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        UpdateChoiceGroupVisibility();
+        BackButton.IsEnabled = currentStep > 0;
+        NextButton.Visibility = currentStep < pages.Length - 1
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        CreateButton.Visibility = currentStep == pages.Length - 1
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        NextButton.IsDefault = currentStep < pages.Length - 1;
+        CreateButton.IsDefault = currentStep == pages.Length - 1;
+
+        if (currentStep == pages.Length - 1) UpdatePreview();
+    }
+
+    private bool ValidateStep(int step)
+    {
+        string? message = step switch
+        {
+            0 when string.IsNullOrWhiteSpace(CharacterName.Text) =>
+                "Enter a character name.",
+            0 when !TryReadPositiveNumber(AgeInput, out _) =>
+                "Enter a valid age.",
+            0 when !TryReadPositiveNumber(HeightInput, out _) =>
+                "Enter a valid height.",
+            0 when !TryReadPositiveNumber(WeightInput, out _) =>
+                "Enter a valid weight.",
+            1 when SelectedAffiliation is null =>
+                "Choose an affiliation.",
+            1 when LanguagePicker.SelectedItem is null =>
+                "Choose a primary language.",
+            2 when SelectedChildhood is null =>
+                "Choose an early childhood.",
+            3 when SelectedLateChildhood is null =>
+                "Choose a late childhood.",
+            4 when SelectedSchool is not null && SelectedBasicField is null =>
+                "Choose one Basic Field for the selected school.",
+            _ => null
+        };
+        if (message is null) return true;
+
+        MessageBox.Show(this, message, "Complete this step",
+            MessageBoxButton.OK, MessageBoxImage.Information);
+        return false;
+    }
+
+    private static bool TryReadPositiveNumber(TextBox input, out int value) =>
+        int.TryParse(input.Text, out value) && value > 0;
 
     public void SmokeAllSelections()
     {
@@ -266,10 +379,16 @@ public partial class CharacterWizardWindow : Window
         {
             ChoicesPanel.Children.Clear();
             choiceControls.Clear();
+            choiceGroups.Clear();
 
             foreach (var selectedModule in SelectedModuleEntries())
             {
                 var module = selectedModule.Module;
+                if (module.Choices.Count == 0) continue;
+
+                var modulePanel = new StackPanel();
+                ChoicesPanel.Children.Add(modulePanel);
+                choiceGroups.Add((modulePanel, ChoiceStep(selectedModule)));
                 foreach (var choice in module.Choices)
                 {
                     var header = new TextBlock
@@ -278,7 +397,7 @@ public partial class CharacterWizardWindow : Window
                         FontWeight = FontWeights.SemiBold,
                         Margin = new Thickness(0, 7, 0, 2)
                     };
-                    ChoicesPanel.Children.Add(header);
+                    modulePanel.Children.Add(header);
 
                     var controls = new List<ComboBox>();
                     var options = ResolveChoiceOptions(choice);
@@ -325,7 +444,7 @@ public partial class CharacterWizardWindow : Window
                             amount.TextChanged += ChoiceAmountChanged;
                             controls.Add(picker);
                             amounts.Add(amount);
-                            ChoicesPanel.Children.Add(row);
+                            modulePanel.Children.Add(row);
                         }
                         choiceControls[Key(selectedModule, choice)] =
                             new ChoiceInput(controls, amounts);
@@ -343,7 +462,7 @@ public partial class CharacterWizardWindow : Window
                         picker.ItemsSource = options;
                         picker.SelectedIndex = Math.Min(i, options.Count - 1);
                         controls.Add(picker);
-                        ChoicesPanel.Children.Add(picker);
+                        modulePanel.Children.Add(picker);
                     }
                     choiceControls[Key(selectedModule, choice)] =
                         new ChoiceInput(controls);
@@ -353,6 +472,32 @@ public partial class CharacterWizardWindow : Window
         finally
         {
             refreshing = wasRefreshing;
+            UpdateChoiceGroupVisibility();
+        }
+    }
+
+    private int ChoiceStep(SelectedModule selectedModule)
+    {
+        if (selectedModule.IsStage4) return 5;
+        if (selectedModule.Module == SelectedChildhood) return 2;
+        if (selectedModule.Module == SelectedLateChildhood) return 3;
+        if (selectedModule.Module == SelectedSchool ||
+            selectedModule.Module == SelectedBasicField ||
+            selectedModule.Module == SelectedAdvancedField ||
+            selectedModule.Module == SelectedSpecialistField)
+        {
+            return 4;
+        }
+        return 1;
+    }
+
+    private void UpdateChoiceGroupVisibility()
+    {
+        foreach (var group in choiceGroups)
+        {
+            group.Element.Visibility = group.Step == currentStep
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
     }
 
@@ -505,6 +650,15 @@ public partial class CharacterWizardWindow : Window
             throw new InvalidOperationException("Choose a primary language.");
 
         var character = LifePathEngine.CreateBase(CharacterName.Text.Trim(), language);
+        character.HomePlanet = HomePlanetPicker.Text.Trim();
+        character.Sex = SexPicker.SelectedItem as string ?? "Male";
+        character.Age = TryReadPositiveNumber(AgeInput, out var age) ? age : 21;
+        character.Height = TryReadPositiveNumber(HeightInput, out var height)
+            ? height : 175;
+        character.Weight = TryReadPositiveNumber(WeightInput, out var weight)
+            ? weight : 80;
+        character.HairColor = HairColorPicker.Text.Trim();
+        character.EyeColor = EyeColorPicker.Text.Trim();
         character.Affiliation = affiliation.Name;
         character.SubAffiliation = SelectedSubAffiliation?.Name ?? "";
         character.BirthAffiliation = SelectedBirthAffiliation?.Name ?? "";
