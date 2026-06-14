@@ -103,6 +103,38 @@ public partial class App : Application
             return;
         }
 
+        var sheetExportArgument = e.Args.FirstOrDefault(
+            argument => argument.StartsWith("--smoke-sheet-export=",
+                StringComparison.Ordinal));
+        if (sheetExportArgument is not null)
+        {
+            var outputPath = Path.GetFullPath(
+                sheetExportArgument["--smoke-sheet-export=".Length..]);
+            var wizard = new CharacterWizardWindow();
+            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    try
+                    {
+                        wizard.SmokeHomeworldClanCharacter();
+                        var editor = new MainWindow(wizard.CreatedCharacter!);
+                        editor.SmokeExportCharacterSheet(outputPath);
+                        editor.Close();
+                        wizard.Close();
+                        Shutdown(0);
+                    }
+                    catch (Exception ex)
+                    {
+                        File.WriteAllText(outputPath + ".error.txt", ex.ToString());
+                        wizard.Close();
+                        Shutdown(1);
+                    }
+                });
+            wizard.Show();
+            return;
+        }
+
         var editorCaptureArgument = e.Args.FirstOrDefault(
             argument => argument.StartsWith("--capture-clan-editor=",
                 StringComparison.Ordinal));

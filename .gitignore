@@ -16,9 +16,12 @@ qrc_*.cpp
 msvcr*.dll
 t
 .edge-pdf*/
+.edge-sheet-preview/
 tmp-*.png
 start-window-*.png
 wizard-*.png
 editor-*.png
+character-sheet-*.png
+character-sheet-*.pdf
 1 A Time of War-The BattleTech RPG — Corrected Third Printing.pdf
 1r A Time of War-The BattleTech RPG Character Record Sheet.pdf

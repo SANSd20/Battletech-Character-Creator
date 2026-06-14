@@ -70,6 +70,8 @@
                     <Button Content="Open" Click="Open_Click"/>
                     <Button Content="Save" Click="Save_Click"/>
                     <Button Content="Save As" Click="SaveAs_Click"/>
+                    <Button Content="Preview" Click="PreviewSheet_Click"/>
+                    <Button Content="Export PDF" Click="ExportPdf_Click"/>
                     <Button Content="Recalculate" Click="Recalculate_Click"/>
                 </StackPanel>
                 <TextBlock Grid.Column="3"

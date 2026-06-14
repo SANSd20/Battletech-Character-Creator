@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -211,6 +212,29 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ApplyXpGridColumnWidths();
     }
 
+    public void SmokeExportCharacterSheet(string path)
+    {
+        CharacterSheetExporter.Export(Character, Catalog, path);
+        var bytes = File.ReadAllBytes(path);
+        var text = System.Text.Encoding.ASCII.GetString(bytes);
+        var expectedPages =
+            Character.Traits.Count > 8 || Character.Skills.Count > 30 ? 3 : 2;
+        if (bytes.Length < 100_000 ||
+            !text.StartsWith("%PDF-1.4", StringComparison.Ordinal) ||
+            !text.Contains($"/Count {expectedPages}", StringComparison.Ordinal) ||
+            !text.Contains(EscapeSmokeText(Character.Name),
+                StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Character sheet PDF export did not produce a complete document.");
+        }
+    }
+
+    private static string EscapeSmokeText(string value) =>
+        value.Replace("\\", "\\\\", StringComparison.Ordinal)
+            .Replace("(", "\\(", StringComparison.Ordinal)
+            .Replace(")", "\\)", StringComparison.Ordinal);
+
     private void New_Click(object sender, RoutedEventArgs e)
     {
         Character = new Character();
@@ -293,6 +317,60 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             MessageBox.Show(this, ex.Message, "Unable to save character",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    private void PreviewSheet_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var directory = Path.Combine(
+                Path.GetTempPath(), "A-Time-of-War-Character-Sheets");
+            Directory.CreateDirectory(directory);
+            var path = Path.Combine(directory,
+                $"{SafeFileName(Character.Name)}-preview.pdf");
+            CharacterSheetExporter.Export(Character, Catalog, path);
+            Process.Start(new ProcessStartInfo(path)
+            {
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, ex.Message, "Unable to preview character sheet",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void ExportPdf_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new SaveFileDialog
+        {
+            Filter = "PDF documents (*.pdf)|*.pdf",
+            DefaultExt = ".pdf",
+            AddExtension = true,
+            FileName = $"{SafeFileName(Character.Name)} Character Sheet.pdf"
+        };
+        if (dialog.ShowDialog(this) != true) return;
+
+        try
+        {
+            CharacterSheetExporter.Export(Character, Catalog, dialog.FileName);
+            FileStatus.Text = $"Exported {dialog.FileName}";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, ex.Message, "Unable to export character sheet",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private static string SafeFileName(string value)
+    {
+        var invalid = Path.GetInvalidFileNameChars();
+        var cleaned = new string(value
+            .Select(character => invalid.Contains(character) ? '_' : character)
+            .ToArray()).Trim();
+        return cleaned.Length == 0 ? "Character" : cleaned;
     }
 
     private void AddSkill_Click(object sender, RoutedEventArgs e)

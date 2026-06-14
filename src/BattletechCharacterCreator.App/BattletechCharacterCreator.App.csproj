@@ -9,6 +9,18 @@
     <ProjectReference Include="..\BattletechCharacterCreator.Core\BattletechCharacterCreator.Core.csproj" />
     <Resource Include="Assets\Fonts\Montserrat-Black.ttf" />
     <Resource Include="Assets\Images\pilot6.jpg" />
+    <Content Include="..\..\top_page_sheet_pic.png">
+      <Link>Assets\Sheets\CharacterRecordSheet.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\back_page_sheet_pic.png">
+      <Link>Assets\Sheets\CharacterRecordSheetReverse.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\additional_page_sheet_pic.png">
+      <Link>Assets\Sheets\CharacterRecordSheetAdditional.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\resource\*.dat">
       <Link>Resources\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
