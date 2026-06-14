@@ -288,7 +288,7 @@
                                Foreground="#252525"/>
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="145"/>
                             <ColumnDefinition Width="14"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="14"/>
@@ -300,30 +300,30 @@
                                   CanUserAddRows="False"
                                   HeadersVisibility="Column">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Attributes" Binding="{Binding Name}" Width="200"/>
-                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="60"/>
+                                <DataGridTextColumn Header="Attributes" Binding="{Binding Name}" Width="78"/>
+                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="55"/>
                             </DataGrid.Columns>
                         </DataGrid>
                         <DataGrid Grid.Column="2"
-                                  x:Name="PreviewSkills"
-                                  AutoGenerateColumns="False"
-                                  IsReadOnly="True"
-                                  CanUserAddRows="False"
-                                  HeadersVisibility="Column">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Skills" Binding="{Binding Name}" Width="200"/>
-                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="60"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <DataGrid Grid.Column="4"
                                   x:Name="PreviewTraits"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="True"
                                   CanUserAddRows="False"
                                   HeadersVisibility="Column">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Traits" Binding="{Binding Name}" Width="200"/>
-                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="60"/>
+                                <DataGridTextColumn Header="Traits" Binding="{Binding Name}" Width="250"/>
+                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="55"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid Grid.Column="4"
+                                  x:Name="PreviewSkills"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Skills" Binding="{Binding Name}" Width="250"/>
+                                <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="55"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
