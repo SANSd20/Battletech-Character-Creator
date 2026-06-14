@@ -95,6 +95,33 @@ public partial class CharacterWizardWindow : Window
         RefreshModules();
     }
 
+    public void SelectEducationForCapture(
+        string schoolId,
+        string? advancedField = null,
+        string? thirdField = null)
+    {
+        EducationCheck.IsChecked = true;
+        SchoolPicker.SelectedItem = LifePathCatalog.EducationSchools
+            .First(module => module.Id == schoolId);
+        RefreshModules();
+        if (!string.IsNullOrWhiteSpace(advancedField))
+        {
+            AdvancedFieldPicker.SelectedItem = AdvancedFieldPicker.Items
+                .Cast<LifePathModule>()
+                .First(module => module.Name == advancedField);
+            RefreshThirdField(SelectedSchool);
+        }
+        if (!string.IsNullOrWhiteSpace(thirdField))
+        {
+            SpecialistFieldPicker.SelectedItem = SpecialistFieldPicker.Items
+                .Cast<LifePathModule>()
+                .First(module => module.Name == thirdField);
+        }
+        BuildChoiceControls();
+        UpdateEducationSummary();
+        UpdatePreview();
+    }
+
     private void Back_Click(object sender, RoutedEventArgs e)
     {
         if (currentStep > 0) ShowStep(currentStep - 1);
@@ -223,6 +250,7 @@ public partial class CharacterWizardWindow : Window
             LateChildhoodPicker.SelectedItem = lateChildhood;
             RefreshModules();
         }
+        EducationCheck.IsChecked = true;
         foreach (var school in LifePathCatalog.EducationSchools)
         {
             SchoolPicker.SelectedItem = school;
@@ -245,6 +273,7 @@ public partial class CharacterWizardWindow : Window
                 }
             }
         }
+        EducationCheck.IsChecked = false;
         foreach (var realLife in LifePathCatalog.RealLifeModules)
         {
             RealLifePicker.SelectedItem = realLife;
@@ -275,7 +304,9 @@ public partial class CharacterWizardWindow : Window
     private LifePathModule? SelectedCaste => CastePicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedChildhood => ChildhoodPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedLateChildhood => LateChildhoodPicker.SelectedItem as LifePathModule;
-    private LifePathModule? SelectedSchool => SchoolPicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedSchool => EducationCheck.IsChecked == true
+        ? SchoolPicker.SelectedItem as LifePathModule
+        : null;
     private LifePathModule? SelectedBasicField => BasicFieldPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedAdvancedField => AdvancedFieldPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedSpecialistField => SpecialistFieldPicker.SelectedItem as LifePathModule;
@@ -308,7 +339,6 @@ public partial class CharacterWizardWindow : Window
         ChildhoodModuleCost.Text = childhood?.ModuleCost.ToString() ?? "";
         LateChildhoodDescription.Text = lateChildhood?.Description ?? "";
         LateChildhoodModuleCost.Text = lateChildhood?.ModuleCost.ToString() ?? "";
-        SchoolDescription.Text = school?.Description ?? "";
         RealLifeDescription.Text = SelectedRealLife?.Description ?? "";
         SecondRealLifeDescription.Text =
             SelectedSecondRealLife?.Description ?? "";
@@ -326,6 +356,7 @@ public partial class CharacterWizardWindow : Window
         if (LanguagePicker.Items.Count > 0) LanguagePicker.SelectedIndex = 0;
 
         RefreshEducationFields(school);
+        UpdateEducationSummary();
         BuildChoiceControls();
         refreshing = false;
         UpdatePreview();
@@ -340,6 +371,16 @@ public partial class CharacterWizardWindow : Window
     private void SchoolSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded || refreshing) return;
+        RefreshModules();
+    }
+
+    private void EducationSelectionChanged(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded || refreshing) return;
+        if (EducationCheck.IsChecked == true && SchoolPicker.SelectedItem is null)
+        {
+            SchoolPicker.SelectedIndex = 0;
+        }
         RefreshModules();
     }
 
@@ -369,6 +410,35 @@ public partial class CharacterWizardWindow : Window
                 .Concat(school?.SpecialistFields ?? [])
                 .ToArray();
         SetDependentPicker(SpecialistFieldPicker, SpecialistFieldPanel, fields, false);
+    }
+
+    private void UpdateEducationSummary()
+    {
+        var school = SelectedSchool;
+        SchoolDescription.Text = school?.Description ??
+            "No formal education selected.";
+        var fields = new[]
+            {
+                ("Basic field", SelectedBasicField),
+                ("Advanced field", SelectedAdvancedField),
+                ("Third field", SelectedSpecialistField)
+            }
+            .Where(entry => entry.Item2 is not null)
+            .Select(entry => $"{entry.Item1}: {entry.Item2!.Name}")
+            .ToArray();
+        EducationFieldsSummary.Text = string.Join(Environment.NewLine, fields);
+        EducationModuleCost.Text = school is null
+            ? "0"
+            : new[]
+                {
+                    school,
+                    SelectedBasicField,
+                    SelectedAdvancedField,
+                    SelectedSpecialistField
+                }
+                .Where(module => module is not null)
+                .Sum(module => module!.ModuleCost)
+                .ToString();
     }
 
     private static void SetDependentPicker(
@@ -603,6 +673,7 @@ public partial class CharacterWizardWindow : Window
         refreshing = true;
         BuildChoiceControls();
         refreshing = false;
+        UpdateEducationSummary();
         UpdatePreview();
     }
 
@@ -613,6 +684,7 @@ public partial class CharacterWizardWindow : Window
         RefreshThirdField(SelectedSchool);
         BuildChoiceControls();
         refreshing = false;
+        UpdateEducationSummary();
         UpdatePreview();
     }
 

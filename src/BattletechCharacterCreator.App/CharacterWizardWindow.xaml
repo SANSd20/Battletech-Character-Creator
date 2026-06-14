@@ -332,36 +332,112 @@
             </Grid>
 
             <Grid x:Name="Stage3Page" Visibility="Collapsed">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="430"/>
-                    <ColumnDefinition Width="28"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="STAGE 3 · EDUCATION" Style="{StaticResource SectionTitle}"/>
-                        <TextBlock Text="Education (optional)" Style="{StaticResource FieldLabel}"/>
-                        <ComboBox x:Name="SchoolPicker" DisplayMemberPath="Name"
-                                  SelectionChanged="SchoolSelectionChanged"/>
-                        <TextBlock x:Name="SchoolDescription" TextWrapping="Wrap"
-                                   Foreground="#555555" Margin="0,8,12,8"/>
-                        <StackPanel x:Name="BasicFieldPanel">
-                            <TextBlock Text="Basic field" Style="{StaticResource FieldLabel}"/>
-                            <ComboBox x:Name="BasicFieldPicker" DisplayMemberPath="Name"
-                                      SelectionChanged="DependentSelectionChanged"/>
+                <Grid Margin="0,0,474,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="18"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="18"/>
+                            <ColumnDefinition Width="102"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.ColumnSpan="3"
+                                   Text="STAGE 3 · EDUCATION"
+                                   Style="{StaticResource SectionTitle}"
+                                   Margin="0"/>
+                        <StackPanel Grid.Row="2">
+                            <CheckBox x:Name="EducationCheck"
+                                      Content="Attend formal education"
+                                      Margin="0,0,0,7"
+                                      FontWeight="SemiBold"
+                                      Checked="EducationSelectionChanged"
+                                      Unchecked="EducationSelectionChanged"/>
+                            <Grid x:Name="EducationFieldsPanel"
+                                  IsEnabled="{Binding IsChecked, ElementName=EducationCheck}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="School"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="SchoolPicker"
+                                              DisplayMemberPath="Name"
+                                              SelectionChanged="SchoolSelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel x:Name="BasicFieldPanel" Grid.Column="2">
+                                    <TextBlock Text="Basic field"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="BasicFieldPicker" DisplayMemberPath="Name"
+                                              SelectionChanged="DependentSelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel x:Name="AdvancedFieldPanel" Grid.Row="2">
+                                    <TextBlock Text="Advanced field (optional)"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="AdvancedFieldPicker" DisplayMemberPath="Name"
+                                              SelectionChanged="AdvancedFieldSelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel x:Name="SpecialistFieldPanel"
+                                            Grid.Row="2"
+                                            Grid.Column="2">
+                                    <TextBlock Text="Third field (optional)"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="SpecialistFieldPicker" DisplayMemberPath="Name"
+                                              SelectionChanged="DependentSelectionChanged"/>
+                                </StackPanel>
+                            </Grid>
                         </StackPanel>
-                        <StackPanel x:Name="AdvancedFieldPanel">
-                            <TextBlock Text="Advanced field (optional)" Style="{StaticResource FieldLabel}"/>
-                            <ComboBox x:Name="AdvancedFieldPicker" DisplayMemberPath="Name"
-                                      SelectionChanged="AdvancedFieldSelectionChanged"/>
-                        </StackPanel>
-                        <StackPanel x:Name="SpecialistFieldPanel">
-                            <TextBlock Text="Third field (optional)" Style="{StaticResource FieldLabel}"/>
-                            <ComboBox x:Name="SpecialistFieldPicker" DisplayMemberPath="Name"
-                                      SelectionChanged="DependentSelectionChanged"/>
-                        </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
+                        <Border Grid.Row="2"
+                                Grid.Column="2"
+                                VerticalAlignment="Top"
+                                BorderBrush="#A7A7A2"
+                                BorderThickness="1"
+                                Padding="8,6">
+                            <StackPanel>
+                                <TextBlock Text="EDUCATION XP"
+                                           FontSize="11"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="EducationModuleCost"
+                                           FontFamily="{StaticResource MontserratBlack}"
+                                           FontSize="21"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <GroupBox Grid.Row="2" Header="Education Overview">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10,6">
+                            <StackPanel>
+                                <TextBlock x:Name="SchoolDescription"
+                                           TextWrapping="Wrap"
+                                           Foreground="#454545"
+                                           LineHeight="20"/>
+                                <TextBlock x:Name="EducationFieldsSummary"
+                                           TextWrapping="Wrap"
+                                           Foreground="#666666"
+                                           Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </GroupBox>
+                </Grid>
             </Grid>
 
             <Grid x:Name="Stage4Page" Visibility="Collapsed">

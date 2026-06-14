@@ -83,6 +83,20 @@ public partial class App : Application
                     StringComparison.Ordinal));
             var lateChildhood = lateChildhoodArgument?[
                 "--capture-late-childhood=".Length..];
+            var educationArgument = e.Args.FirstOrDefault(
+                argument => argument.StartsWith("--capture-education=",
+                    StringComparison.Ordinal));
+            var education = educationArgument?["--capture-education=".Length..];
+            var advancedFieldArgument = e.Args.FirstOrDefault(
+                argument => argument.StartsWith("--capture-advanced-field=",
+                    StringComparison.Ordinal));
+            var advancedField = advancedFieldArgument?[
+                "--capture-advanced-field=".Length..];
+            var thirdFieldArgument = e.Args.FirstOrDefault(
+                argument => argument.StartsWith("--capture-third-field=",
+                    StringComparison.Ordinal));
+            var thirdField = thirdFieldArgument?[
+                "--capture-third-field=".Length..];
             var wizard = new CharacterWizardWindow();
             wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
                 DispatcherPriority.ApplicationIdle,
@@ -95,6 +109,11 @@ public partial class App : Application
                     if (!string.IsNullOrWhiteSpace(lateChildhood))
                     {
                         wizard.SelectLateChildhoodForCapture(lateChildhood);
+                    }
+                    if (!string.IsNullOrWhiteSpace(education))
+                    {
+                        wizard.SelectEducationForCapture(
+                            education, advancedField, thirdField);
                     }
                     wizard.ShowStepForCapture(wizardStep);
                     CaptureWindow(wizard, outputPath);
