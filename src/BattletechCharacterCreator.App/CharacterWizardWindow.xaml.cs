@@ -48,8 +48,7 @@ public partial class CharacterWizardWindow : Window
         SexPicker.ItemsSource = new[] { "Male", "Female" };
         SexPicker.SelectedIndex = 0;
 
-        AffiliationPicker.ItemsSource = LifePathCatalog.Affiliations;
-        BirthAffiliationPicker.ItemsSource = BirthAffiliations;
+        AffiliationPicker.ItemsSource = BirthAffiliations;
         ChildhoodPicker.ItemsSource = LifePathCatalog.Childhoods;
         LateChildhoodPicker.ItemsSource = LifePathCatalog.LateChildhoods;
         SchoolPicker.ItemsSource = LifePathCatalog.EducationSchools;
@@ -71,6 +70,23 @@ public partial class CharacterWizardWindow : Window
     public Character? CreatedCharacter { get; private set; }
 
     public void ShowStepForCapture(int step) => ShowStep(step);
+
+    public void SelectAffiliationForCapture(string affiliationId)
+    {
+        if (affiliationId is "comstar" or "word-of-blake")
+        {
+            OrderMemberCheck.IsChecked = true;
+            ComStarRadio.IsChecked = affiliationId == "comstar";
+            WordOfBlakeRadio.IsChecked = affiliationId == "word-of-blake";
+        }
+        else
+        {
+            OrderMemberCheck.IsChecked = false;
+            AffiliationPicker.SelectedItem = BirthAffiliations
+                .First(module => module.Id == affiliationId);
+        }
+        RefreshModules();
+    }
 
     private void Back_Click(object sender, RoutedEventArgs e)
     {
@@ -166,7 +182,7 @@ public partial class CharacterWizardWindow : Window
 
     public void SmokeAllSelections()
     {
-        foreach (var affiliation in LifePathCatalog.Affiliations)
+        foreach (var affiliation in BirthAffiliations)
         {
             AffiliationPicker.SelectedItem = affiliation;
             RefreshModules();
@@ -183,6 +199,13 @@ public partial class CharacterWizardWindow : Window
                 UpdatePreview();
             }
         }
+        foreach (var orderId in new[] { "comstar", "word-of-blake" })
+        {
+            SelectAffiliationForCapture(orderId);
+            BuildChoiceControls();
+            UpdatePreview();
+        }
+        OrderMemberCheck.IsChecked = false;
         foreach (var childhood in LifePathCatalog.Childhoods)
         {
             ChildhoodPicker.SelectedItem = childhood;
@@ -230,11 +253,17 @@ public partial class CharacterWizardWindow : Window
         UpdatePreview();
     }
 
-    private LifePathModule? SelectedAffiliation => AffiliationPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedBirthAffiliation =>
-        BirthAffiliationPicker.SelectedItem as LifePathModule;
-    private LifePathModule? SelectedBirthSubAffiliation =>
-        BirthSubAffiliationPicker.SelectedItem as LifePathModule;
+        AffiliationPicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedOrderAffiliation =>
+        OrderMemberCheck.IsChecked == true
+            ? LifePathCatalog.Affiliations.First(module =>
+                module.Id == (WordOfBlakeRadio.IsChecked == true
+                    ? "word-of-blake"
+                    : "comstar"))
+            : null;
+    private LifePathModule? SelectedAffiliation =>
+        SelectedOrderAffiliation ?? SelectedBirthAffiliation;
     private LifePathModule? SelectedSubAffiliation => SubAffiliationPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedCaste => CastePicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedChildhood => ChildhoodPicker.SelectedItem as LifePathModule;
@@ -261,24 +290,25 @@ public partial class CharacterWizardWindow : Window
     {
         refreshing = true;
         var affiliation = SelectedAffiliation;
+        var birthAffiliation = SelectedBirthAffiliation;
         var childhood = SelectedChildhood;
         var lateChildhood = SelectedLateChildhood;
         var school = SelectedSchool;
-        AffiliationDescription.Text = affiliation?.Description ?? "";
+        AffiliationDescription.Text = SelectedOrderAffiliation is null
+            ? birthAffiliation?.Description ?? ""
+            : $"{affiliation?.Description}{Environment.NewLine}{birthAffiliation?.Description}";
         ChildhoodDescription.Text = childhood?.Description ?? "";
         LateChildhoodDescription.Text = lateChildhood?.Description ?? "";
         SchoolDescription.Text = school?.Description ?? "";
         RealLifeDescription.Text = SelectedRealLife?.Description ?? "";
         SecondRealLifeDescription.Text =
             SelectedSecondRealLife?.Description ?? "";
-        RefreshBirthAffiliation(affiliation);
-
-        SubAffiliationPicker.ItemsSource = affiliation?.SubAffiliations ?? [];
+        SubAffiliationPicker.ItemsSource = birthAffiliation?.SubAffiliations ?? [];
         SubAffiliationPanel.Visibility = SubAffiliationPicker.Items.Count > 0
             ? Visibility.Visible : Visibility.Collapsed;
         if (SubAffiliationPicker.Items.Count > 0) SubAffiliationPicker.SelectedIndex = 0;
 
-        CastePicker.ItemsSource = affiliation?.Castes ?? [];
+        CastePicker.ItemsSource = birthAffiliation?.Castes ?? [];
         CastePanel.Visibility = CastePicker.Items.Count > 0
             ? Visibility.Visible : Visibility.Collapsed;
         if (CastePicker.Items.Count > 0) CastePicker.SelectedIndex = 0;
@@ -292,56 +322,16 @@ public partial class CharacterWizardWindow : Window
         UpdatePreview();
     }
 
-    private void SchoolSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void OrderSelectionChanged(object sender, RoutedEventArgs e)
     {
         if (!IsLoaded || refreshing) return;
         RefreshModules();
     }
 
-    private void BirthAffiliationSelectionChanged(
-        object sender,
-        SelectionChangedEventArgs e)
+    private void SchoolSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded || refreshing) return;
-        refreshing = true;
-        RefreshBirthAffiliation(SelectedAffiliation);
-        BuildChoiceControls();
-        refreshing = false;
-        UpdatePreview();
-    }
-
-    private void RefreshBirthAffiliation(LifePathModule? affiliation)
-    {
-        var requiresBirthAffiliation =
-            affiliation?.Id is "comstar" or "word-of-blake";
-        BirthAffiliationPanel.Visibility = requiresBirthAffiliation
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-        BirthSubAffiliationPanel.Visibility = Visibility.Collapsed;
-        if (!requiresBirthAffiliation)
-        {
-            BirthAffiliationPicker.SelectedIndex = -1;
-            BirthSubAffiliationPicker.ItemsSource =
-                Array.Empty<LifePathModule>();
-            BirthAffiliationDescription.Text = "";
-            return;
-        }
-
-        if (BirthAffiliationPicker.SelectedItem is not LifePathModule)
-        {
-            BirthAffiliationPicker.SelectedIndex = 0;
-        }
-        var birthAffiliation = SelectedBirthAffiliation;
-        BirthAffiliationDescription.Text =
-            birthAffiliation?.Description ?? "";
-        BirthSubAffiliationPicker.ItemsSource =
-            birthAffiliation?.SubAffiliations ?? [];
-        BirthSubAffiliationPanel.Visibility =
-            BirthSubAffiliationPicker.Items.Count > 0
-                ? Visibility.Visible
-                : Visibility.Collapsed;
-        BirthSubAffiliationPicker.SelectedIndex =
-            BirthSubAffiliationPicker.Items.Count > 0 ? 0 : -1;
+        RefreshModules();
     }
 
     private void RealLifeSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -678,10 +668,15 @@ public partial class CharacterWizardWindow : Window
         character.HairColor = HairColorPicker.Text.Trim();
         character.EyeColor = EyeColorPicker.Text.Trim();
         character.Affiliation = affiliation.Name;
-        character.SubAffiliation = SelectedSubAffiliation?.Name ?? "";
-        character.BirthAffiliation = SelectedBirthAffiliation?.Name ?? "";
-        character.BirthSubAffiliation =
-            SelectedBirthSubAffiliation?.Name ?? "";
+        character.SubAffiliation = SelectedOrderAffiliation is null
+            ? SelectedSubAffiliation?.Name ?? ""
+            : "";
+        character.BirthAffiliation = SelectedOrderAffiliation is null
+            ? ""
+            : SelectedBirthAffiliation?.Name ?? "";
+        character.BirthSubAffiliation = SelectedOrderAffiliation is null
+            ? ""
+            : SelectedSubAffiliation?.Name ?? "";
         character.ClanCaste = SelectedCaste?.Name ?? "";
         character.ClanTrainingField = GetSelectedChoice(SelectedLateChildhood, "branch");
         character.EarlyChildhood = childhood.Name;
@@ -792,9 +787,8 @@ public partial class CharacterWizardWindow : Window
         foreach (var entry in new[]
                  {
                      (SelectedBirthAffiliation, false),
-                     (SelectedBirthSubAffiliation, false),
-                     (SelectedAffiliation, false),
                      (SelectedSubAffiliation, false),
+                     (SelectedOrderAffiliation, false),
                      (SelectedCaste, false),
                      (SelectedChildhood, false),
                      (SelectedLateChildhood, false),

@@ -73,11 +73,20 @@ public partial class App : Application
                     out var requestedStep)
                     ? requestedStep
                     : 0;
+            var wizardAffiliationArgument = e.Args.FirstOrDefault(
+                argument => argument.StartsWith("--capture-affiliation=",
+                    StringComparison.Ordinal));
+            var wizardAffiliation = wizardAffiliationArgument?[
+                "--capture-affiliation=".Length..];
             var wizard = new CharacterWizardWindow();
             wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
                 DispatcherPriority.ApplicationIdle,
                 () =>
                 {
+                    if (!string.IsNullOrWhiteSpace(wizardAffiliation))
+                    {
+                        wizard.SelectAffiliationForCapture(wizardAffiliation);
+                    }
                     wizard.ShowStepForCapture(wizardStep);
                     CaptureWindow(wizard, outputPath);
                     wizard.Close();

@@ -120,59 +120,52 @@
                             <ColumnDefinition Width="16"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel>
+                        <StackPanel Grid.Column="0">
                             <TextBlock Text="Affiliation" Style="{StaticResource FieldLabel}" Margin="0,0,0,2"/>
                             <ComboBox x:Name="AffiliationPicker" DisplayMemberPath="Name"
                                       SelectionChanged="ModuleSelectionChanged"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="Sub-affiliation" Style="{StaticResource FieldLabel}" Margin="0,0,0,2"/>
+                            <TextBlock Text="Sub-affiliation" Style="{StaticResource FieldLabel}"/>
                             <StackPanel x:Name="SubAffiliationPanel">
                                 <ComboBox x:Name="SubAffiliationPicker" DisplayMemberPath="Name"
                                           SelectionChanged="DependentSelectionChanged"/>
                             </StackPanel>
-                            <StackPanel x:Name="BirthAffiliationPanel" Visibility="Collapsed">
-                                <TextBlock Text="Birth affiliation" Style="{StaticResource FieldLabel}"/>
-                                <ComboBox x:Name="BirthAffiliationPicker" DisplayMemberPath="Name"
-                                          SelectionChanged="BirthAffiliationSelectionChanged"/>
-                                <TextBlock x:Name="BirthAffiliationDescription"
-                                           TextWrapping="Wrap"
-                                           Foreground="#555555"/>
-                            </StackPanel>
-                            <StackPanel x:Name="BirthSubAffiliationPanel" Visibility="Collapsed">
-                                <TextBlock Text="Birth sub-affiliation" Style="{StaticResource FieldLabel}"/>
-                                <ComboBox x:Name="BirthSubAffiliationPicker" DisplayMemberPath="Name"
+                            <TextBlock Text="Primary language" Style="{StaticResource FieldLabel}"/>
+                            <ComboBox x:Name="LanguagePicker" SelectionChanged="ChoiceSelectionChanged"/>
+                            <StackPanel x:Name="CastePanel" Visibility="Collapsed">
+                                <TextBlock Text="Clan caste" Style="{StaticResource FieldLabel}"/>
+                                <ComboBox x:Name="CastePicker" DisplayMemberPath="Name"
                                           SelectionChanged="DependentSelectionChanged"/>
                             </StackPanel>
                         </StackPanel>
+                        <GroupBox Grid.Column="2" Header="Order"
+                                  VerticalAlignment="Top">
+                            <StackPanel Margin="6,2">
+                                <CheckBox x:Name="OrderMemberCheck"
+                                          Content="ComStar or Word of Blake"
+                                          Checked="OrderSelectionChanged"
+                                          Unchecked="OrderSelectionChanged"/>
+                                <StackPanel Margin="18,3,0,0"
+                                            IsEnabled="{Binding IsChecked, ElementName=OrderMemberCheck}">
+                                    <RadioButton x:Name="ComStarRadio"
+                                                 Content="ComStar"
+                                                 GroupName="Order"
+                                                 IsChecked="True"
+                                                 Checked="OrderSelectionChanged"/>
+                                    <RadioButton x:Name="WordOfBlakeRadio"
+                                                 Content="Word of Blake"
+                                                 GroupName="Order"
+                                                 Margin="0,3,0,0"
+                                                 Checked="OrderSelectionChanged"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
                     </Grid>
 
                     <Grid Grid.Row="2">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="10"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="16"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <TextBlock Text="Primary language" Style="{StaticResource FieldLabel}" Margin="0,0,0,2"/>
-                                <ComboBox x:Name="LanguagePicker" SelectionChanged="ChoiceSelectionChanged"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <StackPanel x:Name="CastePanel">
-                                    <TextBlock Text="Clan caste" Style="{StaticResource FieldLabel}" Margin="0,0,0,2"/>
-                                    <ComboBox x:Name="CastePicker" DisplayMemberPath="Name"
-                                              SelectionChanged="DependentSelectionChanged"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-
-                        <Grid Grid.Row="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="110"/>
                                 <ColumnDefinition Width="12"/>
