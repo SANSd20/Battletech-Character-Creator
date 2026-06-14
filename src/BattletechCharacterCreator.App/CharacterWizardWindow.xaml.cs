@@ -88,6 +88,99 @@ public partial class CharacterWizardWindow : Window
         RefreshModules();
     }
 
+    public void SelectInvadingClanTestPath()
+    {
+        SelectClanTestPath("invading-clan", "Ghost Bear");
+    }
+
+    public void SelectHomeworldClanTestPath()
+    {
+        SelectClanTestPath("homeworld-clan", "Goliath Scorpion");
+    }
+
+    private void SelectClanTestPath(
+        string affiliationId,
+        string subAffiliationName)
+    {
+        SelectAffiliationForCapture(affiliationId);
+        ChildhoodPicker.SelectedItem = LifePathCatalog.Childhoods
+            .First(module => module.Id == "trueborn-creche");
+        LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
+            .First(module => module.Id == "late-trueborn-sibko");
+        RefreshModules();
+        SubAffiliationPicker.SelectedItem = SubAffiliationPicker.Items
+            .Cast<LifePathModule>()
+            .First(module => module.Name == subAffiliationName);
+        CastePicker.SelectedItem = CastePicker.Items
+            .Cast<LifePathModule>()
+            .First(module => module.Name == "MechWarrior");
+        BuildChoiceControls();
+        SelectModuleChoice(SelectedChildhood!, "phenotype",
+            "Phenotype/MechWarrior");
+        SelectModuleChoice(SelectedLateChildhood!, "branch", "MechWarrior");
+        UpdatePreview();
+    }
+
+    public void SmokeInvadingClanCharacter()
+    {
+        SelectInvadingClanTestPath();
+        var character = BuildCharacter();
+        if (character.Affiliation != "Invading Clan" ||
+            character.SubAffiliation != "Ghost Bear" ||
+            character.ClanCaste != "MechWarrior" ||
+            character.Phenotype != "Phenotype/MechWarrior" ||
+            character.ClanTrainingField != "MechWarrior")
+        {
+            throw new InvalidOperationException(
+                "The Invading Clan test path did not preserve its selections.");
+        }
+        if (!character.Skills.Any(skill =>
+                skill.Name == "Gunnery/Mech" && skill.Value >= 15) ||
+            !character.Skills.Any(skill =>
+                skill.Name == "Piloting/BattleMech" && skill.Value >= 15))
+        {
+            throw new InvalidOperationException(
+                "The Trueborn MechWarrior branch did not apply its skills.");
+        }
+        if (PrerequisiteRules.Evaluate(character)
+            .Any(issue => issue.Category == "Affiliation"))
+        {
+            throw new InvalidOperationException(
+                "The Invading Clan test path has an affiliation conflict.");
+        }
+        CreatedCharacter = character;
+    }
+
+    public void SmokeHomeworldClanCharacter()
+    {
+        SelectHomeworldClanTestPath();
+        var character = BuildCharacter();
+        if (character.Affiliation != "Homeworld Clan" ||
+            character.SubAffiliation != "Goliath Scorpion" ||
+            character.ClanCaste != "MechWarrior" ||
+            character.Phenotype != "Phenotype/MechWarrior" ||
+            character.ClanTrainingField != "MechWarrior")
+        {
+            throw new InvalidOperationException(
+                "The Homeworld Clan test path did not preserve its selections.");
+        }
+        if (!character.Skills.Any(skill =>
+                skill.Name == "Gunnery/Mech" && skill.Value >= 15) ||
+            !character.Skills.Any(skill =>
+                skill.Name == "Piloting/BattleMech" && skill.Value >= 15))
+        {
+            throw new InvalidOperationException(
+                "The Homeworld Trueborn MechWarrior branch did not apply its skills.");
+        }
+        if (PrerequisiteRules.Evaluate(character)
+            .Any(issue => issue.Category == "Affiliation"))
+        {
+            throw new InvalidOperationException(
+                "The Homeworld Clan test path has an affiliation conflict.");
+        }
+        CreatedCharacter = character;
+    }
+
     public void SelectLateChildhoodForCapture(string lateChildhoodId)
     {
         LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
@@ -766,6 +859,21 @@ public partial class CharacterWizardWindow : Window
             return "";
         }
         return input.Pickers.FirstOrDefault()?.SelectedItem as string ?? "";
+    }
+
+    private void SelectModuleChoice(
+        LifePathModule module,
+        string choiceId,
+        string option)
+    {
+        var choice = module.Choices.First(item => item.Id == choiceId);
+        if (!choiceControls.TryGetValue(
+                Key(module, choice, 0), out var input))
+        {
+            throw new InvalidOperationException(
+                $"{module.Name}: {choice.Label} is not available.");
+        }
+        input.Pickers[0].SelectedItem = option;
     }
 
     private void DependentSelectionChanged(object sender, SelectionChangedEventArgs e)

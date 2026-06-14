@@ -28,6 +28,36 @@ public partial class App : Application
             return;
         }
 
+        if (e.Args.Contains("--smoke-clan", StringComparer.Ordinal))
+        {
+            var wizard = new CharacterWizardWindow();
+            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    wizard.SmokeInvadingClanCharacter();
+                    wizard.Close();
+                    Shutdown(0);
+                });
+            wizard.Show();
+            return;
+        }
+
+        if (e.Args.Contains("--smoke-homeworld-clan", StringComparer.Ordinal))
+        {
+            var wizard = new CharacterWizardWindow();
+            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    wizard.SmokeHomeworldClanCharacter();
+                    wizard.Close();
+                    Shutdown(0);
+                });
+            wizard.Show();
+            return;
+        }
+
         if (e.Args.Contains("--smoke-start", StringComparer.Ordinal))
         {
             var start = new StartWindow();
@@ -108,11 +138,23 @@ public partial class App : Application
                     StringComparison.Ordinal));
             var secondCareer = secondCareerArgument?[
                 "--capture-second-career=".Length..];
+            var clanTest = e.Args.Contains(
+                "--capture-clan-test", StringComparer.Ordinal);
+            var homeworldClanTest = e.Args.Contains(
+                "--capture-homeworld-clan-test", StringComparer.Ordinal);
             var wizard = new CharacterWizardWindow();
             wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
                 DispatcherPriority.ApplicationIdle,
                 () =>
                 {
+                    if (clanTest)
+                    {
+                        wizard.SelectInvadingClanTestPath();
+                    }
+                    if (homeworldClanTest)
+                    {
+                        wizard.SelectHomeworldClanTestPath();
+                    }
                     if (!string.IsNullOrWhiteSpace(wizardAffiliation))
                     {
                         wizard.SelectAffiliationForCapture(wizardAffiliation);
