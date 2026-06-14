@@ -106,45 +106,118 @@
             </Grid>
 
             <Grid x:Name="Stage0Page" Visibility="Collapsed">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="430"/>
-                    <ColumnDefinition Width="28"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="STAGE 0 · AFFILIATION" Style="{StaticResource SectionTitle}"/>
-                        <TextBlock Text="Affiliation" Style="{StaticResource FieldLabel}"/>
-                        <ComboBox x:Name="AffiliationPicker" DisplayMemberPath="Name"
-                                  SelectionChanged="ModuleSelectionChanged"/>
-                        <TextBlock x:Name="AffiliationDescription" TextWrapping="Wrap"
-                                   Foreground="#555555" Margin="0,4,12,8"/>
-                        <StackPanel x:Name="BirthAffiliationPanel">
-                            <TextBlock Text="Birth affiliation" Style="{StaticResource FieldLabel}"/>
-                            <ComboBox x:Name="BirthAffiliationPicker" DisplayMemberPath="Name"
-                                      SelectionChanged="BirthAffiliationSelectionChanged"/>
-                            <TextBlock x:Name="BirthAffiliationDescription" TextWrapping="Wrap"
-                                       Foreground="#555555" Margin="0,4,12,8"/>
+                <Grid Margin="0,0,384,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="14"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="12"/>
+                        <RowDefinition Height="100"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Affiliation" Style="{StaticResource FieldLabel}" Margin="0,0,0,2"/>
+                            <ComboBox x:Name="AffiliationPicker" DisplayMemberPath="Name"
+                                      SelectionChanged="ModuleSelectionChanged"/>
                         </StackPanel>
-                        <StackPanel x:Name="BirthSubAffiliationPanel">
-                            <TextBlock Text="Birth sub-affiliation" Style="{StaticResource FieldLabel}"/>
-                            <ComboBox x:Name="BirthSubAffiliationPicker" DisplayMemberPath="Name"
-                                      SelectionChanged="DependentSelectionChanged"/>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Sub-affiliation" Style="{StaticResource FieldLabel}" Margin="0,0,0,2"/>
+                            <StackPanel x:Name="SubAffiliationPanel">
+                                <ComboBox x:Name="SubAffiliationPicker" DisplayMemberPath="Name"
+                                          SelectionChanged="DependentSelectionChanged"/>
+                            </StackPanel>
+                            <StackPanel x:Name="BirthAffiliationPanel" Visibility="Collapsed">
+                                <TextBlock Text="Birth affiliation" Style="{StaticResource FieldLabel}"/>
+                                <ComboBox x:Name="BirthAffiliationPicker" DisplayMemberPath="Name"
+                                          SelectionChanged="BirthAffiliationSelectionChanged"/>
+                                <TextBlock x:Name="BirthAffiliationDescription"
+                                           TextWrapping="Wrap"
+                                           Foreground="#555555"/>
+                            </StackPanel>
+                            <StackPanel x:Name="BirthSubAffiliationPanel" Visibility="Collapsed">
+                                <TextBlock Text="Birth sub-affiliation" Style="{StaticResource FieldLabel}"/>
+                                <ComboBox x:Name="BirthSubAffiliationPicker" DisplayMemberPath="Name"
+                                          SelectionChanged="DependentSelectionChanged"/>
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel x:Name="SubAffiliationPanel">
-                            <TextBlock Text="Sub-affiliation" Style="{StaticResource FieldLabel}"/>
-                            <ComboBox x:Name="SubAffiliationPicker" DisplayMemberPath="Name"
-                                      SelectionChanged="DependentSelectionChanged"/>
-                        </StackPanel>
-                        <StackPanel x:Name="CastePanel">
-                            <TextBlock Text="Clan caste" Style="{StaticResource FieldLabel}"/>
-                            <ComboBox x:Name="CastePicker" DisplayMemberPath="Name"
-                                      SelectionChanged="DependentSelectionChanged"/>
-                        </StackPanel>
-                        <TextBlock Text="Primary language" Style="{StaticResource FieldLabel}"/>
-                        <ComboBox x:Name="LanguagePicker" SelectionChanged="ChoiceSelectionChanged"/>
-                    </StackPanel>
-                </ScrollViewer>
+                    </Grid>
+
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Primary language" Style="{StaticResource FieldLabel}" Margin="0,0,0,2"/>
+                                <ComboBox x:Name="LanguagePicker" SelectionChanged="ChoiceSelectionChanged"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <StackPanel x:Name="CastePanel">
+                                    <TextBlock Text="Clan caste" Style="{StaticResource FieldLabel}" Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="CastePicker" DisplayMemberPath="Name"
+                                              SelectionChanged="DependentSelectionChanged"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <DataGrid x:Name="Stage0Attributes"
+                                      AutoGenerateColumns="False" IsReadOnly="True"
+                                      CanUserAddRows="False" HeadersVisibility="Column"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Attributes" Binding="{Binding Name}" Width="62"/>
+                                    <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="42"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <DataGrid Grid.Column="2" x:Name="Stage0Traits"
+                                      AutoGenerateColumns="False" IsReadOnly="True"
+                                      CanUserAddRows="False" HeadersVisibility="Column"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Traits" Binding="{Binding Name}" Width="145"/>
+                                    <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="42"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <DataGrid Grid.Column="4" x:Name="Stage0Skills"
+                                      AutoGenerateColumns="False" IsReadOnly="True"
+                                      CanUserAddRows="False" HeadersVisibility="Column"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Skills" Binding="{Binding Name}" Width="145"/>
+                                    <DataGridTextColumn Header="XP" Binding="{Binding Value}" Width="42"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Grid>
+
+                    <GroupBox Grid.Row="4" Header="Affiliation Overview">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,4">
+                            <TextBlock x:Name="AffiliationDescription"
+                                       TextWrapping="Wrap"
+                                       Foreground="#454545"/>
+                        </ScrollViewer>
+                    </GroupBox>
+                </Grid>
             </Grid>
 
             <Grid x:Name="Stage1Page" Visibility="Collapsed">
@@ -256,7 +329,7 @@
             </Grid>
 
             <Border x:Name="ChoicesHost"
-                    Width="450"
+                    Width="360"
                     HorizontalAlignment="Right"
                     BorderBrush="#C9C8C3"
                     BorderThickness="1,0,0,0"
@@ -264,7 +337,31 @@
                     Visibility="Collapsed">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="REQUIRED CHOICES" Style="{StaticResource SectionTitle}"/>
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="90"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="REQUIRED CHOICES"
+                                       FontFamily="{StaticResource MontserratBlack}"
+                                       FontSize="18"
+                                       Foreground="#202020"
+                                       VerticalAlignment="Center"/>
+                            <Border Grid.Column="1"
+                                    BorderBrush="#A7A7A2"
+                                    BorderThickness="1"
+                                    Padding="8,5">
+                                <StackPanel>
+                                    <TextBlock Text="FREE XP"
+                                               FontSize="11"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="RunningFreeXp"
+                                               FontFamily="{StaticResource MontserratBlack}"
+                                               FontSize="21"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
                         <StackPanel x:Name="ChoicesPanel"/>
                     </StackPanel>
                 </ScrollViewer>

@@ -106,13 +106,14 @@ public partial class CharacterWizardWindow : Window
         ChoicesHost.Visibility = currentStep is >= 1 and <= 5
             ? Visibility.Visible
             : Visibility.Collapsed;
-        TotalsHost.Visibility = currentStep > 0
+        ChoicesHost.Width = currentStep == 1 ? 360 : 450;
+        TotalsHost.Visibility = currentStep > 1
             ? Visibility.Visible
             : Visibility.Collapsed;
-        TotalsGapRow.Height = currentStep > 0
+        TotalsGapRow.Height = currentStep > 1
             ? new GridLength(18)
             : new GridLength(0);
-        TotalsRow.Height = currentStep > 0
+        TotalsRow.Height = currentStep > 1
             ? new GridLength(225)
             : new GridLength(0);
         UpdateChoiceGroupVisibility();
@@ -624,16 +625,24 @@ public partial class CharacterWizardWindow : Window
             PreviewAttributes.ItemsSource = character.Attributes;
             PreviewSkills.ItemsSource = character.Skills.OrderBy(item => item.Name);
             PreviewTraits.ItemsSource = character.Traits.OrderBy(item => item.Name);
+            Stage0Attributes.ItemsSource = character.Attributes;
+            Stage0Skills.ItemsSource = character.Skills.OrderBy(item => item.Name);
+            Stage0Traits.ItemsSource = character.Traits.OrderBy(item => item.Name);
             ModuleCost.Text =
                 LifePathEngine.CalculateModuleCost(character, SelectedModules()).ToString();
             SpentXp.Text = summary.SpentXp.ToString();
             FreeXp.Text = summary.FreeXp.ToString();
+            RunningFreeXp.Text = summary.FreeXp.ToString();
         }
         catch (InvalidOperationException)
         {
             PreviewAttributes.ItemsSource = null;
             PreviewSkills.ItemsSource = null;
             PreviewTraits.ItemsSource = null;
+            Stage0Attributes.ItemsSource = null;
+            Stage0Skills.ItemsSource = null;
+            Stage0Traits.ItemsSource = null;
+            RunningFreeXp.Text = "";
         }
     }
 
