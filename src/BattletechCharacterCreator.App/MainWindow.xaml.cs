@@ -2,6 +2,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 using BattletechCharacterCreator.Core.Models;
 using BattletechCharacterCreator.Core.Persistence;
 using BattletechCharacterCreator.Core.Resources;
@@ -16,6 +20,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private string? currentPath;
     private CharacterSummary summary;
     private IReadOnlyList<PrerequisiteIssue> prerequisiteIssues = [];
+    private string ruleStatus = "";
+    private Brush ruleStatusBrush = Brushes.DarkGreen;
 
     public MainWindow() : this(new Character())
     {
@@ -30,6 +36,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DataContext = this;
         InitializeComponent();
         UpdateFileStatus();
+        Recalculate();
     }
 
     public Character Character
@@ -63,9 +70,45 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+    public string RuleStatus
+    {
+        get => ruleStatus;
+        private set
+        {
+            ruleStatus = value;
+            OnPropertyChanged();
+        }
+    }
+    public Brush RuleStatusBrush
+    {
+        get => ruleStatusBrush;
+        private set
+        {
+            ruleStatusBrush = value;
+            OnPropertyChanged();
+        }
+    }
 
-    public string CharacterName { get => Character.Name; set => Character.Name = value; }
-    public string SubAffiliation { get => Character.SubAffiliation; set => Character.SubAffiliation = value; }
+    public string CharacterName
+    {
+        get => Character.Name;
+        set
+        {
+            Character.Name = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Character));
+        }
+    }
+    public string SubAffiliation
+    {
+        get => Character.SubAffiliation;
+        set
+        {
+            Character.SubAffiliation = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Character));
+        }
+    }
     public string Sex { get => Character.Sex; set => Character.Sex = value; }
     public int Age { get => Character.Age; set => Character.Age = value; }
     public int CharacterHeight { get => Character.Height; set => Character.Height = value; }
@@ -89,6 +132,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         currentPath = path;
         UpdateFileStatus();
         Recalculate();
+    }
+
+    public void SmokeXpAllocation()
+    {
+        var bod = Character.Attributes.Single(item => item.Name == "BOD");
+        var originalFreeXp = Summary.FreeXp;
+        bod.Value = 300;
+        Recalculate();
+        if (Summary.FreeXp != originalFreeXp - 75 ||
+            PrerequisiteIssues.Any(issue =>
+                issue.Category == "Attribute" && issue.Name == "BOD"))
+        {
+            throw new InvalidOperationException(
+                "Editor XP allocation did not update totals and prerequisites.");
+        }
     }
 
     private void New_Click(object sender, RoutedEventArgs e)
@@ -219,6 +277,34 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         Summary = CharacterRules.Calculate(Character);
         PrerequisiteIssues = PrerequisiteRules.Evaluate(Character);
+        var blocking = PrerequisiteIssues.Count(issue =>
+            issue.Category == "Affiliation");
+        RuleStatus = blocking > 0
+            ? $"{blocking} blocking conflict(s) must be corrected."
+            : PrerequisiteIssues.Count > 0
+                ? $"{PrerequisiteIssues.Count} prerequisite warning(s) remain."
+                : "No unmet prerequisites.";
+        RuleStatusBrush = blocking > 0
+            ? Brushes.Firebrick
+            : PrerequisiteIssues.Count > 0
+                ? Brushes.DarkGoldenrod
+                : Brushes.DarkGreen;
+        OnPropertyChanged(nameof(Character));
+        OnPropertyChanged(nameof(CharacterName));
+        OnPropertyChanged(nameof(SubAffiliation));
+    }
+
+    private void EditorFieldChanged(object sender, KeyboardFocusChangedEventArgs e) =>
+        Recalculate();
+
+    private void EditorSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (IsLoaded) Recalculate();
+    }
+
+    private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+    {
+        Dispatcher.BeginInvoke(DispatcherPriority.Background, Recalculate);
     }
 
     private void UpdateFileStatus() =>

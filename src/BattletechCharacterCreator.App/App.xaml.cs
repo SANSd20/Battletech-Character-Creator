@@ -85,6 +85,24 @@ public partial class App : Application
             return;
         }
 
+        if (e.Args.Contains("--smoke-editor-allocation", StringComparer.Ordinal))
+        {
+            var wizard = new CharacterWizardWindow();
+            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    wizard.SmokeHomeworldClanCharacter();
+                    var editor = new MainWindow(wizard.CreatedCharacter!);
+                    editor.SmokeXpAllocation();
+                    editor.Close();
+                    wizard.Close();
+                    Shutdown(0);
+                });
+            wizard.Show();
+            return;
+        }
+
         var editorCaptureArgument = e.Args.FirstOrDefault(
             argument => argument.StartsWith("--capture-clan-editor=",
                 StringComparison.Ordinal));
