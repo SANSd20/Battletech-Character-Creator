@@ -63,7 +63,7 @@ public static class CharacterSheetExporter
         canvas.Text(320, 670, character.HairColor, 30);
         canvas.Text(960, 670, character.EyeColor, 30);
 
-        var attributeY = new[] { 968, 1018, 1065, 1112, 1161, 1209, 1257, 1305 };
+        var attributeY = new[] { 948, 1000, 1053, 1105, 1158, 1211, 1263, 1316 };
         for (var index = 0;
              index < character.Attributes.Count && index < attributeY.Length;
              index++)
