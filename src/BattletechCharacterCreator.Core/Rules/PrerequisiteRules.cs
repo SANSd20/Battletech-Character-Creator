@@ -128,20 +128,28 @@ public static class PrerequisiteRules
             }
         }
         if (character.RealLife.StartsWith("Covert Operations - ",
-                StringComparison.Ordinal) &&
-            LifePathCatalog.ResolveCovertOperationsFieldSkills(character).Count == 0 &&
-            !HasPriorCareer(character, "Tour of Duty - ") &&
-            FindValue(character.Traits, "Connections") < 150 &&
-            FindValue(character.Skills, "Leadership") < 150)
-        {
-            issues.Add(new("Education",
-                "Military or Intelligence/Police Field, or prior Tour of Duty with Connections or Leadership",
-                150, Math.Max(FindValue(character.Traits, "Connections"),
-                    FindValue(character.Skills, "Leadership"))));
-        }
-        if (character.RealLife.StartsWith("Covert Operations - ",
                 StringComparison.Ordinal))
         {
+            var module = LifePathCatalog.RealLifeModules.Single(item =>
+                item.Name == character.RealLife);
+            var priorConnections = FindValue(character.Traits, "Connections") -
+                module.Effects
+                    .Where(effect => effect.Target == EffectTarget.Trait &&
+                        effect.Name == "Connections")
+                    .Sum(effect => effect.Xp);
+            var priorLeadership = FindValue(character.Skills, "Leadership") -
+                module.Effects
+                    .Where(effect => effect.Target == EffectTarget.Skill &&
+                        effect.Name == "Leadership")
+                    .Sum(effect => effect.Xp);
+            if (LifePathCatalog.ResolveCovertOperationsFieldSkills(character).Count == 0 &&
+                (!HasPriorCareer(character, "Tour of Duty - ") ||
+                 Math.Max(priorConnections, priorLeadership) < 150))
+            {
+                issues.Add(new("Education",
+                    "Military or Intelligence/Police Field, or prior Tour of Duty with Connections or Leadership",
+                    150, Math.Max(priorConnections, priorLeadership)));
+            }
             if (character.Affiliation is "Invading Clan" or "Homeworld Clan")
             {
                 issues.Add(new("Affiliation", "Inner Sphere or Periphery", 0, 0));
@@ -462,15 +470,18 @@ public static class PrerequisiteRules
         }
         if (character.RealLife == "Think Tank")
         {
-            if (FindValue(character.Attributes, "INT") < 700)
+            var priorInt = FindValue(character.Attributes, "INT") - 90;
+            var priorConnections =
+                FindValue(character.Traits, "Connections") - 100;
+            if (priorInt < 700)
             {
-                issues.Add(new("Attribute", "INT", 700,
-                    FindValue(character.Attributes, "INT")));
+                issues.Add(new("Attribute", "INT before Think Tank", 700,
+                    priorInt));
             }
-            if (FindValue(character.Traits, "Connections") < 300)
+            if (priorConnections < 300)
             {
-                issues.Add(new("Trait", "Connections", 300,
-                    FindValue(character.Traits, "Connections")));
+                issues.Add(new("Trait", "Connections before Think Tank", 300,
+                    priorConnections));
             }
             if (!HasAnyEducationField(character,
                     "Analysis", "Doctor", "Engineer", "Military Scientist"))

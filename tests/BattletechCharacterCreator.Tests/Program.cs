@@ -702,6 +702,23 @@ static void CheckRealLifeModules()
     }
     var fedSunsCovert = covertModules
         .Single(module => module.Id == "real-covert-fed-suns");
+    var underqualifiedVeteran = new Character
+    {
+        Affiliation = "Federated Suns",
+        RealLife = fedSunsCovert.Name
+    };
+    underqualifiedVeteran.RealLifeHistory.Add("Tour of Duty - Inner Sphere");
+    underqualifiedVeteran.RealLifeHistory.Add(fedSunsCovert.Name);
+    underqualifiedVeteran.Traits.Add(new NamedValue("Connections", 140));
+    underqualifiedVeteran.Skills.Add(new NamedValue("Leadership", 120));
+    Assert(PrerequisiteRules.Evaluate(underqualifiedVeteran)
+            .Any(issue => issue.Category == "Education"),
+        "Covert Operations must require a prior Tour of Duty and 150 pre-module XP in Connections or Leadership.");
+    underqualifiedVeteran.Traits.Single(item =>
+        item.Name == "Connections").Value = 190;
+    Assert(!PrerequisiteRules.Evaluate(underqualifiedVeteran)
+            .Any(issue => issue.Category == "Education"),
+        "A prior Tour of Duty and 150 pre-module Connections XP must satisfy Covert Operations.");
     var covertAgent = new Character
     {
         Affiliation = "Federated Suns",
@@ -1257,6 +1274,9 @@ static void CheckRealLifeModules()
         .Single(module => module.Id == "real-solaris-insider");
     Assert(solarisInsider.ModuleCost == 825 && solarisInsider.TimeYears == 4,
         "Solaris Insider must cost 825 XP and take four years.");
+    Assert(solarisInsider.RepeatEffects?.Single() ==
+        new ModuleEffect(EffectTarget.Trait, "In For Life", -100),
+        "Repeated Solaris Insider service must add 100 negative XP to In For Life.");
     var insiderFieldChoice = solarisInsider.Choices
         .Single(choice => choice.Id == "field-skills");
     Assert(insiderFieldChoice.Count == 6 && insiderFieldChoice.Xp == 25 &&
@@ -1295,6 +1315,24 @@ static void CheckRealLifeModules()
             .Any(issue => issue.Name.StartsWith("Solaris Internship",
                 StringComparison.Ordinal)),
         "A Solaris Internship graduate must satisfy Insider prerequisites.");
+    var repeatedInsider = new Character
+    {
+        Affiliation = "Lyran Alliance",
+        School = "Solaris Internship",
+        BasicSchool = "Communications",
+        AdvancedSchool = "MechWarrior"
+    };
+    repeatedInsider.RealLifeHistory.Add(solarisInsider.Name);
+    LifePathEngine.ApplyStage4(repeatedInsider, new ModuleSelection(
+        solarisInsider,
+        insiderChoices,
+        new Dictionary<string, IReadOnlyList<ChoiceAllocation>>
+        {
+            [insiderFlex.Id] = [new("CHA", 100)]
+        }));
+    Assert(repeatedInsider.Traits.Single(item =>
+            item.Name == "In For Life").Value == -100,
+        "The Stage 4 engine must apply Solaris Insider's repeat penalty.");
 
     var connectedInsider = new Character
     {
@@ -1327,6 +1365,9 @@ static void CheckRealLifeModules()
         .Single(module => module.Id == "real-solaris-vii-games");
     Assert(solarisGames.ModuleCost == 900 && solarisGames.TimeYears == 4,
         "Solaris VII Games must cost 900 XP and take four years.");
+    Assert(solarisGames.RepeatEffects?.Single() ==
+        new ModuleEffect(EffectTarget.Trait, "In For Life", -150),
+        "Repeated Solaris VII Games service must add 150 negative XP to In For Life.");
     Assert(solarisGames.Choices.Single(choice => choice.Id == "assets").Count == 3 &&
         solarisGames.Choices.Single(choice => choice.Id == "field-skills").Count == 6,
         "Solaris VII Games must provide three assets and six Field-skill awards.");
@@ -1414,6 +1455,21 @@ static void CheckRealLifeModules()
     Assert(!neerFlex.Options.Any(option =>
             option == "Wealth" || option == "Toughness" || option == "Connections"),
         "Ne'er-Do-Well flexible XP may not target Traits.");
+    Assert(!neerDoWell.AwardFlexibleXpOnRepeat,
+        "Ne'er-Do-Well must not award flexible XP when repeated.");
+    var repeatedNeerDoWell = new Character();
+    repeatedNeerDoWell.RealLifeHistory.Add(neerDoWell.Name);
+    var repeatedNeerChoices = neerDoWell.Choices
+        .Where(choice => choice.Target == EffectTarget.Skill)
+        .ToDictionary(
+            choice => choice.Id,
+            choice => (IReadOnlyList<string>)choice.Options
+                .Take(choice.Count).ToArray());
+    LifePathEngine.ApplyStage4(repeatedNeerDoWell,
+        new ModuleSelection(neerDoWell, repeatedNeerChoices));
+    Assert(repeatedNeerDoWell.Attributes.All(attribute => attribute.Value == 100) &&
+        repeatedNeerDoWell.Traits.Count == 0,
+        "A repeated Ne'er-Do-Well module must award Skills without Attribute, Trait, or flexible XP.");
 
     var correspondent = LifePathCatalog.RealLifeModules
         .Single(module => module.Id == "real-combat-correspondent");
@@ -1494,6 +1550,26 @@ static void CheckRealLifeModules()
     Assert(!thinkTankFlex.Options.Contains("Small Arms") &&
         !thinkTankFlex.Options.Contains("Combat Sense"),
         "Think Tank flexible XP must exclude combat options.");
+    var underqualifiedThinker = new Character
+    {
+        Affiliation = "Federated Suns",
+        AdvancedSchool = "Analysis",
+        RealLife = thinkTank.Name
+    };
+    underqualifiedThinker.Attributes.Single(item =>
+        item.Name == "INT").Value = 700;
+    underqualifiedThinker.Traits.Add(new NamedValue("Connections", 300));
+    var thinkerIssues = PrerequisiteRules.Evaluate(underqualifiedThinker);
+    Assert(thinkerIssues.Any(issue => issue.Name == "INT before Think Tank") &&
+        thinkerIssues.Any(issue => issue.Name == "Connections before Think Tank"),
+        "Think Tank must not count its own INT and Connections awards toward prerequisites.");
+    underqualifiedThinker.Attributes.Single(item =>
+        item.Name == "INT").Value = 790;
+    underqualifiedThinker.Traits.Single(item =>
+        item.Name == "Connections").Value = 400;
+    Assert(!PrerequisiteRules.Evaluate(underqualifiedThinker)
+            .Any(issue => issue.Category is "Attribute" or "Trait" or "Education"),
+        "A character meeting Think Tank prerequisites before its awards must qualify.");
 
     var travel = LifePathCatalog.RealLifeModules
         .Single(module => module.Id == "real-travel");

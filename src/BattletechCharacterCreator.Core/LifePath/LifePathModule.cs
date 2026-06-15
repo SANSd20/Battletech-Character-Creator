@@ -54,7 +54,9 @@ public sealed record LifePathModule(
     int AffiliationProtocolXp = 0,
     int AffiliationStreetwiseXp = 0,
     int TimeYears = 0,
-    bool Repeatable = true);
+    bool Repeatable = true,
+    bool AwardFlexibleXpOnRepeat = true,
+    IReadOnlyList<ModuleEffect>? RepeatEffects = null);
 
 public sealed record ModuleSelection(
     LifePathModule Module,
@@ -146,6 +148,14 @@ public static class LifePathEngine
         ModuleSelection selection,
         bool repeated)
     {
+        if (repeated && selection.Module.RepeatEffects is not null)
+        {
+            foreach (var effect in selection.Module.RepeatEffects)
+            {
+                ApplyEffect(character, effect.Target, effect.Name, effect.Xp);
+            }
+        }
+
         foreach (var effect in selection.Module.Effects)
         {
             if (repeated && effect.Target != EffectTarget.Skill)
@@ -159,6 +169,12 @@ public static class LifePathEngine
         {
             if (repeated &&
                 choice.Target is not (EffectTarget.Skill or EffectTarget.Flexible))
+            {
+                continue;
+            }
+            if (repeated &&
+                choice.Target == EffectTarget.Flexible &&
+                !selection.Module.AwardFlexibleXpOnRepeat)
             {
                 continue;
             }

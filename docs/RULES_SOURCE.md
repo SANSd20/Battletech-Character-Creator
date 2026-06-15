@@ -107,3 +107,10 @@ module is selected again, rejects non-repeatable modules, and recognizes prior
 Tour of Duty and Dark Caste careers for later prerequisites. The creation
 wizard exposes two ordered Stage 4 career selectors, including repeated
 careers where the module permits them.
+
+Module-specific repeat rules are also enforced: Ne'er-Do-Well does not award
+Flexible XP when repeated, repeated Solaris Insider service applies -100 XP to
+In For Life, and repeated Solaris VII Games service applies -150 XP to In For
+Life. Prerequisites that must exist before a module, including Think Tank and
+Covert Operations requirements, are evaluated without counting XP awarded by
+the selected module itself.

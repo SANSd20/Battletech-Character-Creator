@@ -7,9 +7,10 @@ keeps compatibility with existing `.btcc` character files. The original Qt
 application remains in the repository as a reference during migration.
 
 The new Create flow includes affiliations, early and late childhood, higher
-education, basic, advanced, and specialist education fields, and the first
-46 Stage 4 real-life module variants. Module effects and choices are implemented
-in the Core library so the remaining Stage 4 modules can reuse the same engine.
+education, basic, advanced, and specialist education fields, and all 46
+Stage 4 real-life module variants, representing all 24 base modules in the
+corrected printing. Module effects, choices, prerequisites, repeat restrictions,
+and module-specific repeat penalties are implemented in the Core library.
 The wizard supports two ordered careers, including legal repeat modules and
 career-to-career prerequisites.
 ComStar and Word of Blake characters also select a full-cost birth affiliation.
