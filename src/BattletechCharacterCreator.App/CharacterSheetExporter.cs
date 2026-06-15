@@ -73,7 +73,8 @@ public static class CharacterSheetExporter
             canvas.Text(490, attributeY[index], value.ToString(), 30);
             canvas.Text(745, attributeY[index],
                 CharacterRules.LinkModifier(value).ToString("+0;-0;0"), 30);
-            canvas.Text(995, attributeY[index], attribute.Value.ToString(), 30);
+            canvas.TextRight(
+                1090, attributeY[index], attribute.Value.ToString(), 30);
         }
 
         canvas.Text(1535, 1243, summary.Walk.ToString(), 30);
@@ -87,7 +88,7 @@ public static class CharacterSheetExporter
         for (var index = 0; index < traits.Length; index++)
         {
             var y = 1571 + index * 59;
-            WriteTrait(canvas, traits[index], catalog, 150, 715, 825, 1010, y);
+            WriteTrait(canvas, traits[index], catalog, 150, 715, 825, 1112, y);
         }
 
         var skills = character.Skills.OrderBy(item => item.Name).Take(30).ToArray();
@@ -100,7 +101,7 @@ public static class CharacterSheetExporter
                 secondColumn ? 1280 : 150,
                 secondColumn ? 1848 : 718,
                 secondColumn ? 1930 : 800,
-                secondColumn ? 2245 : 1115,
+                secondColumn ? 2302 : 1179,
                 y,
                 character.Traits);
         }
@@ -206,7 +207,7 @@ public static class CharacterSheetExporter
                 secondColumn ? 1275 : 150,
                 secondColumn ? 1930 : 780,
                 secondColumn ? 2030 : 880,
-                secondColumn ? 2230 : 1080,
+                secondColumn ? 2324 : 1177,
                 y);
         }
 
@@ -220,7 +221,7 @@ public static class CharacterSheetExporter
                 secondColumn ? 1280 : 150,
                 secondColumn ? 1848 : 718,
                 secondColumn ? 1930 : 800,
-                secondColumn ? 2245 : 1115,
+                secondColumn ? 2302 : 1179,
                 y,
                 character.Traits);
         }
@@ -264,7 +265,7 @@ public static class CharacterSheetExporter
         canvas.Text(levelX, y,
             CharacterRules.TraitLevel(trait.Name, trait.Value).ToString(), 30);
         canvas.Text(referenceX, y, reference, 18, 170);
-        canvas.Text(xpX, y, trait.Value.ToString(), 30);
+        canvas.TextRight(xpX, y, trait.Value.ToString(), 30);
     }
 
     private static void WriteSkill(
@@ -285,7 +286,7 @@ public static class CharacterSheetExporter
         canvas.Text(levelX, y,
             CharacterRules.SkillLevel(skill.Value, traits).ToString(), 30);
         canvas.Text(rulesX, y, rules, 18, 220);
-        canvas.Text(xpX, y, skill.Value.ToString(), 30);
+        canvas.TextRight(xpX, y, skill.Value.ToString(), 30);
     }
 
     private static int Find(IEnumerable<NamedValue> values, string name) =>
@@ -433,6 +434,19 @@ public static class CharacterSheetExporter
                 .Append(" Tf 0 g 1 0 0 1 ")
                 .Append(F(x)).Append(' ').Append(F(y))
                 .Append(" Tm (").Append(Escape(text)).Append(") Tj ET\n");
+        }
+
+        public void TextRight(
+            double imageRightX,
+            double imageY,
+            string? value,
+            double pixelSize)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return;
+            var text = Sanitize(value);
+            var width = text.Sum(character =>
+                character == '-' ? pixelSize * 0.333 : pixelSize * 0.556);
+            Text(imageRightX - width, imageY, text, pixelSize);
         }
 
         public void WrappedText(
