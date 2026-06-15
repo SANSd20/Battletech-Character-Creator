@@ -78,10 +78,14 @@ public static class CharacterRules
         var wealthXp = FindValue(character.Traits, "Wealth");
         var wealthLevel = TraitLevel("Wealth", wealthXp);
         var startingCBills = StartingCBills(wealthLevel) + character.CBillModifier;
-        var inventoryCost = character.Equipment.Sum(item => ParseNumber(item.Cost)) +
-            character.Weapons.Sum(item => ParseNumber(item.Cost));
-        var inventoryMass = character.Equipment.Sum(item => ParseDecimal(item.Mass)) +
-            character.Weapons.Sum(item => ParseDecimal(item.Mass));
+        var inventoryCost = character.Equipment.Sum(item =>
+                ParseNumber(item.Cost) * ParseCount(item.Count)) +
+            character.Weapons.Sum(item =>
+                ParseNumber(item.Cost) * ParseCount(item.Count));
+        var inventoryMass = character.Equipment.Sum(item =>
+                ParseDecimal(item.Mass) * ParseCount(item.Count)) +
+            character.Weapons.Sum(item =>
+                ParseDecimal(item.Mass) * ParseCount(item.Count));
         var capacity = CarryingCapacity(strength);
 
         return new CharacterSummary(
@@ -189,6 +193,9 @@ public static class CharacterRules
     private static decimal ParseDecimal(string value) =>
         decimal.TryParse(value, System.Globalization.NumberStyles.Number,
             System.Globalization.CultureInfo.InvariantCulture, out var parsed) ? parsed : 0m;
+
+    private static int ParseCount(string value) =>
+        int.TryParse(value, out var parsed) && parsed > 0 ? parsed : 1;
 }
 
 public sealed record CharacterSummary(

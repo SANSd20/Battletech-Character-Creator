@@ -27,6 +27,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private Brush ruleStatusBrush = Brushes.DarkGreen;
     private string skillFilter = "";
     private string traitFilter = "";
+    private EquipmentCatalogItem? selectedEquipmentCatalogItem;
+    private WeaponCatalogItem? selectedWeaponCatalogItem;
 
     public ObservableCollection<XpEditorRow> AttributeRows { get; } = [];
     public ObservableCollection<XpEditorRow> SkillRows { get; } = [];
@@ -131,6 +133,24 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public string Notes { get => Character.Notes; set => Character.Notes = value; }
     public object Equipment => Character.Equipment;
     public object Weapons => Character.Weapons;
+    public EquipmentCatalogItem? SelectedEquipmentCatalogItem
+    {
+        get => selectedEquipmentCatalogItem;
+        set
+        {
+            selectedEquipmentCatalogItem = value;
+            OnPropertyChanged();
+        }
+    }
+    public WeaponCatalogItem? SelectedWeaponCatalogItem
+    {
+        get => selectedWeaponCatalogItem;
+        set
+        {
+            selectedWeaponCatalogItem = value;
+            OnPropertyChanged();
+        }
+    }
     public string SkillFilter
     {
         get => skillFilter;
@@ -201,6 +221,41 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 "Editor Skill filtering returned an unrelated row.");
         }
         SkillFilter = "";
+    }
+
+    public void SmokeInventoryCatalog()
+    {
+        Character = new Character();
+        SelectedEquipmentCatalogItem = Catalog.Equipment.Single(item =>
+            item.Name == "Flak/Jacket");
+        AddEquipment_Click(this, new RoutedEventArgs());
+        SelectedWeaponCatalogItem = Catalog.Weapons.Single(item =>
+            item.Name == "Katana");
+        AddWeapon_Click(this, new RoutedEventArgs());
+
+        var equipment = Character.Equipment.Single();
+        var weapon = Character.Weapons.Single();
+        equipment.Count = "2";
+        weapon.Count = "3";
+        Recalculate();
+
+        if (equipment.Armor != "1/5/1/3" ||
+            weapon.Skill != "Melee Weapons" ||
+            Summary.InventoryMass <= 0)
+        {
+            throw new InvalidOperationException(
+                "Catalog equipment and weapon fields were not copied correctly.");
+        }
+
+        EquipmentGrid.SelectedItem = equipment;
+        RemoveEquipment_Click(this, new RoutedEventArgs());
+        WeaponsGrid.SelectedItem = weapon;
+        RemoveWeapon_Click(this, new RoutedEventArgs());
+        if (Character.Equipment.Count != 0 || Character.Weapons.Count != 0)
+        {
+            throw new InvalidOperationException(
+                "Inventory remove actions did not remove the selected rows.");
+        }
     }
 
     public void SelectTabForCapture(string name)
@@ -407,6 +462,60 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (TraitsGrid.SelectedItem is XpEditorRow item)
         {
             Character.Traits.Remove(item.Source);
+            Recalculate();
+        }
+    }
+
+    private void AddEquipment_Click(object sender, RoutedEventArgs e)
+    {
+        if (SelectedEquipmentCatalogItem is not { } item) return;
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = item.Name,
+            Cost = item.Cost,
+            Mass = item.Mass,
+            Locations = item.Locations,
+            Armor = item.Armor,
+            Notes = item.Notes,
+            Count = "1"
+        });
+        Recalculate();
+    }
+
+    private void RemoveEquipment_Click(object sender, RoutedEventArgs e)
+    {
+        if (EquipmentGrid.SelectedItem is EquipmentItem item)
+        {
+            Character.Equipment.Remove(item);
+            Recalculate();
+        }
+    }
+
+    private void AddWeapon_Click(object sender, RoutedEventArgs e)
+    {
+        if (SelectedWeaponCatalogItem is not { } item) return;
+        Character.Weapons.Add(new WeaponItem
+        {
+            Skill = item.Skill,
+            Name = item.Name,
+            Damage = item.Damage,
+            Range = item.Range,
+            Cost = item.Cost,
+            Mass = item.Mass,
+            Shots = item.Shots,
+            AmmoCost = item.AmmoCost,
+            AmmoMass = item.AmmoMass,
+            Notes = item.Notes,
+            Count = "1"
+        });
+        Recalculate();
+    }
+
+    private void RemoveWeapon_Click(object sender, RoutedEventArgs e)
+    {
+        if (WeaponsGrid.SelectedItem is WeaponItem item)
+        {
+            Character.Weapons.Remove(item);
             Recalculate();
         }
     }

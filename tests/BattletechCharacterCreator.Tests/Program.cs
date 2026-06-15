@@ -62,9 +62,23 @@ Assert(CharacterRules.SkillLevel(64, [new NamedValue("Fast Learner", 300)]) == 3
 Assert(CharacterRules.TraitLevel("Wealth", -95) == -1,
     "Negative trait XP uses floor semantics.");
 Assert(CharacterRules.StartingCBills(3) == 10_000, "Wealth level determines starting C-Bills.");
+var inventoryCharacter = new Character();
+inventoryCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Test equipment", Cost = "100", Mass = "2", Count = "3"
+});
+inventoryCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Test weapon", Cost = "200", Mass = "1.5", Count = "2"
+});
+var inventorySummary = CharacterRules.Calculate(inventoryCharacter);
+Assert(inventorySummary.RemainingCBills == 300,
+    "Inventory cost must multiply each item's cost by its quantity.");
+Assert(inventorySummary.InventoryMass == 9m,
+    "Inventory mass must multiply each item's mass by its quantity.");
 
 CheckSample("newchar.btcc", 2_900, 100, 6, 18, 36);
-CheckSample("test.btcc", 4_212, 5_854, 6, 18, 36);
+CheckSample("test.btcc", 4_212, 5_494, 6, 18, 36);
 CheckSample("lisa.btcc", 3_610, 1_000, 3, 14, 28);
 CheckLifePath();
 CheckExpandedLifePaths();

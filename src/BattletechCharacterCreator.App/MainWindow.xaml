@@ -551,12 +551,109 @@
                     </DockPanel>
                 </TabItem>
                 <TabItem Header="Equipment">
-                    <DataGrid ItemsSource="{Binding Equipment}" AutoGenerateColumns="True" Margin="8"
-                              CellEditEnding="DataGrid_CellEditEnding"/>
+                    <Grid Margin="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox ItemsSource="{Binding Catalog.Equipment}"
+                                      SelectedItem="{Binding SelectedEquipmentCatalogItem}"
+                                      DisplayMemberPath="Name"
+                                      IsEditable="True"
+                                      IsTextSearchEnabled="True"
+                                      Margin="0,0,8,8"/>
+                            <Button Grid.Column="1" Content="Add equipment"
+                                    Click="AddEquipment_Click" Margin="0,0,8,8"/>
+                            <Button Grid.Column="2" Content="Remove selected"
+                                    Click="RemoveEquipment_Click" Margin="0,0,0,8"/>
+                        </Grid>
+                        <DataGrid Grid.Row="1" x:Name="EquipmentGrid"
+                                  ItemsSource="{Binding Equipment}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  CellEditEnding="DataGrid_CellEditEnding">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Qty" Binding="{Binding Count}" Width="55"/>
+                                <DataGridTextColumn Header="Item" Binding="{Binding Name}" Width="220"/>
+                                <DataGridTextColumn Header="Cost" Binding="{Binding Cost}" Width="75"/>
+                                <DataGridTextColumn Header="Mass" Binding="{Binding Mass}" Width="70"/>
+                                <DataGridTextColumn Header="Locations" Binding="{Binding Locations}" Width="90"/>
+                                <DataGridTextColumn Header="Armor" Binding="{Binding Armor}" Width="90"/>
+                                <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                                    HorizontalAlignment="Right" Margin="0,8,4,0">
+                            <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
+                            <TextBlock Text="Inventory mass:" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Summary.InventoryMass}" Margin="6,0,20,0"/>
+                            <TextBlock Text="Capacity remaining:" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Summary.RemainingCapacity}" Margin="6,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Weapons">
-                    <DataGrid ItemsSource="{Binding Weapons}" AutoGenerateColumns="True" Margin="8"
-                              CellEditEnding="DataGrid_CellEditEnding"/>
+                    <Grid Margin="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox ItemsSource="{Binding Catalog.Weapons}"
+                                      SelectedItem="{Binding SelectedWeaponCatalogItem}"
+                                      DisplayMemberPath="Name"
+                                      IsEditable="True"
+                                      IsTextSearchEnabled="True"
+                                      Margin="0,0,8,8"/>
+                            <Button Grid.Column="1" Content="Add weapon"
+                                    Click="AddWeapon_Click" Margin="0,0,8,8"/>
+                            <Button Grid.Column="2" Content="Remove selected"
+                                    Click="RemoveWeapon_Click" Margin="0,0,0,8"/>
+                        </Grid>
+                        <DataGrid Grid.Row="1" x:Name="WeaponsGrid"
+                                  ItemsSource="{Binding Weapons}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  CellEditEnding="DataGrid_CellEditEnding"
+                                  HorizontalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Qty" Binding="{Binding Count}" Width="55"/>
+                                <DataGridTextColumn Header="Weapon" Binding="{Binding Name}" Width="180"/>
+                                <DataGridTextColumn Header="Skill" Binding="{Binding Skill}" Width="140"/>
+                                <DataGridTextColumn Header="Damage" Binding="{Binding Damage}" Width="90"/>
+                                <DataGridTextColumn Header="Range" Binding="{Binding Range}" Width="135"/>
+                                <DataGridTextColumn Header="Cost" Binding="{Binding Cost}" Width="80"/>
+                                <DataGridTextColumn Header="Mass" Binding="{Binding Mass}" Width="70"/>
+                                <DataGridTextColumn Header="Shots" Binding="{Binding Shots}" Width="90"/>
+                                <DataGridTextColumn Header="Ammo cost" Binding="{Binding AmmoCost}" Width="90"/>
+                                <DataGridTextColumn Header="Ammo mass" Binding="{Binding AmmoMass}" Width="90"/>
+                                <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="180"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                                    HorizontalAlignment="Right" Margin="0,8,4,0">
+                            <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
+                            <TextBlock Text="Inventory mass:" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Summary.InventoryMass}" Margin="6,0,20,0"/>
+                            <TextBlock Text="Capacity remaining:" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Summary.RemainingCapacity}" Margin="6,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Notes">
                     <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"

@@ -161,6 +161,30 @@ public partial class App : Application
             return;
         }
 
+        if (e.Args.Contains("--smoke-inventory", StringComparer.Ordinal))
+        {
+            var editor = new MainWindow(
+                new BattletechCharacterCreator.Core.Models.Character());
+            editor.Loaded += (_, _) => editor.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    try
+                    {
+                        editor.SmokeInventoryCatalog();
+                        editor.Close();
+                        Shutdown(0);
+                    }
+                    catch
+                    {
+                        editor.Close();
+                        Shutdown(1);
+                    }
+                });
+            editor.Show();
+            return;
+        }
+
         var sheetExportArgument = e.Args.FirstOrDefault(
             argument => argument.StartsWith("--smoke-sheet-export=",
                 StringComparison.Ordinal));
