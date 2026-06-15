@@ -16,6 +16,7 @@ public static class CharacterSheetExporter
     private const double SheetHeight = 3508;
     private const double PageWidth = 612;
     private const double PageHeight = 792;
+    private const double TextBaselineLift = 11;
 
     public static void Export(
         Character character,
@@ -85,7 +86,7 @@ public static class CharacterSheetExporter
         var traits = character.Traits.OrderBy(item => item.Name).Take(8).ToArray();
         for (var index = 0; index < traits.Length; index++)
         {
-            var y = 1575 + index * 54;
+            var y = 1571 + index * 59;
             WriteTrait(canvas, traits[index], catalog, 150, 715, 825, 1010, y);
         }
 
@@ -94,7 +95,7 @@ public static class CharacterSheetExporter
         {
             var secondColumn = index >= 15;
             var row = secondColumn ? index - 15 : index;
-            var y = 2240 + row * 68;
+            var y = 2261 + row * 74;
             WriteSkill(canvas, skills[index], catalog,
                 secondColumn ? 1280 : 150,
                 secondColumn ? 1848 : 718,
@@ -200,7 +201,7 @@ public static class CharacterSheetExporter
         {
             var secondColumn = index >= 14;
             var row = secondColumn ? index - 14 : index;
-            var y = 1020 + row * 54;
+            var y = 1006 + row * 54;
             WriteTrait(canvas, traits[index], catalog,
                 secondColumn ? 1275 : 150,
                 secondColumn ? 1930 : 780,
@@ -214,7 +215,7 @@ public static class CharacterSheetExporter
         {
             var secondColumn = index >= 19;
             var row = secondColumn ? index - 19 : index;
-            var y = 1965 + row * 68;
+            var y = 2015 + row * 68;
             WriteSkill(canvas, skills[index], catalog,
                 secondColumn ? 1280 : 150,
                 secondColumn ? 1848 : 718,
@@ -425,7 +426,8 @@ public static class CharacterSheetExporter
                 text = text[..Math.Max(1, maxChars - 1)] + "...";
             }
             var x = imageX * PageWidth / SheetWidth;
-            var y = PageHeight - imageY * PageHeight / SheetHeight;
+            var y = PageHeight -
+                (imageY - TextBaselineLift) * PageHeight / SheetHeight;
             content.Append("BT /F1 ")
                 .Append(F(fontSize))
                 .Append(" Tf 0 g 1 0 0 1 ")
