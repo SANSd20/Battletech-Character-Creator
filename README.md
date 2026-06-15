@@ -44,6 +44,23 @@ dotnet run --project tests/BattletechCharacterCreator.Tests
 The application provides a Life Module character wizard and a detailed
 character editor for *A Time of War*.
 
+## Interface mockups
+
+These development mockups show the current direction of the .NET interface.
+Layouts and details may continue to change before the first stable release.
+
+### Start screen
+
+![Start screen mockup](docs/images/start-screen-mockup.png)
+
+### Character wizard
+
+![Stage 0 character wizard mockup](docs/images/wizard-stage0-mockup.png)
+
+### Character editor
+
+![Character editor summary mockup](docs/images/editor-summary-mockup.png)
+
 ## Development status
 
 The .NET migration is approximately **80% complete**. There is not yet a stable
