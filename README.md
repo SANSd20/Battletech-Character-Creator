@@ -6,6 +6,11 @@ A new WPF implementation is being developed in `src/`. It targets .NET 10 and
 keeps compatibility with existing `.btcc` character files. The original Qt
 application remains in the repository as a reference during migration.
 
+This project is based on bearchik's original
+[BattleTech Character Creator](https://github.com/bearchik/Battletech-Character-Creator).
+The original Qt application, data, and design provide the foundation for this
+modern .NET migration.
+
 The new Create flow includes affiliations, early and late childhood, higher
 education, basic, advanced, and specialist education fields, and all 46
 Stage 4 real-life module variants, representing all 24 base modules in the
