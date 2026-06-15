@@ -36,17 +36,34 @@ Run the dependency-free migration checks with:
 dotnet run --project tests/BattletechCharacterCreator.Tests
 ```
 
-The program is created according to the rules “BATTLETECH A Time of War” and include Wizard for Life Modules and 
-character editor. It allows you to quickly and easily create a new character to play Battletech RPG.
+The application provides a Life Module character wizard and a detailed
+character editor for *A Time of War*.
 
-## Last Stable Version is 0.8.9
-Development is closed now. Last stable version is 0.8.9.
+## Development status
 
-## Download
-You can download install file from releases.
-## Installation
-Run file as Administrator.
-Next, Next, Next, Enjoy
+The .NET migration is approximately **80% complete**. There is not yet a stable
+or packaged release.
+
+### Completed
+
+- .NET 10 and WPF application foundation
+- Character wizard from basic information through Stage 4
+- All affiliations and 68 corrected sub-affiliations
+- Life-path effects, prerequisites, repeat rules, and flexible XP allocation
+- Character editor with guided Attribute, Trait, and Skill XP controls
+- Searchable equipment and weapon catalogs with quantity-aware totals
+- Legacy `.btcc` character save and load compatibility
+- Official character-sheet PDF preview and export
+- Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
+
+### Remaining
+
+- Audit and optionally import character options from *A Time of War Companion*
+- Expand equipment and weapon purchasing details
+- Continue interface polish and usability testing
+- Strengthen error handling and recovery
+- Complete the final rulebook audit
+- Create a Windows installer and packaged release
 
 ## License
 Only for Non-commercial use.
