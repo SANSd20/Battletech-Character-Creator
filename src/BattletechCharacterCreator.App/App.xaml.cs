@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using BattletechCharacterCreator.Core.Rules;
 
 namespace BattletechCharacterCreator.App;
 
@@ -79,6 +80,63 @@ public partial class App : Application
                     finally
                     {
                         File.Delete(path);
+                    }
+                });
+            wizard.Show();
+            return;
+        }
+
+        if (e.Args.Contains("--smoke-complete-life-paths",
+                StringComparer.Ordinal))
+        {
+            var wizard = new CharacterWizardWindow();
+            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                DispatcherPriority.ApplicationIdle,
+                () =>
+                {
+                    var paths = new List<string>();
+                    var errorPath = Path.Combine(
+                        Path.GetTempPath(),
+                        "atow-complete-life-paths.error.txt");
+                    try
+                    {
+                        File.Delete(errorPath);
+                        foreach (var character in
+                                 wizard.SmokeRepresentativeLifePaths())
+                        {
+                            var path = Path.Combine(
+                                Path.GetTempPath(),
+                                $"atow-life-path-{Guid.NewGuid():N}.btcc");
+                            paths.Add(path);
+                            BattletechCharacterCreator.Core.Persistence
+                                .LegacyCharacterSerializer.Save(character, path);
+                            var loaded = BattletechCharacterCreator.Core.Persistence
+                                .LegacyCharacterSerializer.Load(path);
+                            if (loaded.Affiliation != character.Affiliation ||
+                                !loaded.RealLifeHistory.SequenceEqual(
+                                    character.RealLifeHistory) ||
+                                CharacterRules.Calculate(loaded).FreeXp !=
+                                CharacterRules.Calculate(character).FreeXp)
+                            {
+                                throw new InvalidOperationException(
+                                    $"{character.Name} did not round-trip correctly.");
+                            }
+                        }
+                        wizard.Close();
+                        Shutdown(0);
+                    }
+                    catch (Exception ex)
+                    {
+                        File.WriteAllText(errorPath, ex.ToString());
+                        wizard.Close();
+                        Shutdown(1);
+                    }
+                    finally
+                    {
+                        foreach (var path in paths)
+                        {
+                            File.Delete(path);
+                        }
                     }
                 });
             wizard.Show();

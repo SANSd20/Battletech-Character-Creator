@@ -433,6 +433,117 @@ public partial class CharacterWizardWindow : Window
         CreatedCharacter = character;
     }
 
+    public IReadOnlyList<Character> SmokeRepresentativeLifePaths()
+    {
+        var characters = new List<Character>
+        {
+            BuildSmokeLifePath(
+                "lyran", "street", "late-street", "real-agitator"),
+            BuildSmokeLifePath(
+                "comstar", "street", "late-street",
+                "real-comstar-service"),
+            BuildSmokeLifePath(
+                "major-periphery", "street", "late-street",
+                "real-explorer")
+        };
+
+        SelectHomeworldClanTestPath();
+        SelectCareersForCapture("real-goliath-scorpion-seeker");
+        var clanCharacter = BuildCharacter();
+        ValidateSmokeLifePath(clanCharacter, "Homeworld Clan",
+            "Goliath Scorpion Seeker");
+        characters.Add(clanCharacter);
+
+        ValidateSmokeEffect(characters[0], "Protocol/Lyran",
+            "Lyran Alliance affiliation");
+        ValidateSmokeEffect(characters[0], "Leadership", "Agitator career");
+        ValidateSmokeEffect(characters[1], "Protocol/ComStar",
+            "ComStar affiliation");
+        ValidateSmokeEffect(characters[1], "Communications/HPG",
+            "ComStar Service career");
+        if (!characters[2].Traits.Any(item =>
+                item.Name == "Equipped" && item.Value != 0))
+        {
+            throw new InvalidOperationException(
+                "Major Periphery affiliation did not apply Equipped.");
+        }
+        ValidateSmokeEffect(characters[2], "Sensor Operations",
+            "Explorer career");
+        ValidateSmokeEffect(clanCharacter, "Interests/Star League History",
+            "Goliath Scorpion Seeker career");
+
+        return characters;
+    }
+
+    private Character BuildSmokeLifePath(
+        string affiliationId,
+        string childhoodId,
+        string lateChildhoodId,
+        string careerId)
+    {
+        if (affiliationId is "comstar" or "word-of-blake")
+        {
+            AffiliationPicker.SelectedItem = BirthAffiliations
+                .First(module => module.Id == "capellan");
+        }
+        SelectAffiliationForCapture(affiliationId);
+        ChildhoodPicker.SelectedItem = LifePathCatalog.Childhoods
+            .First(module => module.Id == childhoodId);
+        LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
+            .First(module => module.Id == lateChildhoodId);
+        RefreshModules();
+        SelectCareersForCapture(careerId);
+        var character = BuildCharacter();
+        ValidateSmokeLifePath(character,
+            SelectedAffiliation!.Name, SelectedRealLife!.Name);
+        return character;
+    }
+
+    private void ValidateSmokeLifePath(
+        Character character,
+        string affiliation,
+        string career)
+    {
+        if (character.Affiliation != affiliation ||
+            character.RealLife != career ||
+            character.RealLifeHistory.LastOrDefault() != career)
+        {
+            throw new InvalidOperationException(
+                $"{affiliation} / {career} did not preserve its life path.");
+        }
+        var issues = PrerequisiteRules.Evaluate(character);
+        var blockingIssues = issues
+            .Where(issue => issue.Category == "Affiliation")
+            .ToArray();
+        if (blockingIssues.Length > 0)
+        {
+            throw new InvalidOperationException(
+                $"{affiliation} / {career} has unmet prerequisites: " +
+                string.Join(", ", blockingIssues.Select(issue =>
+                    $"{issue.Category} {issue.Name}")));
+        }
+        var expectedFreeXp = LifePathEngine.StartingXp -
+            LifePathEngine.CalculateModuleCost(character, SelectedModules());
+        if (CharacterRules.Calculate(character).FreeXp != expectedFreeXp)
+        {
+            throw new InvalidOperationException(
+                $"{affiliation} / {career} has incorrect XP accounting.");
+        }
+    }
+
+    private static void ValidateSmokeEffect(
+        Character character,
+        string skill,
+        string source)
+    {
+        if (!character.Skills.Any(item =>
+                item.Name == skill && item.Value != 0))
+        {
+            throw new InvalidOperationException(
+                $"{source} did not apply {skill}.");
+        }
+    }
+
     private LifePathModule? SelectedBirthAffiliation =>
         AffiliationPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedOrderAffiliation =>

@@ -114,3 +114,9 @@ In For Life, and repeated Solaris VII Games service applies -150 XP to In For
 Life. Prerequisites that must exist before a module, including Think Tank and
 Covert Operations requirements, are evaluated without counting XP awarded by
 the selected module itself.
+
+The application smoke suite creates and save/loads representative complete
+paths for an Inner Sphere agitator, a ComStar member with a separate birth
+affiliation, a Periphery explorer, and a Clan warrior Seeker. These scenarios
+verify wizard selections, affiliation and career awards, XP accounting, career
+history, and legacy-file persistence together.
