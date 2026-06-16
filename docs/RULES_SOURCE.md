@@ -8,6 +8,12 @@ The local reference copy is not committed to this repository. The original Qt
 code may help locate data, but the corrected rulebook takes precedence when
 values, prerequisites, choices, terminology, or stage behavior disagree.
 
+Optional expansion material from `A Time of War Companion - First Printing
+Corrected with Errata v1.1` is tracked separately. Companion options must be
+clearly labeled and opt-in so they do not silently change the core character
+creation flow. See `docs/COMPANION_AUDIT.md` for the Companion page map and
+import plan.
+
 ## Character Creation Page Map
 
 | Subject | PDF page | Printed page |

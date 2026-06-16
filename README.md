@@ -25,8 +25,10 @@ catalogs are imported as structured .NET data for the editor.
 
 Rules are verified against *A Time of War: The BattleTech RPG, Corrected Third
 Printing*. See `docs/RULES_SOURCE.md` for the authoritative page map and
-migration policy. The original Qt application is an implementation reference,
-not the final authority when it conflicts with the corrected rulebook.
+migration policy. Optional material from *A Time of War Companion* is tracked in
+`docs/COMPANION_AUDIT.md`. The original Qt application is an implementation
+reference, not the final authority when it conflicts with the corrected
+rulebook.
 
 Build the new application with:
 
@@ -80,7 +82,7 @@ or packaged release.
 
 ### Remaining
 
-- Audit and optionally import character options from *A Time of War Companion*
+- Import selected optional character options from *A Time of War Companion*
 - Expand equipment and weapon purchasing details
 - Continue interface polish and usability testing
 - Strengthen error handling and recovery
