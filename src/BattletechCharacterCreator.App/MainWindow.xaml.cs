@@ -287,6 +287,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             throw new InvalidOperationException(
                 "The Companion catalog toggle did not reload catalog options.");
         }
+        SelectedEquipmentCatalogItem = Catalog.Equipment.Single(item =>
+            item.Name == "Vintage Bulletproof Vest");
+        SelectedWeaponCatalogItem = Catalog.Weapons.Single(item =>
+            item.Name == "Shock Staff");
+        if (SelectedEquipmentSourceLabel != "A Time of War Companion" ||
+            SelectedWeaponSourceLabel != "A Time of War Companion")
+        {
+            throw new InvalidOperationException(
+                "Companion catalog source labels were not shown in the editor.");
+        }
         IncludeCompanionContent = false;
     }
 

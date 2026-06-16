@@ -110,8 +110,8 @@ public sealed class ResourceCatalog
                 pair.Value,
                 FindDescription(traitDescriptions, pair.Name)))
             .ToArray();
-        var equipment = FilterBySource(ReadEquipment(directory), options).ToArray();
-        var weapons = FilterBySource(ReadWeapons(directory), options).ToArray();
+        var equipment = ReadEquipment(directory, options);
+        var weapons = ReadWeapons(directory, options);
         var filteredSkills = FilterBySource(skills, options).ToArray();
         var filteredTraits = FilterBySource(traits, options).ToArray();
 
@@ -146,22 +146,63 @@ public sealed class ResourceCatalog
         where T : ISourceCatalogItem =>
         items.Where(item => IsSourceEnabled(item.Source, options));
 
-    private static EquipmentCatalogItem[] ReadEquipment(string directory) =>
-        ReadDataLines(directory, "equiplist.dat")
+    private static EquipmentCatalogItem[] ReadEquipment(
+        string directory,
+        ResourceCatalogOptions options)
+    {
+        var items = ReadEquipmentFile(
+            directory,
+            "equiplist.dat",
+            RulebookSource.CoreRulebook);
+        return options.IncludeCompanion
+            ? items.Concat(ReadEquipmentFile(
+                    directory,
+                    "companion_equiplist.dat",
+                    RulebookSource.Companion))
+                .ToArray()
+            : items.ToArray();
+    }
+
+    private static EquipmentCatalogItem[] ReadEquipmentFile(
+        string directory,
+        string name,
+        RulebookSource source) =>
+        ReadDataLines(directory, name)
             .Select(line => line.Split(';'))
             .Where(fields => fields.Length == 7)
             .Select(fields => new EquipmentCatalogItem(
                 fields[0], fields[1], fields[2], fields[3], fields[4],
-                fields[5], fields[6]))
+                fields[5], fields[6], source))
             .ToArray();
 
-    private static WeaponCatalogItem[] ReadWeapons(string directory) =>
-        ReadDataLines(directory, "weaponslist.dat")
+    private static WeaponCatalogItem[] ReadWeapons(
+        string directory,
+        ResourceCatalogOptions options)
+    {
+        var items = ReadWeaponsFile(
+            directory,
+            "weaponslist.dat",
+            RulebookSource.CoreRulebook);
+        return options.IncludeCompanion
+            ? items.Concat(ReadWeaponsFile(
+                    directory,
+                    "companion_weaponslist.dat",
+                    RulebookSource.Companion))
+                .ToArray()
+            : items.ToArray();
+    }
+
+    private static WeaponCatalogItem[] ReadWeaponsFile(
+        string directory,
+        string name,
+        RulebookSource source) =>
+        ReadDataLines(directory, name)
             .Select(line => line.Split(';'))
             .Where(fields => fields.Length == 11)
             .Select(fields => new WeaponCatalogItem(
                 fields[0], fields[1], fields[2], fields[3], fields[4],
-                fields[5], fields[6], fields[7], fields[8], fields[9], fields[10]))
+                fields[5], fields[6], fields[7], fields[8], fields[9],
+                fields[10], source))
             .ToArray();
 
     private static IReadOnlyDictionary<string, IReadOnlyList<string>> ReadSubskills(

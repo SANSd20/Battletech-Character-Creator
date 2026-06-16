@@ -1,0 +1,12 @@
+# A Time of War Companion - First Printing Corrected with Errata v1.1
+# Archaic, vintage, and advanced personal weapons, PDF pages 176 and 178.
+# category;skill;name;damage;range;cost;mass kg;shots;ammo cost;ammo mass kg;notes
+archmelee;Melee Weapons;Archaic Sword;1M/2;1M;45;3.5;0;0;0;-1 to attack roll, p.176
+archmelee;Melee Weapons;Jousting Lance;1M/3;3M;65;3.5;0;0;0;-2 to attack roll, add damage to mounted charge attack, p.176
+archmelee;Melee Weapons;Whip;0M/3D;2M;18;0.3;0;0;0;Do not add STR damage, p.176
+archery;Archery;Primitive Bow;1B/1;5/16/30/70;5;1;1;1;0.1;Simple action to reload, -1 to attack roll, p.176
+slugpistol;Small Arms;Vintage Pistol (Automatic);2B/3;8/18/40/90;500;0.5;9;12;0.06;Jam on fumble, p.176
+slugrifle;Small Arms;Vintage Assault Rifle;2B/3B;25/70/160/410;2000;4.5;30;40;0.48;Burst: 10, recoil: -1, jam on fumble, p.176
+support;Support Weapons;Vintage Machine Gun;3B/4B;35/90/215/485;6000;11;90;150;4;Burst: 15, recoil: -2, encumbering, jam on fumble, p.176
+energymelee;Melee Weapons;Shock Staff;2E/6;2M;1500;3;5 PPS;*;*;AP/BD 1M/2 when unpowered, p.178
+energyrifle;Small Arms;Variable-Pulse Laser Rifle;3E/4B;35/80/190/420;4500;6;5 PPS;*;*;Burst: 10, recoil: 0, p.178

@@ -106,6 +106,10 @@ static void CheckResourceCatalog()
         "All 187 legacy equipment entries must be imported.");
     Assert(catalog.Weapons.Count == 209,
         "All 209 legacy weapon entries must be imported.");
+    Assert(companionCatalog.Equipment.Count == 194,
+        "Companion-enabled equipment must include the starter Companion import.");
+    Assert(companionCatalog.Weapons.Count == 218,
+        "Companion-enabled weapons must include the starter Companion import.");
     Assert(catalog.Skills.Count == 92 &&
         catalog.Traits.Count == 76 &&
         catalog.Careers.Count == 26,
@@ -144,6 +148,22 @@ static void CheckResourceCatalog()
         !ResourceCatalog.IsSourceEnabled(RulebookSource.Companion, catalog.Options) &&
         ResourceCatalog.IsSourceEnabled(RulebookSource.Companion, companionCatalog.Options),
         "Companion source filtering must be opt-in.");
+    Assert(catalog.Equipment.All(item => item.Source != RulebookSource.Companion) &&
+        catalog.Weapons.All(item => item.Source != RulebookSource.Companion) &&
+        catalog.Equipment.All(item => item.Name != "Vintage Bulletproof Vest") &&
+        catalog.Weapons.All(item => item.Name != "Shock Staff"),
+        "Companion equipment and weapons must be hidden by default.");
+    var companionArmor = companionCatalog.Equipment.Single(item =>
+        item.Name == "Vintage Bulletproof Vest");
+    var companionWeapon = companionCatalog.Weapons.Single(item =>
+        item.Name == "Shock Staff");
+    Assert(companionArmor.Source == RulebookSource.Companion &&
+        companionArmor.Armor == "1/4/0/2" &&
+        companionArmor.SourceLabel == "A Time of War Companion" &&
+        companionWeapon.Source == RulebookSource.Companion &&
+        companionWeapon.Skill == "Melee Weapons" &&
+        companionWeapon.Damage == "2E/6",
+        "Companion starter equipment and weapons must retain source-tagged fields.");
     Assert(new EquipmentCatalogItem("", "Test", "", "", "", "", "",
             RulebookSource.Companion).SourceLabel == "A Time of War Companion",
         "Companion catalog entries must have a user-facing source label.");

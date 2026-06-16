@@ -57,6 +57,9 @@ core corrected-printing character creation rules.
    source labels.
 2. Import additional personal equipment, weapons, armor, implants, and
    prosthetics where the current catalog model already has matching fields.
+   Started: vintage personal armor, First SLDF armor kit entries, archaic and
+   vintage weapons, and two advanced personal weapons are imported behind the
+   Companion catalog toggle.
 3. Extend equipment data only where needed for Companion-only fields such as
    maintenance, modification, legality, or conversion notes.
 4. Add expanded trait metadata after the trait model can represent richer
@@ -71,6 +74,12 @@ core corrected-printing character creation rules.
 The most practical first Companion import is the equipment expansion. It is
 mostly catalog data, it fits the existing editor direction, and it has a smaller
 blast radius than changing character creation math.
+
+The first implemented batch covers PDF pages 176 and 178: vintage personal
+armor, the First SLDF armor kit, several archaic and vintage weapons, and the
+Shock Staff and Variable-Pulse Laser Rifle. These entries live in separate
+`resource/companion_*.dat` files and are hidden unless Companion content is
+enabled.
 
 Expanded traits should follow after the editor supports source-tagged rule notes
 and richer trait effects. Character templates should wait until the start screen

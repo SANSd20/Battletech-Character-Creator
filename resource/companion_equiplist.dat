@@ -1,0 +1,10 @@
+# A Time of War Companion - First Printing Corrected with Errata v1.1
+# Vintage personal armor and First SLDF armor kit, PDF page 176.
+# category;name;cost;mass kg;coverage;BAR M/B/E/X;notes
+persarmor;Vintage Bulletproof Vest;500/100;3.1;Torso;1/4/0/2;p.176
+persarmor;Vintage Combat Helmet;250/100;1.1;Head;1/4/0/2;p.176
+persarmor;Vintage Bomb Suit;750/50;8.5;Full;1/2/1/4;Encumbering, BAR 1/1/1/2 in rear, p.176
+persarmor;SLDF Infantry Helmet;1500;2.1;Head;4/5/5/3;Includes military comm, IR scanner, night vision, rangefinder, electronic compass, p.176
+persarmor;SLDF Infantry Fatigues;900/20;7.8;Torso, Arms, Legs;3/4/4/3;p.176
+persarmor;SLDF Cargo Jacket;25;0.1;Torso Rear;2/1/1/1;+1 STR for carry and encumbrance only, includes HC satchel battery, p.176
+persarmor;SLDF Combat Boots;50/10;2;Feet;2/3/3/1;p.176
