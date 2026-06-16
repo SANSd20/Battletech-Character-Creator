@@ -2,11 +2,18 @@
 # Archaic, vintage, and advanced personal weapons, PDF pages 176 and 178.
 # category;skill;name;damage;range;cost;mass kg;shots;ammo cost;ammo mass kg;notes
 archmelee;Melee Weapons;Archaic Sword;1M/2;1M;45;3.5;0;0;0;-1 to attack roll, p.176
+archmelee;Melee Weapons;Zweihander Sword;1M/3;2M;60;5.1;0;0;0;-2 to attack roll, two-handed sword, p.176
 archmelee;Melee Weapons;Jousting Lance;1M/3;3M;65;3.5;0;0;0;-2 to attack roll, add damage to mounted charge attack, p.176
 archmelee;Melee Weapons;Whip;0M/3D;2M;18;0.3;0;0;0;Do not add STR damage, p.176
 archery;Archery;Primitive Bow;1B/1;5/16/30/70;5;1;1;1;0.1;Simple action to reload, -1 to attack roll, p.176
 slugpistol;Small Arms;Vintage Pistol (Automatic);2B/3;8/18/40/90;500;0.5;9;12;0.06;Jam on fumble, p.176
 slugrifle;Small Arms;Vintage Assault Rifle;2B/3B;25/70/160/410;2000;4.5;30;40;0.48;Burst: 10, recoil: -1, jam on fumble, p.176
 support;Support Weapons;Vintage Machine Gun;3B/4B;35/90/215/485;6000;11;90;150;4;Burst: 15, recoil: -2, encumbering, jam on fumble, p.176
+support;Support Weapons;Vintage Minigun;3B/4B;45/150/375/1000;50000;21;500;600;12;Burst: 50, recoil: -3, crew: 2, jam on fumble, p.176
+support;Support Weapons;Vintage Gatling Gun;2B/3B;55/120/340/914;450000;269;480;650;15;Burst: 12, recoil: -3, crew: 4, jam on fumble, p.176
+support;Support Weapons;Wire-Guided Missile Launcher;4X/12A;50/240/775/1500;800000;95;1;2500;22;Crew: 4, -2 to attack roll, p.176
 energymelee;Melee Weapons;Shock Staff;2E/6;2M;1500;3;5 PPS;*;*;AP/BD 1M/2 when unpowered, p.178
 energyrifle;Small Arms;Variable-Pulse Laser Rifle;3E/4B;35/80/190/420;4500;6;5 PPS;*;*;Burst: 10, recoil: 0, p.178
+supenergy;Support Weapons;Gungnir Heavy Support Gauss Rifle;7B/10;75/275/650/1400;15000;60;10, 10 PPS;50;20;Crew: 3, recharge: 1 turn, p.178
+support;Support Weapons;MagPulse Harpoon Gun;8B/8;80/300/975/1800;12000;95;1, 30 PPS;1000;22;Crew: 2, -1 to attack roll, p.178
+supenergy;Support Weapons;Snub-Nose Support PPC;5E/14S;140/450/525/675;60000;1600;10 PPS;*;*;Crew: 3, recharge: 2 turns, mounted on wheeled carriage, p.178

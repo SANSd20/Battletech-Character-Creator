@@ -108,7 +108,7 @@ static void CheckResourceCatalog()
         "All 209 legacy weapon entries must be imported.");
     Assert(companionCatalog.Equipment.Count == 194,
         "Companion-enabled equipment must include the starter Companion import.");
-    Assert(companionCatalog.Weapons.Count == 218,
+    Assert(companionCatalog.Weapons.Count == 225,
         "Companion-enabled weapons must include the starter Companion import.");
     Assert(catalog.Skills.Count == 92 &&
         catalog.Traits.Count == 76 &&
@@ -157,12 +157,17 @@ static void CheckResourceCatalog()
         item.Name == "Vintage Bulletproof Vest");
     var companionWeapon = companionCatalog.Weapons.Single(item =>
         item.Name == "Shock Staff");
+    var companionSupportWeapon = companionCatalog.Weapons.Single(item =>
+        item.Name == "Snub-Nose Support PPC");
     Assert(companionArmor.Source == RulebookSource.Companion &&
         companionArmor.Armor == "1/4/0/2" &&
         companionArmor.SourceLabel == "A Time of War Companion" &&
         companionWeapon.Source == RulebookSource.Companion &&
         companionWeapon.Skill == "Melee Weapons" &&
-        companionWeapon.Damage == "2E/6",
+        companionWeapon.Damage == "2E/6" &&
+        companionSupportWeapon.Source == RulebookSource.Companion &&
+        companionSupportWeapon.Skill == "Support Weapons" &&
+        companionSupportWeapon.Mass == "1600",
         "Companion starter equipment and weapons must retain source-tagged fields.");
     Assert(new EquipmentCatalogItem("", "Test", "", "", "", "", "",
             RulebookSource.Companion).SourceLabel == "A Time of War Companion",
