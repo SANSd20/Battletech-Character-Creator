@@ -27,6 +27,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private Brush ruleStatusBrush = Brushes.DarkGreen;
     private string skillFilter = "";
     private string traitFilter = "";
+    private readonly string resourcePath;
+    private bool includeCompanionContent;
     private EquipmentCatalogItem? selectedEquipmentCatalogItem;
     private WeaponCatalogItem? selectedWeaponCatalogItem;
 
@@ -43,7 +45,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public MainWindow(Character initialCharacter)
     {
         character = initialCharacter;
-        var resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
+        resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
         Catalog = ResourceCatalog.Load(resourcePath);
         summary = CharacterRules.Calculate(character);
         SkillRowsView = CollectionViewSource.GetDefaultView(SkillRows);
@@ -67,7 +69,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    public ResourceCatalog Catalog { get; }
+    public ResourceCatalog Catalog { get; private set; }
     public string[] SexOptions { get; } = ["Male", "Female"];
     public CharacterSummary Summary
     {
@@ -133,6 +135,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public string Notes { get => Character.Notes; set => Character.Notes = value; }
     public object Equipment => Character.Equipment;
     public object Weapons => Character.Weapons;
+    public bool IncludeCompanionContent
+    {
+        get => includeCompanionContent;
+        set
+        {
+            if (includeCompanionContent == value) return;
+            includeCompanionContent = value;
+            ReloadCatalog();
+            OnPropertyChanged();
+        }
+    }
     public EquipmentCatalogItem? SelectedEquipmentCatalogItem
     {
         get => selectedEquipmentCatalogItem;
@@ -140,8 +153,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             selectedEquipmentCatalogItem = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(SelectedEquipmentSourceLabel));
         }
     }
+    public string SelectedEquipmentSourceLabel =>
+        SelectedEquipmentCatalogItem?.SourceLabel ?? "";
     public WeaponCatalogItem? SelectedWeaponCatalogItem
     {
         get => selectedWeaponCatalogItem;
@@ -149,8 +165,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             selectedWeaponCatalogItem = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(SelectedWeaponSourceLabel));
         }
     }
+    public string SelectedWeaponSourceLabel =>
+        SelectedWeaponCatalogItem?.SourceLabel ?? "";
     public string SkillFilter
     {
         get => skillFilter;
@@ -226,6 +245,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public void SmokeInventoryCatalog()
     {
         Character = new Character();
+        if (IncludeCompanionContent)
+        {
+            throw new InvalidOperationException(
+                "Companion catalog content must be disabled by default.");
+        }
         SelectedEquipmentCatalogItem = Catalog.Equipment.Single(item =>
             item.Name == "Flak/Jacket");
         AddEquipment_Click(this, new RoutedEventArgs());
@@ -256,6 +280,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             throw new InvalidOperationException(
                 "Inventory remove actions did not remove the selected rows.");
         }
+
+        IncludeCompanionContent = true;
+        if (!Catalog.Options.IncludeCompanion)
+        {
+            throw new InvalidOperationException(
+                "The Companion catalog toggle did not reload catalog options.");
+        }
+        IncludeCompanionContent = false;
     }
 
     public void SelectTabForCapture(string name)
@@ -518,6 +550,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Character.Weapons.Remove(item);
             Recalculate();
         }
+    }
+
+    private void ReloadCatalog()
+    {
+        Catalog = ResourceCatalog.Load(
+            resourcePath,
+            new ResourceCatalogOptions(includeCompanionContent));
+        SelectedEquipmentCatalogItem = null;
+        SelectedWeaponCatalogItem = null;
+        OnPropertyChanged(nameof(Catalog));
     }
 
     private void IncreaseXp_Click(object sender, RoutedEventArgs e)

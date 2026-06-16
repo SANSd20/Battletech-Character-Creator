@@ -52,7 +52,9 @@ core corrected-printing character creation rules.
 
 ## Suggested Import Order
 
-1. Add source labels and settings for optional Companion material.
+1. Add source labels and settings for optional Companion material. Done: the
+   editor catalog now has an opt-in Companion toggle, and catalog entries carry
+   source labels.
 2. Import additional personal equipment, weapons, armor, implants, and
    prosthetics where the current catalog model already has matching fields.
 3. Extend equipment data only where needed for Companion-only fields such as

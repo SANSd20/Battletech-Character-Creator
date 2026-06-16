@@ -554,12 +554,18 @@
                     <Grid Margin="8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <Grid>
+                        <CheckBox Content="Companion"
+                                  IsChecked="{Binding IncludeCompanionContent}"
+                                  HorizontalAlignment="Left"
+                                  Margin="0,0,0,8"/>
+                        <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
@@ -569,12 +575,16 @@
                                       IsEditable="True"
                                       IsTextSearchEnabled="True"
                                       Margin="0,0,8,8"/>
-                            <Button Grid.Column="1" Content="Add equipment"
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding SelectedEquipmentSourceLabel}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,12,8"/>
+                            <Button Grid.Column="2" Content="Add equipment"
                                     Click="AddEquipment_Click" Margin="0,0,8,8"/>
-                            <Button Grid.Column="2" Content="Remove selected"
+                            <Button Grid.Column="3" Content="Remove selected"
                                     Click="RemoveEquipment_Click" Margin="0,0,0,8"/>
                         </Grid>
-                        <DataGrid Grid.Row="1" x:Name="EquipmentGrid"
+                        <DataGrid Grid.Row="2" x:Name="EquipmentGrid"
                                   ItemsSource="{Binding Equipment}"
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
@@ -589,7 +599,7 @@
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                        <StackPanel Grid.Row="3" Orientation="Horizontal"
                                     HorizontalAlignment="Right" Margin="0,8,4,0">
                             <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
                             <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
@@ -604,12 +614,18 @@
                     <Grid Margin="8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <Grid>
+                        <CheckBox Content="Companion"
+                                  IsChecked="{Binding IncludeCompanionContent}"
+                                  HorizontalAlignment="Left"
+                                  Margin="0,0,0,8"/>
+                        <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
@@ -619,12 +635,16 @@
                                       IsEditable="True"
                                       IsTextSearchEnabled="True"
                                       Margin="0,0,8,8"/>
-                            <Button Grid.Column="1" Content="Add weapon"
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding SelectedWeaponSourceLabel}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,12,8"/>
+                            <Button Grid.Column="2" Content="Add weapon"
                                     Click="AddWeapon_Click" Margin="0,0,8,8"/>
-                            <Button Grid.Column="2" Content="Remove selected"
+                            <Button Grid.Column="3" Content="Remove selected"
                                     Click="RemoveWeapon_Click" Margin="0,0,0,8"/>
                         </Grid>
-                        <DataGrid Grid.Row="1" x:Name="WeaponsGrid"
+                        <DataGrid Grid.Row="2" x:Name="WeaponsGrid"
                                   ItemsSource="{Binding Weapons}"
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
@@ -644,7 +664,7 @@
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="180"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                        <StackPanel Grid.Row="3" Orientation="Horizontal"
                                     HorizontalAlignment="Right" Margin="0,8,4,0">
                             <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
                             <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
