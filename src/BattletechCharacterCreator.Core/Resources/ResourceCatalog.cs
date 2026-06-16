@@ -1,5 +1,23 @@
 namespace BattletechCharacterCreator.Core.Resources;
 
+public enum RulebookSource
+{
+    CoreRulebook,
+    Companion
+}
+
+public static class RulebookSourceExtensions
+{
+    public static string DisplayName(this RulebookSource source) =>
+        source switch
+        {
+            RulebookSource.Companion => "A Time of War Companion",
+            _ => "A Time of War"
+        };
+}
+
+public sealed record ResourceCatalogOptions(bool IncludeCompanion = false);
+
 public sealed record EquipmentCatalogItem(
     string Category,
     string Name,
@@ -7,7 +25,11 @@ public sealed record EquipmentCatalogItem(
     string Mass,
     string Locations,
     string Armor,
-    string Notes);
+    string Notes,
+    RulebookSource Source = RulebookSource.CoreRulebook) : ISourceCatalogItem
+{
+    public string SourceLabel => Source.DisplayName();
+}
 
 public sealed record WeaponCatalogItem(
     string Category,
@@ -20,18 +42,30 @@ public sealed record WeaponCatalogItem(
     string Shots,
     string AmmoCost,
     string AmmoMass,
-    string Notes);
+    string Notes,
+    RulebookSource Source = RulebookSource.CoreRulebook) : ISourceCatalogItem
+{
+    public string SourceLabel => Source.DisplayName();
+}
 
 public sealed record SkillCatalogItem(
     string Name,
     string Rules,
     string Description,
-    IReadOnlyList<string> Subskills);
+    IReadOnlyList<string> Subskills,
+    RulebookSource Source = RulebookSource.CoreRulebook) : ISourceCatalogItem
+{
+    public string SourceLabel => Source.DisplayName();
+}
 
 public sealed record TraitCatalogItem(
     string Name,
     string Reference,
-    string Description);
+    string Description,
+    RulebookSource Source = RulebookSource.CoreRulebook) : ISourceCatalogItem
+{
+    public string SourceLabel => Source.DisplayName();
+}
 
 public sealed class ResourceCatalog
 {
@@ -51,8 +85,14 @@ public sealed class ResourceCatalog
         new Dictionary<string, string>();
     public IReadOnlyDictionary<string, string> TraitDescriptions { get; private init; } =
         new Dictionary<string, string>();
+    public ResourceCatalogOptions Options { get; private init; } = new();
 
-    public static ResourceCatalog Load(string directory)
+    public static ResourceCatalog Load(string directory) =>
+        Load(directory, new ResourceCatalogOptions());
+
+    public static ResourceCatalog Load(
+        string directory,
+        ResourceCatalogOptions options)
     {
         var skillDescriptions = ReadDescriptions(directory, "skillsdesc.dat");
         var traitDescriptions = ReadDescriptions(directory, "traitsdesc.dat");
@@ -70,25 +110,41 @@ public sealed class ResourceCatalog
                 pair.Value,
                 FindDescription(traitDescriptions, pair.Name)))
             .ToArray();
+        var equipment = FilterBySource(ReadEquipment(directory), options).ToArray();
+        var weapons = FilterBySource(ReadWeapons(directory), options).ToArray();
+        var filteredSkills = FilterBySource(skills, options).ToArray();
+        var filteredTraits = FilterBySource(traits, options).ToArray();
 
         return new ResourceCatalog
         {
+            Options = options,
             Affiliations = ReadLines(directory, "affilations.dat"),
             Phenotypes = ReadLines(directory, "phenotype.dat"),
             EyeColors = ReadLines(directory, "eyecolor.dat"),
             HairColors = ReadLines(directory, "haircolor.dat"),
             Planets = ReadLines(directory, "planets.dat"),
-            SkillNames = skills.Select(item => item.Name).ToArray(),
-            TraitNames = traits.Select(item => item.Name).ToArray(),
+            SkillNames = filteredSkills.Select(item => item.Name).ToArray(),
+            TraitNames = filteredTraits.Select(item => item.Name).ToArray(),
             Careers = ReadLines(directory, "career.dat"),
-            Equipment = ReadEquipment(directory),
-            Weapons = ReadWeapons(directory),
-            Skills = skills,
-            Traits = traits,
+            Equipment = equipment,
+            Weapons = weapons,
+            Skills = filteredSkills,
+            Traits = filteredTraits,
             SkillDescriptions = skillDescriptions,
             TraitDescriptions = traitDescriptions
         };
     }
+
+    public static bool IsSourceEnabled(
+        RulebookSource source,
+        ResourceCatalogOptions options) =>
+        source == RulebookSource.CoreRulebook || options.IncludeCompanion;
+
+    private static IEnumerable<T> FilterBySource<T>(
+        IEnumerable<T> items,
+        ResourceCatalogOptions options)
+        where T : ISourceCatalogItem =>
+        items.Where(item => IsSourceEnabled(item.Source, options));
 
     private static EquipmentCatalogItem[] ReadEquipment(string directory) =>
         ReadDataLines(directory, "equiplist.dat")
@@ -179,4 +235,9 @@ public sealed class ResourceCatalog
                     !line.StartsWith('#'))
             : [];
     }
+}
+
+public interface ISourceCatalogItem
+{
+    RulebookSource Source { get; }
 }

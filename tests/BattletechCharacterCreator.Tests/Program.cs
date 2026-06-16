@@ -99,6 +99,9 @@ static void CheckResourceCatalog()
 {
     var resources = Path.Combine(AppContext.BaseDirectory, "Resources");
     var catalog = ResourceCatalog.Load(resources);
+    var companionCatalog = ResourceCatalog.Load(
+        resources,
+        new ResourceCatalogOptions(IncludeCompanion: true));
     Assert(catalog.Equipment.Count == 187,
         "All 187 legacy equipment entries must be imported.");
     Assert(catalog.Weapons.Count == 209,
@@ -129,6 +132,21 @@ static void CheckResourceCatalog()
         catalog.Traits.Single(item =>
             item.Name == "Ambidextrous").Description.Contains("both hands"),
         "Trait references and descriptions must be linked to their entries.");
+    Assert(catalog.Equipment.All(item => item.Source == RulebookSource.CoreRulebook) &&
+        catalog.Weapons.All(item => item.Source == RulebookSource.CoreRulebook) &&
+        catalog.Skills.All(item => item.Source == RulebookSource.CoreRulebook) &&
+        catalog.Traits.All(item => item.Source == RulebookSource.CoreRulebook),
+        "Legacy catalog entries must be tagged as core-rulebook content.");
+    Assert(!catalog.Options.IncludeCompanion &&
+        companionCatalog.Options.IncludeCompanion,
+        "Companion catalog loading must be controlled by an explicit option.");
+    Assert(ResourceCatalog.IsSourceEnabled(RulebookSource.CoreRulebook, catalog.Options) &&
+        !ResourceCatalog.IsSourceEnabled(RulebookSource.Companion, catalog.Options) &&
+        ResourceCatalog.IsSourceEnabled(RulebookSource.Companion, companionCatalog.Options),
+        "Companion source filtering must be opt-in.");
+    Assert(new EquipmentCatalogItem("", "Test", "", "", "", "", "",
+            RulebookSource.Companion).SourceLabel == "A Time of War Companion",
+        "Companion catalog entries must have a user-facing source label.");
 }
 
 static void CheckSample(
