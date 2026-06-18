@@ -106,7 +106,7 @@ static void CheckResourceCatalog()
         "All 187 legacy equipment entries must be imported.");
     Assert(catalog.Weapons.Count == 209,
         "All 209 legacy weapon entries must be imported.");
-    Assert(companionCatalog.Equipment.Count == 271,
+    Assert(companionCatalog.Equipment.Count == 286,
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,
         "Companion-enabled weapons must include the starter Companion import.");
@@ -156,6 +156,7 @@ static void CheckResourceCatalog()
         catalog.Equipment.All(item => item.Name != "Prosthetic Enhancement - Vibroblade") &&
         catalog.Equipment.All(item => item.Name != "Mermaid Adaptation Kit") &&
         catalog.Equipment.All(item => item.Name != "Field Simulation Server") &&
+        catalog.Equipment.All(item => item.Name != "Hoodling Sensor HoverJeep") &&
         catalog.Weapons.All(item => item.Name != "Shock Staff"),
         "Companion equipment and weapons must be hidden by default.");
     var companionArmor = companionCatalog.Equipment.Single(item =>
@@ -180,6 +181,8 @@ static void CheckResourceCatalog()
         item.Name == "Mermaid Adaptation Kit");
     var companionPracticeEquipment = companionCatalog.Equipment.Single(item =>
         item.Name == "Field Simulation Server");
+    var companionVehicle = companionCatalog.Equipment.Single(item =>
+        item.Name == "Hoodling Sensor HoverJeep");
     var companionWeapon = companionCatalog.Weapons.Single(item =>
         item.Name == "Shock Staff");
     var companionSupportWeapon = companionCatalog.Weapons.Single(item =>
@@ -212,6 +215,9 @@ static void CheckResourceCatalog()
         companionPracticeEquipment.Source == RulebookSource.Companion &&
         companionPracticeEquipment.Cost == "200000" &&
         companionPracticeEquipment.Armor == "D/D-F-E/D" &&
+        companionVehicle.Source == RulebookSource.Companion &&
+        companionVehicle.Cost == "92000" &&
+        companionVehicle.Armor == "D/X-X-D/C" &&
         companionWeapon.Source == RulebookSource.Companion &&
         companionWeapon.Skill == "Melee Weapons" &&
         companionWeapon.Damage == "2E/6" &&

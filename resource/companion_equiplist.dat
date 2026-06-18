@@ -85,3 +85,18 @@ practice;Null-Network Server;10000;0;Practice;D/D-D-D/B;Network for console inte
 practice;Simulator Pod, Basic;12000;0;Practice;C/A-B-B/B;Full enclosure with basic vehicle or aerospace control simulation, p.192
 practice;Simulator Pod, Enhanced;60000;0;Practice;C/A-B-B/B;Full enclosure with immersive cockpit heat and impact motion effects, p.192
 practice;Pod Command Server;65000;0;Practice;C/A-B-B/B;Network for simulator pods, max 24 units per server, p.192
+vehicle;Boreas Cavalry Hovercraft (Prime);60000;0;Vehicle;F/X-F-E/F;Armor 1/1/1 BAR 8, fuel 29/H, range 1104 km, speed 151/226 kph, crew/pass 1/0, p.196
+vehicle;Boreas Cavalry Hovercraft (A);67500;0;Vehicle;F/X-F-E/F;Armor 1/1/1 BAR 8, fuel 29/H, range 1104 km, speed 151/226 kph, crew/pass 1/0, p.196
+vehicle;Boreas Cavalry Hovercraft (B);65200;0;Vehicle;F/X-F-E/F;Armor 1/1/1 BAR 8, fuel 29/H, range 1104 km, speed 151/226 kph, crew/pass 1/0, p.196
+vehicle;Hoodling Sensor HoverJeep;92000;0;Vehicle;D/X-X-D/C;Armor 2/1/1 BAR 5, fusion, unlimited range, speed 97/151 kph, crew/pass 2/0, cargo 50 kg, p.196
+vehicle;Hoverpod;130;0;Vehicle;C/D-D-D/B;Armor 0/0/0 BAR 2, fuel 12/B, range 2181 km, speed 54/86 kph, crew/pass 1/0, cargo 40 kg, p.196
+vehicle;JI-002 Hoverbike;5500;0;Vehicle;C/X-X-D/D;Armor 1/1/1 BAR 8, fuel 14/P, range 477 km, speed 108/162 kph, crew/pass 1/1, cargo 20 kg, p.196
+vehicle;Assuan Armored Bike;53500;0;Vehicle;E/X-X-E/D;Armor 1/1/1 BAR 10, fuel 5/P, range 961 km, speed 65/97 kph, crew/pass 1/0, p.196
+vehicle;Beast Riot Car;23500;0;Vehicle;E/X-X-D/E;Armor 2/2/2/2 BAR 10, fuel 26/H, range 1343 km, speed 32/54 kph, crew/pass 2/7, cargo 250 kg, p.196
+vehicle;Death Trike;6500;0;Vehicle;C/X-F-F/E;Armor 0/0/0 BAR 2, fuel 30/AL, range 1250 km, speed 97/151 kph with supercharger 194, p.196
+vehicle;Dune Buggy;5100;0;Vehicle;C/C-D-C/E;Armor 1/1/1 BAR 2, fuel 28/P, range 882 km, speed 86/129 kph, crew/pass 2/0, cargo 200 kg, p.196
+vehicle;Eagre Firefighting ATV;7850;0;Vehicle;E/X-X-B/A;Armor 1/1/1 BAR 7, fuel 73/B, range 1114 km, speed 54/86 kph, crew/pass 1/1, cargo 300 kg, p.196
+vehicle;Tracked Quad;47500;0;Vehicle;C/B-C-B/B;Armor 2/1/1 BAR 2, fuel 25/P, range 694 km, speed 43/64 kph, crew/pass 1/1, cargo 700 kg, p.196
+vehicle;HTE Micro-Copter;145;0;Vehicle;D/X-X-D/C;Armor 0/0/0/0 BAR 2, fuel 6/P, range 6666 km, speed 54/86 kph, crew/pass 1/0, cargo 50 kg, p.196
+vehicle;Harpoon Parasub;25000;0;Vehicle;D/X-X-D/E;Armor 1/1/1 BAR 2, fuel 21/H, range 2222 km, speed 32/54 kph, crew/pass 1/4, cargo 200 kg, p.196
+vehicle;Small Steamer;8000;0;Vehicle;A/C-D-C/C;Armor 1/1/1 BAR 2, fuel 210/coal, range 1367 km, speed 21/32 kph, crew/pass 1/21, cargo 700 kg, p.196

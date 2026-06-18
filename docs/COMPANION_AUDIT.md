@@ -62,8 +62,9 @@ core corrected-printing character creation rules.
    straightforward archaic, vintage, and advanced weapon rows from PDF pages
    176 and 178, fixed-cost advanced implant rows from PDF pages 182, 184, 188,
    prosthetic enhancements from PDF page 189, cosmetic implants and adaptation
-   kits from PDF page 191, and advanced combat practice equipment from PDF page
-   192 are imported behind the Companion catalog toggle.
+   kits from PDF page 191, advanced combat practice equipment from PDF page
+   192, and light support vehicles from PDF page 196 are imported behind the
+   Companion catalog toggle.
 3. Extend equipment data only where needed for Companion-only fields such as
    maintenance, modification, legality, or conversion notes.
 4. Add expanded trait metadata after the trait model can represent richer
@@ -118,6 +119,12 @@ The sixth equipment batch covers advanced combat practice equipment from PDF
 page 192: field simulation systems, null-network equipment, simulator pods, and
 their command servers. These are represented as Companion equipment entries
 with unit limits and special behavior preserved in notes.
+
+The seventh equipment batch covers light support vehicles from PDF page 196.
+Because the editor does not yet have a dedicated vehicle model, these are
+represented as Companion equipment entries with their vehicle ratings in the
+armor/rating field and vehicle armor, fuel, range, speed, crew, passenger, and
+cargo details preserved in notes.
 
 Expanded traits should follow after the editor supports source-tagged rule notes
 and richer trait effects. Character templates should wait until the start screen
