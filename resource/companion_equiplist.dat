@@ -26,3 +26,18 @@ implant;Cybernetic Ear (Enhanced);200000;0;Implant;C/E-F-C/B;+1 to Perception ro
 implant;Cybernetic Ear (Signal Pickup);400000;0;Implant;D/E-F-C/C;Detects radio signals within 100 meters, p.182
 implant;Cybernetic Speech (Variable);180000;0;Implant;C/D-F-C/C;+1 to Acting checks, usable as a voice distorter, p.182
 implant;Cybernetic Speech (Ultrasonic);200000;0;Implant;D/E-F-C/D;Speech can transmit in ultrasonic frequencies, p.182
+implant;Recorder Unit;5000;0;Implant;D/F-F-C/F;Records 12 hours audio or 6 hours audio/visual from implants, p.182
+implant;Boosted Recorder Unit;50000;0;Implant;D/X-X-C/F;Records 48 hours audio or 24 hours audio/visual from implants, p.182
+implant;Transmitter Unit;5000;0;Implant;D/E-F-D/F;Transmit only, range 100 meters, p.182
+implant;Boosted Transmitter Unit;50000;0;Implant;D/X-X-D/F;Transmit only, range 1 kilometer, p.182
+implant;Receiver Unit;2000;0;Implant;D/E-F-C/F;Receive only, range 100 meters, p.182
+implant;Boosted Receiver Unit;20000;0;Implant;D/X-X-C/F;Receive only, range 1 kilometer, p.182
+implant;Communications Unit;8000;0;Implant;E/E-F-D/F;Transmit and receive, range 100 meters, p.182
+implant;Boosted Communications Unit;8000;0;Implant;E/X-X-D/F;Transmit and receive, range 1 kilometer, p.182
+implant;Pheromone Effuser;40000;0;Implant;E/X-X-F/E;Range 3m, 10 doses, +2 to CHA-based action checks, p.182
+implant;Vehicular DNI;1400000;0;Implant;F/X-X-E/F;+1 to Piloting checks and halves several vehicle attack modifiers, p.184
+implant;Buffered VDNI;2000000;0;Implant;F/X-X-F/F;Ignores small cockpit modifiers and halves several vehicle attack modifiers, p.184
+implant;Pain Shunt;500000;0;Implant;F/X-X-F/F;Pain Resistance, halves injury and fatigue modifiers, p.184
+implant;Secondary Power Supply;4500;0;Implant;E/X-X-E/E;80 power points, rechargeable, p.184
+implant;Toxin Effuser;9000;0;Implant;F/X-X-E/F;Range 3m, 10 doses, uses any inhaled poison, p.184
+implant;Triple-Core Processor;3000000;0;Implant;E/X-X-F/F;-1 BOD, -1 CHA, +5 to INT-based checks, +2 initiative, p.184

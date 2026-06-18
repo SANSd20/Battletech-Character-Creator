@@ -106,7 +106,7 @@ static void CheckResourceCatalog()
         "All 187 legacy equipment entries must be imported.");
     Assert(catalog.Weapons.Count == 209,
         "All 209 legacy weapon entries must be imported.");
-    Assert(companionCatalog.Equipment.Count == 212,
+    Assert(companionCatalog.Equipment.Count == 227,
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,
         "Companion-enabled weapons must include the starter Companion import.");
@@ -160,6 +160,10 @@ static void CheckResourceCatalog()
         item.Name == "Gill Implant");
     var companionCybernetic = companionCatalog.Equipment.Single(item =>
         item.Name == "Cybernetic Eye (IR)");
+    var companionCommunicationImplant = companionCatalog.Equipment.Single(item =>
+        item.Name == "Pheromone Effuser");
+    var companionCombatImplant = companionCatalog.Equipment.Single(item =>
+        item.Name == "Pain Shunt");
     var companionWeapon = companionCatalog.Weapons.Single(item =>
         item.Name == "Shock Staff");
     var companionSupportWeapon = companionCatalog.Weapons.Single(item =>
@@ -172,6 +176,10 @@ static void CheckResourceCatalog()
         companionImplant.Armor == "D/A-A-A/C" &&
         companionCybernetic.Source == RulebookSource.Companion &&
         companionCybernetic.Cost == "450000" &&
+        companionCommunicationImplant.Source == RulebookSource.Companion &&
+        companionCommunicationImplant.Cost == "40000" &&
+        companionCombatImplant.Source == RulebookSource.Companion &&
+        companionCombatImplant.Armor == "F/X-X-F/F" &&
         companionWeapon.Source == RulebookSource.Companion &&
         companionWeapon.Skill == "Melee Weapons" &&
         companionWeapon.Damage == "2E/6" &&

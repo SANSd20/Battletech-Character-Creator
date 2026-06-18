@@ -59,8 +59,8 @@ core corrected-printing character creation rules.
    prosthetics where the current catalog model already has matching fields.
    Started: vintage personal armor, First SLDF armor kit entries, the
    straightforward archaic, vintage, and advanced weapon rows from PDF pages
-   176 and 178, and starter advanced implant rows from PDF page 182 are
-   imported behind the Companion catalog toggle.
+   176 and 178, fixed-cost advanced implant rows from PDF pages 182 and 184
+   are imported behind the Companion catalog toggle.
 3. Extend equipment data only where needed for Companion-only fields such as
    maintenance, modification, legality, or conversion notes.
 4. Add expanded trait metadata after the trait model can represent richer
@@ -83,12 +83,15 @@ files and are hidden unless Companion content is enabled. Specialty munitions
 and ordnance remain deferred because the current catalog does not yet model
 ammunition modifiers as first-class inventory rules.
 
-The second equipment batch starts PDF page 182 with Hostile Environment
-implants and a basic Black Ops cybernetics set. These are represented as
+The second equipment batch covers fixed-cost implant rows from PDF pages 182
+and 184: Hostile Environment implants, Black Ops cybernetics, communication
+implants, pheromone and toxin effusers, VDNI systems, pain shunts, secondary
+power supplies, and the triple-core processor. These are represented as
 Companion equipment entries with their equipment rating in the existing
-armor/rating field. Percentage-cost dermal systems, prosthetic enhancements,
-and cosmetic adaptation kits remain deferred until the editor can represent
-their special cost and rule dependencies more clearly.
+armor/rating field. Wildcard-cost multimodal implants, percentage-cost dermal
+systems, prosthetic enhancements, and cosmetic adaptation kits remain deferred
+until the editor can represent their special cost and rule dependencies more
+clearly.
 
 Expanded traits should follow after the editor supports source-tagged rule notes
 and richer trait effects. Character templates should wait until the start screen
