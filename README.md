@@ -27,7 +27,7 @@ behind an explicit Companion toggle in the equipment and weapon editor tabs.
 Imported Companion content currently includes vintage armor, First SLDF armor
 kit entries, archaic, vintage, and advanced personal weapons, fixed-cost
 advanced implants and cybernetics, extreme prosthetics, and prosthetic
-enhancements that fit the current catalog model.
+enhancements and cosmetic adaptation kits that fit the current catalog model.
 
 Rules are verified against *A Time of War: The BattleTech RPG, Corrected Third
 Printing*. See `docs/RULES_SOURCE.md` for the authoritative page map and
@@ -83,7 +83,8 @@ or packaged release.
 - Character editor with guided Attribute, Trait, and Skill XP controls
 - Searchable equipment and weapon catalogs with quantity-aware totals
 - Optional Companion catalog toggle with source-tagged imported equipment,
-  weapons, implants, cybernetics, prosthetics, and prosthetic enhancements
+  weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
+  cosmetic adaptation kits
 - Legacy `.btcc` character save and load compatibility
 - Official character-sheet PDF preview and export
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths

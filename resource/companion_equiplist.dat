@@ -68,3 +68,11 @@ prostenh;Prosthetic Enhancement - Holster/Cargo;200;0;Prosthetic;D/X-D-C/C;+2 to
 prostenh;Prosthetic Enhancement - Lockpick;550;0;Prosthetic;D/E-E-D/D;+1 to Security Systems, p.189
 prostenh;Prosthetic Enhancement - Microcomputer;350;0;Prosthetic;E/F-F-D/B;+1 to Computers, cannot combine with Electromagnet, p.189
 prostenh;Prosthetic Enhancement - Prosthetic Leg MASC;2500;0;Prosthetic;E/X-X-F/E;Sprint x2 once per two turns, requires two prosthetic legs, p.189
+cosmetic;Cosmetic Beauty Enhancement;15000;0;Implant;E/C-C-C/A;+1 CHA, +1 to Acting, Negotiation, and Leadership, Attractive trait, p.191
+cosmetic;Cosmetic Horror Enhancement;15000;0;Implant;E/E-E-E/A;+1 CHA, +1 Interrogation or Acting to intimidate, Unattractive trait, p.191
+cosmetic;Cosmetic Tail Prosthetic;15000;0;Prosthetic;E/D-F-E/B;+1 to Acrobatics, whip AP/BD 0M/1+BOD, tail BAR 0/0/0/0, p.191
+cosmetic;Cosmetic Wing Prosthetic;60000;0;Prosthetic;E/D-F-E/B;Glide in atmosphere at half speed, +1 to Acrobatics/Free-Fall, wing BAR 1/1/0/0, p.191
+cosmetic;Cosmetic Claws;200;0;Prosthetic;E/D-F-E/B;Additional cost for retractable claw enhancement, AP/BD 1M/1, p.191
+cosmetic;Centaur Adaptation Kit;800000;0;Kit;E/F-F-F/B;Half movement, +1 BOD while worn, adds two additional legs, p.191
+cosmetic;Mermaid Adaptation Kit;750000;0;Kit;E/F-F-F/D;Includes Gill Implant, +2 to Swimming, crawling movement only on land, p.191
+cosmetic;Naga Adaptation Kit;550000;0;Kit;E/F-F-F/D;One-quarter movement, no sprint or jump, p.191

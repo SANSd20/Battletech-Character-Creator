@@ -106,7 +106,7 @@ static void CheckResourceCatalog()
         "All 187 legacy equipment entries must be imported.");
     Assert(catalog.Weapons.Count == 209,
         "All 209 legacy weapon entries must be imported.");
-    Assert(companionCatalog.Equipment.Count == 254,
+    Assert(companionCatalog.Equipment.Count == 262,
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,
         "Companion-enabled weapons must include the starter Companion import.");
@@ -154,6 +154,7 @@ static void CheckResourceCatalog()
         catalog.Equipment.All(item => item.Name != "Gill Implant") &&
         catalog.Equipment.All(item => item.Name != "Flight Wings") &&
         catalog.Equipment.All(item => item.Name != "Prosthetic Enhancement - Vibroblade") &&
+        catalog.Equipment.All(item => item.Name != "Mermaid Adaptation Kit") &&
         catalog.Weapons.All(item => item.Name != "Shock Staff"),
         "Companion equipment and weapons must be hidden by default.");
     var companionArmor = companionCatalog.Equipment.Single(item =>
@@ -172,6 +173,10 @@ static void CheckResourceCatalog()
         item.Name == "Prosthetic Enhancement - Vibroblade");
     var companionUtilityEnhancement = companionCatalog.Equipment.Single(item =>
         item.Name == "Prosthetic Enhancement - Microcomputer");
+    var companionCosmetic = companionCatalog.Equipment.Single(item =>
+        item.Name == "Cosmetic Beauty Enhancement");
+    var companionAdaptationKit = companionCatalog.Equipment.Single(item =>
+        item.Name == "Mermaid Adaptation Kit");
     var companionWeapon = companionCatalog.Weapons.Single(item =>
         item.Name == "Shock Staff");
     var companionSupportWeapon = companionCatalog.Weapons.Single(item =>
@@ -196,6 +201,11 @@ static void CheckResourceCatalog()
         companionWeaponEnhancement.Armor == "E/F-F-E/E" &&
         companionUtilityEnhancement.Source == RulebookSource.Companion &&
         companionUtilityEnhancement.Cost == "350" &&
+        companionCosmetic.Source == RulebookSource.Companion &&
+        companionCosmetic.Cost == "15000" &&
+        companionCosmetic.Armor == "E/C-C-C/A" &&
+        companionAdaptationKit.Source == RulebookSource.Companion &&
+        companionAdaptationKit.Cost == "750000" &&
         companionWeapon.Source == RulebookSource.Companion &&
         companionWeapon.Skill == "Melee Weapons" &&
         companionWeapon.Damage == "2E/6" &&
