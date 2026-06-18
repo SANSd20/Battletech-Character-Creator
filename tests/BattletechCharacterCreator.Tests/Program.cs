@@ -106,7 +106,7 @@ static void CheckResourceCatalog()
         "All 187 legacy equipment entries must be imported.");
     Assert(catalog.Weapons.Count == 209,
         "All 209 legacy weapon entries must be imported.");
-    Assert(companionCatalog.Equipment.Count == 227,
+    Assert(companionCatalog.Equipment.Count == 235,
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,
         "Companion-enabled weapons must include the starter Companion import.");
@@ -152,6 +152,7 @@ static void CheckResourceCatalog()
         catalog.Weapons.All(item => item.Source != RulebookSource.Companion) &&
         catalog.Equipment.All(item => item.Name != "Vintage Bulletproof Vest") &&
         catalog.Equipment.All(item => item.Name != "Gill Implant") &&
+        catalog.Equipment.All(item => item.Name != "Flight Wings") &&
         catalog.Weapons.All(item => item.Name != "Shock Staff"),
         "Companion equipment and weapons must be hidden by default.");
     var companionArmor = companionCatalog.Equipment.Single(item =>
@@ -164,6 +165,8 @@ static void CheckResourceCatalog()
         item.Name == "Pheromone Effuser");
     var companionCombatImplant = companionCatalog.Equipment.Single(item =>
         item.Name == "Pain Shunt");
+    var companionProsthetic = companionCatalog.Equipment.Single(item =>
+        item.Name == "Flight Wings");
     var companionWeapon = companionCatalog.Weapons.Single(item =>
         item.Name == "Shock Staff");
     var companionSupportWeapon = companionCatalog.Weapons.Single(item =>
@@ -180,6 +183,9 @@ static void CheckResourceCatalog()
         companionCommunicationImplant.Cost == "40000" &&
         companionCombatImplant.Source == RulebookSource.Companion &&
         companionCombatImplant.Armor == "F/X-X-F/F" &&
+        companionProsthetic.Source == RulebookSource.Companion &&
+        companionProsthetic.Cost == "115000" &&
+        companionProsthetic.Armor == "F/X-X-F/F" &&
         companionWeapon.Source == RulebookSource.Companion &&
         companionWeapon.Skill == "Melee Weapons" &&
         companionWeapon.Damage == "2E/6" &&

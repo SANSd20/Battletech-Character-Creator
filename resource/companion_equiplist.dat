@@ -41,3 +41,11 @@ implant;Pain Shunt;500000;0;Implant;F/X-X-F/F;Pain Resistance, halves injury and
 implant;Secondary Power Supply;4500;0;Implant;E/X-X-E/E;80 power points, rechargeable, p.184
 implant;Toxin Effuser;9000;0;Implant;F/X-X-E/F;Range 3m, 10 doses, uses any inhaled poison, p.184
 implant;Triple-Core Processor;3000000;0;Implant;E/X-X-F/F;-1 BOD, -1 CHA, +5 to INT-based checks, +2 initiative, p.184
+implant;Prosthetic Jaw/Fangs;3500;0;Implant;F/X-X-E/F;Bite AP/BD 2M/3+STR, cosmetic horror enhancement, p.188
+implant;Enhanced Jaw/Incisor Injectors;6500;0;Implant;F/X-X-F/F;Bite AP/BD 2M/3+STR, toxin 1 dose per injector max 2, p.188
+implant;Prosthetic Tail;35000;0;Implant;E/X-X-E/E;+1 to Acrobatics, whip AP/BD 1M/2+BOD, tail BAR 2/2/2/2, p.188
+implant;Enhanced Prosthetic Tail;55000;0;Implant;E/X-X-F/F;+1 to Acrobatics, whip AP/BD 3M/4+BOD, tail BAR 4/4/3/3, p.188
+implant;Additional Prosthetic Leg/Arm;100000;0;Implant;F/X-X-F/F;Add one extra prosthetic limb max 4, plus cost of limb, p.188
+implant;Additional Enhanced Prosthetic Leg/Arm;200000;0;Implant;F/X-X-F/F;Add one extra enhanced prosthetic limb max 4, plus cost of limb, p.188
+implant;Glide Wings;85000;0;Implant;E/X-X-E/E;Glide in atmosphere, +1 to Acrobatics/Free-Fall, wing BAR 2/2/1/1, p.188
+implant;Flight Wings;115000;0;Implant;F/X-X-F/F;Glide or fly in atmosphere, +1 to Acrobatics/Free-Fall, wing BAR 4/4/3/3, p.188
