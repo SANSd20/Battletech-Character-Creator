@@ -86,6 +86,10 @@ public static class CharacterRules
                 CatalogMass(item.Mass) * ItemCount(item.Count)) +
             character.Weapons.Sum(item =>
                 CatalogMass(item.Mass) * ItemCount(item.Count));
+        var unresolvedInventoryPrices = character.Equipment.Sum(item =>
+                HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0) +
+            character.Weapons.Sum(item =>
+                HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0);
         var capacity = CarryingCapacity(strength);
 
         return new CharacterSummary(
@@ -96,6 +100,7 @@ public static class CharacterRules
             startingXp - spentXp - character.GmXpModifier,
             wealthLevel,
             startingCBills - inventoryCost,
+            unresolvedInventoryPrices,
             capacity,
             inventoryMass,
             capacity - inventoryMass,
@@ -193,6 +198,9 @@ public static class CharacterRules
             : 0;
     }
 
+    public static bool HasUnresolvedPurchaseCost(string value) =>
+        BasePurchaseCost(value) == 0 && value.Contains('*', StringComparison.Ordinal);
+
     public static decimal CatalogMass(string value) =>
         decimal.TryParse(value, System.Globalization.NumberStyles.Number,
             System.Globalization.CultureInfo.InvariantCulture, out var parsed)
@@ -217,6 +225,7 @@ public sealed record CharacterSummary(
     int FreeXp,
     int WealthLevel,
     int RemainingCBills,
+    int UnresolvedInventoryPrices,
     decimal CarryingCapacity,
     decimal InventoryMass,
     decimal RemainingCapacity,

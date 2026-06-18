@@ -138,8 +138,8 @@ Treat each import as a feature with its own source label and regression tests.
 
 Equipment expansion may require new fields before every item can be represented
 cleanly. Current inventory totals count base purchase prices from slash,
-comma, and wildcard cost formats, but reload, patch, ammunition, vehicle, and
-prosthetic enhancement purchasing still need richer modeling. Trait expansion
-may require more than the current name-and-XP model. Templates may need a
-preset pipeline that can create a complete character without passing through
-every normal wizard screen.
+comma, and wildcard cost formats and report pure wildcard prices as unresolved,
+but reload, patch, ammunition, vehicle, and prosthetic enhancement purchasing
+still need richer modeling. Trait expansion may require more than the current
+name-and-XP model. Templates may need a preset pipeline that can create a
+complete character without passing through every normal wizard screen.

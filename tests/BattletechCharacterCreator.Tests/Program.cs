@@ -68,6 +68,9 @@ Assert(CharacterRules.BasePurchaseCost("1,400,000*") == 1_400_000,
     "Comma and wildcard catalog costs must expose the numeric base price.");
 Assert(CharacterRules.BasePurchaseCost("*") == 0,
     "Pure wildcard catalog costs must stay unresolved.");
+Assert(!CharacterRules.HasUnresolvedPurchaseCost("1,400,000*") &&
+    CharacterRules.HasUnresolvedPurchaseCost("*"),
+    "Only pure wildcard catalog costs must be reported as unresolved.");
 Assert(CharacterRules.CatalogMass("1,600") == 1600m,
     "Catalog mass parsing must accept grouped numbers.");
 Assert(CharacterRules.ItemCount("0") == 1 &&
@@ -105,6 +108,8 @@ Assert(companionInventorySummary.RemainingCBills == -1_400_000,
     "Inventory cost must use base prices from slash, comma, and wildcard formats.");
 Assert(companionInventorySummary.InventoryMass == 1606.2m,
     "Inventory mass must continue parsing comma and decimal quantities.");
+Assert(companionInventorySummary.UnresolvedInventoryPrices == 4,
+    "Inventory summaries must count unresolved wildcard purchase prices by quantity.");
 
 CheckSample("newchar.btcc", 2_900, 100, 6, 18, 36);
 CheckSample("test.btcc", 4_212, 5_494, 6, 18, 36);

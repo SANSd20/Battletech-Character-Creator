@@ -83,6 +83,7 @@ or packaged release.
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
 - Character editor with guided Attribute, Trait, and Skill XP controls
 - Searchable equipment and weapon catalogs with quantity-aware base-price totals
+  and unresolved-price counts
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
   cosmetic adaptation kits, plus advanced combat practice equipment and light
