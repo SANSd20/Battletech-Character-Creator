@@ -595,7 +595,7 @@
                                 <DataGridTextColumn Header="Cost" Binding="{Binding Cost}" Width="75"/>
                                 <DataGridTextColumn Header="Mass" Binding="{Binding Mass}" Width="70"/>
                                 <DataGridTextColumn Header="Locations" Binding="{Binding Locations}" Width="90"/>
-                                <DataGridTextColumn Header="Armor" Binding="{Binding Armor}" Width="90"/>
+                                <DataGridTextColumn Header="Armor/Rating" Binding="{Binding Armor}" Width="105"/>
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>

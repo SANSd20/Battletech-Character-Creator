@@ -106,7 +106,7 @@ static void CheckResourceCatalog()
         "All 187 legacy equipment entries must be imported.");
     Assert(catalog.Weapons.Count == 209,
         "All 209 legacy weapon entries must be imported.");
-    Assert(companionCatalog.Equipment.Count == 194,
+    Assert(companionCatalog.Equipment.Count == 212,
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,
         "Companion-enabled weapons must include the starter Companion import.");
@@ -151,10 +151,15 @@ static void CheckResourceCatalog()
     Assert(catalog.Equipment.All(item => item.Source != RulebookSource.Companion) &&
         catalog.Weapons.All(item => item.Source != RulebookSource.Companion) &&
         catalog.Equipment.All(item => item.Name != "Vintage Bulletproof Vest") &&
+        catalog.Equipment.All(item => item.Name != "Gill Implant") &&
         catalog.Weapons.All(item => item.Name != "Shock Staff"),
         "Companion equipment and weapons must be hidden by default.");
     var companionArmor = companionCatalog.Equipment.Single(item =>
         item.Name == "Vintage Bulletproof Vest");
+    var companionImplant = companionCatalog.Equipment.Single(item =>
+        item.Name == "Gill Implant");
+    var companionCybernetic = companionCatalog.Equipment.Single(item =>
+        item.Name == "Cybernetic Eye (IR)");
     var companionWeapon = companionCatalog.Weapons.Single(item =>
         item.Name == "Shock Staff");
     var companionSupportWeapon = companionCatalog.Weapons.Single(item =>
@@ -162,6 +167,11 @@ static void CheckResourceCatalog()
     Assert(companionArmor.Source == RulebookSource.Companion &&
         companionArmor.Armor == "1/4/0/2" &&
         companionArmor.SourceLabel == "A Time of War Companion" &&
+        companionImplant.Source == RulebookSource.Companion &&
+        companionImplant.Cost == "8000" &&
+        companionImplant.Armor == "D/A-A-A/C" &&
+        companionCybernetic.Source == RulebookSource.Companion &&
+        companionCybernetic.Cost == "450000" &&
         companionWeapon.Source == RulebookSource.Companion &&
         companionWeapon.Skill == "Melee Weapons" &&
         companionWeapon.Damage == "2E/6" &&
