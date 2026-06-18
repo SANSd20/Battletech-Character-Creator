@@ -82,7 +82,7 @@ or packaged release.
 - All affiliations and 68 corrected sub-affiliations
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
 - Character editor with guided Attribute, Trait, and Skill XP controls
-- Searchable equipment and weapon catalogs with quantity-aware totals
+- Searchable equipment and weapon catalogs with quantity-aware base-price totals
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
   cosmetic adaptation kits, plus advanced combat practice equipment and light
@@ -95,8 +95,8 @@ or packaged release.
 
 - Continue importing and modeling selected optional content from
   *A Time of War Companion*
-- Expand equipment, weapon, ammunition, and prosthetic enhancement purchasing
-  details
+- Expand reload, patch, ammunition, vehicle, and prosthetic enhancement
+  purchasing details
 - Continue interface polish and usability testing
 - Strengthen error handling and recovery
 - Complete the final rulebook audit

@@ -76,6 +76,24 @@ Assert(inventorySummary.RemainingCBills == 300,
     "Inventory cost must multiply each item's cost by its quantity.");
 Assert(inventorySummary.InventoryMass == 9m,
     "Inventory mass must multiply each item's mass by its quantity.");
+var companionInventoryCharacter = new Character();
+companionInventoryCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Patched armor", Cost = "500/100", Mass = "3.1", Count = "2"
+});
+companionInventoryCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Wildcard implant", Cost = "*", Mass = "0", Count = "4"
+});
+companionInventoryCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Expensive support weapon", Cost = "1,400,000*", Mass = "1,600", Count = "1"
+});
+var companionInventorySummary = CharacterRules.Calculate(companionInventoryCharacter);
+Assert(companionInventorySummary.RemainingCBills == -1_400_000,
+    "Inventory cost must use base prices from slash, comma, and wildcard formats.");
+Assert(companionInventorySummary.InventoryMass == 1606.2m,
+    "Inventory mass must continue parsing comma and decimal quantities.");
 
 CheckSample("newchar.btcc", 2_900, 100, 6, 18, 36);
 CheckSample("test.btcc", 4_212, 5_494, 6, 18, 36);

@@ -187,8 +187,17 @@ public static class CharacterRules
     private static int DivideRoundUp(int value, int divisor) =>
         (int)Math.Ceiling(value / (double)divisor);
 
-    private static int ParseNumber(string value) =>
-        int.TryParse(value, out var parsed) ? parsed : 0;
+    private static int ParseNumber(string value)
+    {
+        var baseValue = value.Split('/', 2)[0]
+            .Replace(",", "", StringComparison.Ordinal)
+            .Replace("*", "", StringComparison.Ordinal)
+            .Trim();
+        return int.TryParse(baseValue, System.Globalization.NumberStyles.Integer,
+            System.Globalization.CultureInfo.InvariantCulture, out var parsed)
+            ? parsed
+            : 0;
+    }
 
     private static decimal ParseDecimal(string value) =>
         decimal.TryParse(value, System.Globalization.NumberStyles.Number,
