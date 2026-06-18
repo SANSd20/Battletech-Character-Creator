@@ -22,6 +22,12 @@ ComStar and Word of Blake characters also select a full-cost birth affiliation.
 All 68 corrected Stage 0 sub-affiliation XP packages are included.
 The legacy equipment, weapon, skill, trait, career, subskill, and description
 catalogs are imported as structured .NET data for the editor.
+Optional *A Time of War Companion* catalog entries are source-tagged and hidden
+behind an explicit Companion toggle in the equipment and weapon editor tabs.
+Imported Companion content currently includes vintage armor, First SLDF armor
+kit entries, archaic, vintage, and advanced personal weapons, fixed-cost
+advanced implants and cybernetics, extreme prosthetics, and prosthetic
+enhancements that fit the current catalog model.
 
 Rules are verified against *A Time of War: The BattleTech RPG, Corrected Third
 Printing*. See `docs/RULES_SOURCE.md` for the authoritative page map and
@@ -65,7 +71,7 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **80% complete**. There is not yet a stable
+The .NET migration is approximately **84% complete**. There is not yet a stable
 or packaged release.
 
 ### Completed
@@ -76,14 +82,18 @@ or packaged release.
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
 - Character editor with guided Attribute, Trait, and Skill XP controls
 - Searchable equipment and weapon catalogs with quantity-aware totals
+- Optional Companion catalog toggle with source-tagged imported equipment,
+  weapons, implants, cybernetics, prosthetics, and prosthetic enhancements
 - Legacy `.btcc` character save and load compatibility
 - Official character-sheet PDF preview and export
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
 
-- Import selected optional character options from *A Time of War Companion*
-- Expand equipment and weapon purchasing details
+- Continue importing and modeling selected optional content from
+  *A Time of War Companion*
+- Expand equipment, weapon, ammunition, and prosthetic enhancement purchasing
+  details
 - Continue interface polish and usability testing
 - Strengthen error handling and recovery
 - Complete the final rulebook audit
