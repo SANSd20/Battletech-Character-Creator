@@ -59,8 +59,9 @@ core corrected-printing character creation rules.
    prosthetics where the current catalog model already has matching fields.
    Started: vintage personal armor, First SLDF armor kit entries, the
    straightforward archaic, vintage, and advanced weapon rows from PDF pages
-   176 and 178, fixed-cost advanced implant rows from PDF pages 182, 184, and
-   188 are imported behind the Companion catalog toggle.
+   176 and 178, fixed-cost advanced implant rows from PDF pages 182, 184, 188,
+   and prosthetic enhancements from PDF page 189 are imported behind the
+   Companion catalog toggle.
 3. Extend equipment data only where needed for Companion-only fields such as
    maintenance, modification, legality, or conversion notes.
 4. Add expanded trait metadata after the trait model can represent richer
@@ -98,6 +99,12 @@ and prosthetics from PDF page 188: prosthetic jaws and fangs, prosthetic tails,
 additional prosthetic limbs, glide wings, and flight wings. Entries whose table
 costs are listed as base cost plus limb cost retain the base cost and call out
 the extra limb cost requirement in notes.
+
+The fourth equipment batch covers prosthetic enhancements from PDF page 189.
+Because these are add-ons to prosthetic limbs rather than standalone weapons,
+they are represented as Companion equipment entries. Their attack profile,
+power use, reload notes, and utility modifiers are preserved in notes until the
+editor has a dedicated prosthetic enhancement model.
 
 Expanded traits should follow after the editor supports source-tagged rule notes
 and richer trait effects. Character templates should wait until the start screen
