@@ -86,6 +86,8 @@ inventoryCharacter.Weapons.Add(new WeaponItem
     Name = "Test weapon", Cost = "200", Mass = "1.5", Count = "2"
 });
 var inventorySummary = CharacterRules.Calculate(inventoryCharacter);
+Assert(inventorySummary.InventoryBaseCost == 700,
+    "Inventory base cost must total equipment and weapons by quantity.");
 Assert(inventorySummary.RemainingCBills == 300,
     "Inventory cost must multiply each item's cost by its quantity.");
 Assert(inventorySummary.InventoryMass == 9m,
@@ -104,6 +106,8 @@ companionInventoryCharacter.Weapons.Add(new WeaponItem
     Name = "Expensive support weapon", Cost = "1,400,000*", Mass = "1,600", Count = "1"
 });
 var companionInventorySummary = CharacterRules.Calculate(companionInventoryCharacter);
+Assert(companionInventorySummary.InventoryBaseCost == 1_401_000,
+    "Inventory base cost must expose the parsed base total.");
 Assert(companionInventorySummary.RemainingCBills == -1_400_000,
     "Inventory cost must use base prices from slash, comma, and wildcard formats.");
 Assert(companionInventorySummary.InventoryMass == 1606.2m,

@@ -603,6 +603,8 @@
                                     HorizontalAlignment="Right" Margin="0,8,4,0">
                             <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
                             <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
+                            <TextBlock Text="Base cost:" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Summary.InventoryBaseCost}" Margin="6,0,20,0"/>
                             <TextBlock Text="Inventory mass:" FontWeight="SemiBold"/>
                             <TextBlock Text="{Binding Summary.InventoryMass}" Margin="6,0,20,0"/>
                             <TextBlock Text="Capacity remaining:" FontWeight="SemiBold"/>
@@ -670,6 +672,8 @@
                                     HorizontalAlignment="Right" Margin="0,8,4,0">
                             <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
                             <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
+                            <TextBlock Text="Base cost:" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Summary.InventoryBaseCost}" Margin="6,0,20,0"/>
                             <TextBlock Text="Inventory mass:" FontWeight="SemiBold"/>
                             <TextBlock Text="{Binding Summary.InventoryMass}" Margin="6,0,20,0"/>
                             <TextBlock Text="Capacity remaining:" FontWeight="SemiBold"/>
