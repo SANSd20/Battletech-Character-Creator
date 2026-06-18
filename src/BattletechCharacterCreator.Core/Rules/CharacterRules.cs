@@ -79,13 +79,13 @@ public static class CharacterRules
         var wealthLevel = TraitLevel("Wealth", wealthXp);
         var startingCBills = StartingCBills(wealthLevel) + character.CBillModifier;
         var inventoryCost = character.Equipment.Sum(item =>
-                ParseNumber(item.Cost) * ParseCount(item.Count)) +
+                BasePurchaseCost(item.Cost) * ItemCount(item.Count)) +
             character.Weapons.Sum(item =>
-                ParseNumber(item.Cost) * ParseCount(item.Count));
+                BasePurchaseCost(item.Cost) * ItemCount(item.Count));
         var inventoryMass = character.Equipment.Sum(item =>
-                ParseDecimal(item.Mass) * ParseCount(item.Count)) +
+                CatalogMass(item.Mass) * ItemCount(item.Count)) +
             character.Weapons.Sum(item =>
-                ParseDecimal(item.Mass) * ParseCount(item.Count));
+                CatalogMass(item.Mass) * ItemCount(item.Count));
         var capacity = CarryingCapacity(strength);
 
         return new CharacterSummary(
@@ -181,13 +181,7 @@ public static class CharacterRules
         _ => 2_000_000
     };
 
-    private static int FindValue(IEnumerable<NamedValue> values, string name) =>
-        values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;
-
-    private static int DivideRoundUp(int value, int divisor) =>
-        (int)Math.Ceiling(value / (double)divisor);
-
-    private static int ParseNumber(string value)
+    public static int BasePurchaseCost(string value)
     {
         var baseValue = value.Split('/', 2)[0]
             .Replace(",", "", StringComparison.Ordinal)
@@ -199,12 +193,20 @@ public static class CharacterRules
             : 0;
     }
 
-    private static decimal ParseDecimal(string value) =>
+    public static decimal CatalogMass(string value) =>
         decimal.TryParse(value, System.Globalization.NumberStyles.Number,
-            System.Globalization.CultureInfo.InvariantCulture, out var parsed) ? parsed : 0m;
+            System.Globalization.CultureInfo.InvariantCulture, out var parsed)
+            ? parsed
+            : 0m;
 
-    private static int ParseCount(string value) =>
+    public static int ItemCount(string value) =>
         int.TryParse(value, out var parsed) && parsed > 0 ? parsed : 1;
+
+    private static int FindValue(IEnumerable<NamedValue> values, string name) =>
+        values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;
+
+    private static int DivideRoundUp(int value, int divisor) =>
+        (int)Math.Ceiling(value / (double)divisor);
 }
 
 public sealed record CharacterSummary(

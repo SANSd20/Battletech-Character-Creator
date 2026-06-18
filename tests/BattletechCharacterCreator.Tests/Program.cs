@@ -62,6 +62,17 @@ Assert(CharacterRules.SkillLevel(64, [new NamedValue("Fast Learner", 300)]) == 3
 Assert(CharacterRules.TraitLevel("Wealth", -95) == -1,
     "Negative trait XP uses floor semantics.");
 Assert(CharacterRules.StartingCBills(3) == 10_000, "Wealth level determines starting C-Bills.");
+Assert(CharacterRules.BasePurchaseCost("500/100") == 500,
+    "Slash-separated catalog costs must expose the base purchase price.");
+Assert(CharacterRules.BasePurchaseCost("1,400,000*") == 1_400_000,
+    "Comma and wildcard catalog costs must expose the numeric base price.");
+Assert(CharacterRules.BasePurchaseCost("*") == 0,
+    "Pure wildcard catalog costs must stay unresolved.");
+Assert(CharacterRules.CatalogMass("1,600") == 1600m,
+    "Catalog mass parsing must accept grouped numbers.");
+Assert(CharacterRules.ItemCount("0") == 1 &&
+    CharacterRules.ItemCount("3") == 3,
+    "Inventory item counts must default to one and accept positive counts.");
 var inventoryCharacter = new Character();
 inventoryCharacter.Equipment.Add(new EquipmentItem
 {
