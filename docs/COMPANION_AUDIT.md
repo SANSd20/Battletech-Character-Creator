@@ -45,6 +45,7 @@ core corrected-printing character creation rules.
 | Equipment expansion begins | 160 |
 | Additional personal equipment begins | 174 |
 | Advanced implants and prosthetics equipment | 180 |
+| Advanced combat practice equipment | 192 |
 | Light support vehicles | 193 |
 | Mech-less warriors character guidance | 218 |
 | Power player and high-power NPC guidance begins | 236 |
@@ -60,9 +61,9 @@ core corrected-printing character creation rules.
    Started: vintage personal armor, First SLDF armor kit entries, the
    straightforward archaic, vintage, and advanced weapon rows from PDF pages
    176 and 178, fixed-cost advanced implant rows from PDF pages 182, 184, 188,
-   prosthetic enhancements from PDF page 189, and cosmetic implants and
-   adaptation kits from PDF page 191 are imported behind the Companion catalog
-   toggle.
+   prosthetic enhancements from PDF page 189, cosmetic implants and adaptation
+   kits from PDF page 191, and advanced combat practice equipment from PDF page
+   192 are imported behind the Companion catalog toggle.
 3. Extend equipment data only where needed for Companion-only fields such as
    maintenance, modification, legality, or conversion notes.
 4. Add expanded trait metadata after the trait model can represent richer
@@ -112,6 +113,11 @@ PDF page 191: beauty and horror enhancements, cosmetic tail and wing
 prosthetics, cosmetic claws, and centaur, mermaid, and naga adaptation kits.
 These are represented as Companion equipment entries; the cosmetic claws row
 uses the numeric additional cost and records the add-on nature in notes.
+
+The sixth equipment batch covers advanced combat practice equipment from PDF
+page 192: field simulation systems, null-network equipment, simulator pods, and
+their command servers. These are represented as Companion equipment entries
+with unit limits and special behavior preserved in notes.
 
 Expanded traits should follow after the editor supports source-tagged rule notes
 and richer trait effects. Character templates should wait until the start screen

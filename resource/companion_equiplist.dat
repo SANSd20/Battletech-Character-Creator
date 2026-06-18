@@ -76,3 +76,12 @@ cosmetic;Cosmetic Claws;200;0;Prosthetic;E/D-F-E/B;Additional cost for retractab
 cosmetic;Centaur Adaptation Kit;800000;0;Kit;E/F-F-F/B;Half movement, +1 BOD while worn, adds two additional legs, p.191
 cosmetic;Mermaid Adaptation Kit;750000;0;Kit;E/F-F-F/D;Includes Gill Implant, +2 to Swimming, crawling movement only on land, p.191
 cosmetic;Naga Adaptation Kit;550000;0;Kit;E/F-F-F/D;One-quarter movement, no sprint or jump, p.191
+practice;Infantry Practice Mesh;1000;0;Practice;E/E-E-E/C;Sensor mesh and ultra-light exo-frame for field simulation combat, p.192
+practice;Vehicular Inhibitor Kit;1500;0;Practice;D/D-F-E/D;Software package for Mechs, vehicles, and battle armor, p.192
+practice;Vehicular Holo-Projector;75000;0;Practice;E/E-X-F/D;Attaches to drone vehicle controlled by field simulator server, p.192
+practice;Field Simulation Server;200000;0;Practice;D/D-F-E/D;Interprets field simulation combat, max 36 units per server, p.192
+practice;Console Interrupt Kit;500;0;Practice;D/D-D-D/B;Overrides cockpit and controls for parked simulator operation, p.192
+practice;Null-Network Server;10000;0;Practice;D/D-D-D/B;Network for console interrupt kits, max 12 units per server, p.192
+practice;Simulator Pod, Basic;12000;0;Practice;C/A-B-B/B;Full enclosure with basic vehicle or aerospace control simulation, p.192
+practice;Simulator Pod, Enhanced;60000;0;Practice;C/A-B-B/B;Full enclosure with immersive cockpit heat and impact motion effects, p.192
+practice;Pod Command Server;65000;0;Practice;C/A-B-B/B;Network for simulator pods, max 24 units per server, p.192
