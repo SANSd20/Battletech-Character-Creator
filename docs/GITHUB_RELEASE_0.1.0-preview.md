@@ -68,6 +68,7 @@ June 18, 2026.
 - Per-user Windows installer
 - Release packaging guard against stale installers when release checks are skipped
 - GitHub release validation cross-checks manifest installer metadata
+- GitHub release validation cross-checks the packaged release version
 
 ## Known Gaps
 

@@ -61,6 +61,10 @@ if (!$AllowDirtyManifest -and $manifestText -match "Dirty working tree:\s*True")
     throw "Release manifest was built from a dirty working tree. Rebuild the package from a clean commit."
 }
 
+if ($manifestText -notmatch "Version:\s*$([regex]::Escape($Version))\b") {
+    throw "Release manifest version does not match requested version ($Version). Rebuild the package."
+}
+
 $currentCommit = git rev-parse --short HEAD
 if ($manifestText -notmatch "Commit:\s*$currentCommit\b") {
     throw "Release manifest commit does not match HEAD ($currentCommit). Rebuild the package after committing."
