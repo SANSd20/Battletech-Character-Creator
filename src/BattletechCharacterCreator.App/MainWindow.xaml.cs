@@ -145,11 +145,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             ? $"{Summary.UnresolvedInventoryPrices} inventory price(s) need manual pricing."
             : Summary.RemainingCBills < 0
                 ? $"Inventory is over budget by {-Summary.RemainingCBills} C-Bills."
-                : $"Inventory has {Summary.RemainingCBills} C-Bills remaining.";
+                : Summary.RemainingCapacity < 0
+                    ? $"Inventory is over carrying capacity by {-Summary.RemainingCapacity:0.##} kg."
+                    : $"Inventory has {Summary.RemainingCBills} C-Bills and {Summary.RemainingCapacity:0.##} kg capacity remaining.";
     public Brush InventoryStatusBrush =>
         Summary.UnresolvedInventoryPrices > 0
             ? Brushes.DarkGoldenrod
-            : Summary.RemainingCBills < 0
+            : Summary.RemainingCBills < 0 || Summary.RemainingCapacity < 0
                 ? Brushes.Firebrick
                 : Brushes.DarkGreen;
     public bool IncludeCompanionContent
@@ -343,6 +345,24 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             throw new InvalidOperationException(
                 "Inventory remove actions did not remove the selected rows.");
         }
+
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Heavy smoke item",
+            Cost = "0",
+            Mass = "999",
+            Count = "1"
+        });
+        Recalculate();
+        if (Summary.RemainingCapacity >= 0 ||
+            !InventoryStatus.Contains("over carrying capacity",
+                StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Inventory carrying capacity warning was not shown in the editor.");
+        }
+        Character.Equipment.Clear();
+        Recalculate();
 
         IncludeCompanionContent = true;
         if (!Catalog.Options.IncludeCompanion)

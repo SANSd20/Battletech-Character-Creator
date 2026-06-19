@@ -85,7 +85,7 @@ release.
 - Character editor with guided Attribute, Trait, and Skill XP controls
 - Searchable equipment and weapon catalogs with visible quantity-aware
   base-price totals, purchased patch and ammo totals, and unresolved-price counts
-- Inventory status warnings for over-budget and manually priced wildcard items
+- Inventory status warnings for over-budget, overloaded, and manually priced wildcard items
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
   cosmetic adaptation kits, plus advanced combat practice equipment, light
