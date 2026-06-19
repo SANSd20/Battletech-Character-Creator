@@ -61,3 +61,6 @@ smoke:
 ```powershell
 .\scripts\Test-Installer.ps1
 ```
+
+Status note: the full installer smoke test passed on June 18, 2026. Repeat it
+before each packaged release after rebuilding the installer.
