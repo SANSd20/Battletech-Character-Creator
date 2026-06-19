@@ -43,10 +43,12 @@ New-Item -ItemType Directory -Force -Path $releaseDir | Out-Null
 
 Copy-Item -LiteralPath $installerPath -Destination $releaseInstaller
 Copy-Item -LiteralPath $notesSourcePath -Destination $notesOutputPath
-Copy-Item -LiteralPath $releaseDraftSourcePath -Destination $releaseDraftOutputPath
 
 $hash = Get-FileHash -LiteralPath $releaseInstaller -Algorithm SHA256
 "$($hash.Hash)  $installerName" | Set-Content -LiteralPath $checksumPath
+$releaseDraft = Get-Content -LiteralPath $releaseDraftSourcePath -Raw
+$releaseDraft.Replace("{{INSTALLER_SHA256}}", $hash.Hash) |
+    Set-Content -LiteralPath $releaseDraftOutputPath
 
 $commit = git rev-parse --short HEAD
 $created = Get-Date -Format "yyyy-MM-dd HH:mm:ss K"

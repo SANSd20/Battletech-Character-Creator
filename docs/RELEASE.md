@@ -75,7 +75,8 @@ Run this from a clean working tree. The package script records the current Git
 commit in the release manifest and stops if uncommitted changes are present.
 
 The package script writes the installer, a SHA-256 checksum, preview release
-notes, a GitHub release draft, and a manifest to:
+notes, a GitHub release draft with the current installer hash injected, and a
+manifest to:
 
 ```text
 artifacts\release\0.1.0-preview
@@ -95,5 +96,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Publish-GitHubReleas
 
 The publish helper checks that the installer, checksum, release notes, GitHub
 release draft, and manifest are present. It also verifies that the checksum
-matches the installer and that the manifest was generated from the current clean
+matches the installer, that the GitHub release draft includes the current
+installer hash, and that the manifest was generated from the current clean
 commit before creating the prerelease.

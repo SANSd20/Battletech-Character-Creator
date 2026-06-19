@@ -48,6 +48,14 @@ if (!$checksumText.Contains($actualHash)) {
     throw "Checksum file does not match installer hash. Expected $actualHash."
 }
 
+$notesText = Get-Content -LiteralPath $notesPath -Raw
+if (!$notesText.Contains($actualHash)) {
+    throw "GitHub release draft does not include the current installer hash. Rebuild the package."
+}
+if ($notesText.Contains("{{INSTALLER_SHA256}}")) {
+    throw "GitHub release draft still contains the installer hash placeholder. Rebuild the package."
+}
+
 $manifestText = Get-Content -LiteralPath $manifestPath -Raw
 if (!$AllowDirtyManifest -and $manifestText -match "Dirty working tree:\s*True") {
     throw "Release manifest was built from a dirty working tree. Rebuild the package from a clean commit."

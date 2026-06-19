@@ -25,7 +25,7 @@ See `release-manifest.txt` for the exact packaged commit.
 SHA-256:
 
 ```text
-FC526AF2E16E621538409A5BA41B6F3F1B20BCB7ED721258C2A837520A310284
+{{INSTALLER_SHA256}}
 ```
 
 Before packaging, the automated release checks passed:
