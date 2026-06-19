@@ -80,8 +80,17 @@ if ($uninstallProcess.ExitCode -ne 0) {
     throw "Uninstaller exited with code $($uninstallProcess.ExitCode)."
 }
 
+for ($attempt = 1; $attempt -le 20; $attempt++) {
+    if (!(Test-Path -LiteralPath $installedExe)) {
+        break
+    }
+    Start-Sleep -Milliseconds 250
+}
+
 if (Test-Path -LiteralPath $installedExe) {
-    throw "Installed app remained after uninstall: $installedExe"
+    $remaining = Get-ChildItem -LiteralPath $installTarget -Recurse -Force |
+        Select-Object -ExpandProperty FullName
+    throw "Installed app remained after uninstall: $installedExe`nRemaining files:`n$($remaining -join "`n")"
 }
 
 Write-Host "Installer smoke test passed."

@@ -45,10 +45,13 @@ Section "${APP_NAME}" Required
 SectionEnd
 
 Section "Uninstall"
+  SetOutPath "$TEMP"
+
   Delete "$SMPROGRAMS\A Time of War Character Creator\A Time of War Character Creator.lnk"
   Delete "$SMPROGRAMS\A Time of War Character Creator\Uninstall.lnk"
   RMDir "$SMPROGRAMS\A Time of War Character Creator"
 
+  Delete "$INSTDIR\${APP_EXE}"
   RMDir /r "$INSTDIR"
 
   DeleteRegKey HKCU "${UNINSTALL_KEY}"
