@@ -15,6 +15,7 @@ release.
 - Legacy `.btcc` save/load compatibility
 - Searchable equipment and weapon catalogs with C-Bill and mass summaries
 - Equipment and weapon catalog filters for faster inventory selection
+- Selected equipment and weapon detail panels for source and rules context
 - Inventory status warnings for over-budget, overloaded, and manually priced wildcard items
 - Opt-in *A Time of War Companion* equipment and weapon catalog content
 - Opt-in *A Time of War Companion* expanded trait reference entries

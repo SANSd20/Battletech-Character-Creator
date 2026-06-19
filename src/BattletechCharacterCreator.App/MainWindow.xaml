@@ -615,6 +615,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
@@ -654,7 +655,35 @@
                             <Button Grid.Column="3" Content="Remove selected"
                                     Click="RemoveEquipment_Click" Margin="0,0,0,8"/>
                         </Grid>
-                        <DataGrid Grid.Row="2" x:Name="EquipmentGrid"
+                        <Border Grid.Row="2"
+                                BorderBrush="#CECDC8"
+                                BorderThickness="1"
+                                Padding="8,5"
+                                Margin="0,0,0,8"
+                                Background="#FAFAF7">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock FontWeight="SemiBold"
+                                           Text="{Binding SelectedEquipmentSourceLabel}"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding SelectedEquipmentSummary}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Row="1"
+                                           Grid.ColumnSpan="3"
+                                           Text="{Binding SelectedEquipmentNotes}"
+                                           TextWrapping="Wrap"
+                                           MaxHeight="44"/>
+                            </Grid>
+                        </Border>
+                        <DataGrid Grid.Row="3" x:Name="EquipmentGrid"
                                   ItemsSource="{Binding Equipment}"
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
@@ -670,7 +699,7 @@
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <DockPanel Grid.Row="3" Margin="0,8,4,0">
+                        <DockPanel Grid.Row="4" Margin="0,8,4,0">
                             <TextBlock Text="{Binding InventoryStatus}"
                                        Foreground="{Binding InventoryStatusBrush}"
                                        FontWeight="SemiBold"
@@ -693,6 +722,7 @@
                 <TabItem Header="Weapons">
                     <Grid Margin="8">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -734,7 +764,35 @@
                             <Button Grid.Column="3" Content="Remove selected"
                                     Click="RemoveWeapon_Click" Margin="0,0,0,8"/>
                         </Grid>
-                        <DataGrid Grid.Row="2" x:Name="WeaponsGrid"
+                        <Border Grid.Row="2"
+                                BorderBrush="#CECDC8"
+                                BorderThickness="1"
+                                Padding="8,5"
+                                Margin="0,0,0,8"
+                                Background="#FAFAF7">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock FontWeight="SemiBold"
+                                           Text="{Binding SelectedWeaponSourceLabel}"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding SelectedWeaponSummary}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Row="1"
+                                           Grid.ColumnSpan="3"
+                                           Text="{Binding SelectedWeaponNotes}"
+                                           TextWrapping="Wrap"
+                                           MaxHeight="44"/>
+                            </Grid>
+                        </Border>
+                        <DataGrid Grid.Row="3" x:Name="WeaponsGrid"
                                   ItemsSource="{Binding Weapons}"
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
@@ -755,7 +813,7 @@
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="180"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <DockPanel Grid.Row="3" Margin="0,8,4,0">
+                        <DockPanel Grid.Row="4" Margin="0,8,4,0">
                             <TextBlock Text="{Binding InventoryStatus}"
                                        Foreground="{Binding InventoryStatusBrush}"
                                        FontWeight="SemiBold"

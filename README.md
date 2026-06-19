@@ -90,6 +90,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   base-price totals, purchased patch and ammo totals, and unresolved-price counts
 - Equipment and weapon catalog filters for faster core and Companion inventory
   selection
+- Selected equipment and weapon detail panels showing source, cost, mass, and
+  combat notes before adding items
 - Inventory status warnings for over-budget, overloaded, and manually priced wildcard items
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and

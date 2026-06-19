@@ -180,10 +180,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             selectedEquipmentCatalogItem = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(SelectedEquipmentSourceLabel));
+            OnPropertyChanged(nameof(SelectedEquipmentSummary));
+            OnPropertyChanged(nameof(SelectedEquipmentNotes));
         }
     }
     public string SelectedEquipmentSourceLabel =>
         SelectedEquipmentCatalogItem?.SourceLabel ?? "";
+    public string SelectedEquipmentSummary =>
+        SelectedEquipmentCatalogItem is { } item
+            ? $"{item.Category} | Cost {item.Cost} | Mass {item.Mass} | Armor/Rating {item.Armor}"
+            : "";
+    public string SelectedEquipmentNotes =>
+        PlainCatalogText(SelectedEquipmentCatalogItem?.Notes ?? "");
     public WeaponCatalogItem? SelectedWeaponCatalogItem
     {
         get => selectedWeaponCatalogItem;
@@ -192,10 +200,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             selectedWeaponCatalogItem = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(SelectedWeaponSourceLabel));
+            OnPropertyChanged(nameof(SelectedWeaponSummary));
+            OnPropertyChanged(nameof(SelectedWeaponNotes));
         }
     }
     public string SelectedWeaponSourceLabel =>
         SelectedWeaponCatalogItem?.SourceLabel ?? "";
+    public string SelectedWeaponSummary =>
+        SelectedWeaponCatalogItem is { } item
+            ? $"{item.Category} | {item.Skill} | Damage {item.Damage} | Range {item.Range} | Cost {item.Cost} | Mass {item.Mass}"
+            : "";
+    public string SelectedWeaponNotes =>
+        SelectedWeaponCatalogItem is { } item
+            ? PlainCatalogText(
+                $"Shots {item.Shots}; Ammo {item.AmmoCost} C-Bills / {item.AmmoMass} kg. {item.Notes}")
+            : "";
     public string? SelectedSkillName
     {
         get => selectedSkillName;
@@ -441,7 +460,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         });
         Recalculate();
         if (SelectedEquipmentSourceLabel != "A Time of War Companion" ||
+            !SelectedEquipmentSummary.Contains("Cost 500/100", StringComparison.Ordinal) ||
+            SelectedEquipmentNotes.Length == 0 ||
             SelectedWeaponSourceLabel != "A Time of War Companion" ||
+            !SelectedWeaponSummary.Contains("Damage 2E/6", StringComparison.Ordinal) ||
+            !SelectedWeaponNotes.Contains("Shots", StringComparison.Ordinal) ||
             SelectedTraitSourceLabel != "A Time of War Companion" ||
             !SelectedTraitDescription.Contains("genetic conditions",
                 StringComparison.Ordinal) ||
