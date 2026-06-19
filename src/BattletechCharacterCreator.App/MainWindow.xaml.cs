@@ -352,6 +352,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
+    public static string SmokeOperationErrorReport(string path) =>
+        WriteOperationReport(
+            new InvalidOperationException("Smoke editor operation error"),
+            "Unable to save character",
+            path);
+
     private static string EscapeSmokeText(string value) =>
         value.Replace("\\", "\\\\", StringComparison.Ordinal)
             .Replace("(", "\\(", StringComparison.Ordinal)
@@ -395,8 +401,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, ex.Message, "Unable to open character",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            ShowOperationError(ex, "Unable to open character");
         }
     }
 
@@ -436,8 +441,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, ex.Message, "Unable to save character",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            ShowOperationError(ex, "Unable to save character");
         }
     }
 
@@ -458,8 +462,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, ex.Message, "Unable to preview character sheet",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            ShowOperationError(ex, "Unable to preview character sheet");
         }
     }
 
@@ -481,10 +484,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, ex.Message, "Unable to export character sheet",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            ShowOperationError(ex, "Unable to export character sheet");
         }
     }
+
+    private void ShowOperationError(Exception exception, string title)
+    {
+        var reportPath = WriteOperationReport(exception, title);
+        MessageBox.Show(this,
+            $"{exception.Message}\n\nA report was saved here:\n{reportPath}",
+            title,
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
+    }
+
+    private static string WriteOperationReport(
+        Exception exception,
+        string title,
+        string? path = null) =>
+        AppErrorReporter.WriteReport(exception, title, path);
 
     private static string SafeFileName(string value)
     {

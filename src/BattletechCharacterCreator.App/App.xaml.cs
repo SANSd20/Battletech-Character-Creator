@@ -60,6 +60,20 @@ public partial class App : Application
             return;
         }
 
+        var operationErrorArgument = e.Args.FirstOrDefault(
+            argument => argument.StartsWith("--smoke-operation-error-report=",
+                StringComparison.Ordinal));
+        if (operationErrorArgument is not null)
+        {
+            var outputPath = Path.GetFullPath(
+                operationErrorArgument[
+                    "--smoke-operation-error-report=".Length..]);
+            BattletechCharacterCreator.App.MainWindow
+                .SmokeOperationErrorReport(outputPath);
+            Shutdown(0);
+            return;
+        }
+
         if (e.Args.Contains("--smoke-wizard", StringComparer.Ordinal))
         {
             var wizard = new CharacterWizardWindow();
