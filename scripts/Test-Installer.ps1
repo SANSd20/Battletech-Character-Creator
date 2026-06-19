@@ -20,6 +20,8 @@ $installedExe = Join-Path $installTarget "BattletechCharacterCreator.App.exe"
 $resourceFile = Join-Path $installTarget "Resources\equiplist.dat"
 $sheetFile = Join-Path $installTarget "Assets\Sheets\CharacterRecordSheet.png"
 $smokeReport = Join-Path $installTarget "installer-smoke-report.txt"
+$sheetExportPath = Join-Path $installTarget "installer-smoke-sheet-export.pdf"
+$sheetExportErrorPath = $sheetExportPath + ".error.txt"
 $uninstaller = Join-Path $installTarget "uninstall.exe"
 
 if (!(Test-Path -LiteralPath $installer)) {
@@ -35,6 +37,8 @@ if ($DryRun) {
     Write-Host "Would verify: $sheetFile"
     Write-Host "Would smoke: $installedExe --smoke-error-report=$smokeReport"
     Write-Host "Would verify smoke report diagnostic metadata"
+    Write-Host "Would smoke: $installedExe --smoke-sheet-export=$sheetExportPath"
+    Write-Host "Would verify sheet export output"
     Write-Host "Would uninstall: $uninstaller /S"
     exit 0
 }
@@ -84,6 +88,28 @@ foreach ($text in $requiredReportText) {
     if (!$report.Contains($text)) {
         throw "Installed app smoke report did not include diagnostic metadata: $text"
     }
+}
+
+$sheetExportProcess = Start-Process -FilePath $installedExe `
+    -ArgumentList "--smoke-sheet-export=$sheetExportPath" `
+    -WindowStyle Hidden `
+    -PassThru
+if (!$sheetExportProcess.WaitForExit(30000)) {
+    $sheetExportProcess.Kill()
+    throw "Installed app sheet export smoke test timed out."
+}
+if ($sheetExportProcess.ExitCode -ne 0) {
+    throw "Installed app sheet export smoke test exited with code $($sheetExportProcess.ExitCode)."
+}
+if (Test-Path -LiteralPath $sheetExportErrorPath) {
+    $exportError = Get-Content -LiteralPath $sheetExportErrorPath -Raw
+    throw "Installed app sheet export wrote an error report: $exportError"
+}
+if (!(Test-Path -LiteralPath $sheetExportPath)) {
+    throw "Installed app sheet export output was not created."
+}
+if ((Get-Item -LiteralPath $sheetExportPath).Length -le 0) {
+    throw "Installed app sheet export output was empty."
 }
 
 $uninstallProcess = Start-Process -FilePath $uninstaller `

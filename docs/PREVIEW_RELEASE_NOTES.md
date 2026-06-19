@@ -23,6 +23,7 @@ release.
 - Error reports include app version, runtime, process, and launch diagnostics
 - Release checks validate diagnostic report versions against the requested version
 - Installer smoke validates diagnostic metadata from the installed app
+- Installer smoke validates character-sheet PDF export from the installed app
 - Per-user Windows installer and release package manifest/checksum output
 - Release packaging guard against stale installers when release checks are skipped
 - GitHub release validation cross-checks manifest installer metadata
