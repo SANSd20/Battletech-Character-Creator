@@ -13,7 +13,7 @@ character.Skills.Add(new NamedValue("Piloting/'Mech", 80));
 character.Equipment.Add(new EquipmentItem
 {
     Name = "Helmet", Cost = "300", Mass = "1", Locations = "H",
-    Armor = "5/6/5/2", Notes = "p.292", Count = "1"
+    Armor = "5/6/5/2", Notes = "p.292", PatchCount = "2", Count = "1"
 });
 character.Weapons.Add(new WeaponItem
 {
@@ -38,7 +38,14 @@ var loaded = LegacyCharacterSerializer.Read(input);
 Assert(loaded.Name == character.Name, "Names containing colons must round-trip.");
 Assert(loaded.Notes == character.Notes, "Multiline notes must round-trip.");
 Assert(loaded.Skills.Single().Name == "Piloting/'Mech", "Skills must round-trip.");
-Assert(loaded.Equipment.Single().Notes == "p.292", "All seven equipment fields must round-trip.");
+Assert(loaded.Equipment.Single().PatchCount == "2" &&
+    loaded.Equipment.Single().Notes == "p.292",
+    "All eight equipment fields must round-trip.");
+var legacyEquipment = LegacyCharacterSerializer.Read(new StringReader(
+    "equip:Flak/Jacket;150/10;4;Torso;1/5/1/3;legacy notes;2"));
+Assert(legacyEquipment.Equipment.Single().PatchCount == "0" &&
+    legacyEquipment.Equipment.Single().Notes == "legacy notes",
+    "Older seven-field equipment rows must load with no purchased patches.");
 Assert(loaded.Weapons.Single().AmmoCount == "4" &&
     loaded.Weapons.Single().Notes == "Burst 5",
     "All twelve weapon fields must round-trip.");
@@ -71,6 +78,8 @@ Assert(CharacterRules.TraitLevel("Wealth", -95) == -1,
 Assert(CharacterRules.StartingCBills(3) == 10_000, "Wealth level determines starting C-Bills.");
 Assert(CharacterRules.BasePurchaseCost("500/100") == 500,
     "Slash-separated catalog costs must expose the base purchase price.");
+Assert(CharacterRules.SecondaryPurchaseCost("500/100") == 100,
+    "Slash-separated catalog costs must expose the patch purchase price.");
 Assert(CharacterRules.BasePurchaseCost("1,400,000*") == 1_400_000,
     "Comma and wildcard catalog costs must expose the numeric base price.");
 Assert(CharacterRules.BasePurchaseCost("*") == 0,
@@ -86,7 +95,7 @@ Assert(CharacterRules.ItemCount("0") == 1 &&
 var inventoryCharacter = new Character();
 inventoryCharacter.Equipment.Add(new EquipmentItem
 {
-    Name = "Test equipment", Cost = "100", Mass = "2", Count = "3"
+    Name = "Test equipment", Cost = "100/7", Mass = "2", PatchCount = "5", Count = "3"
 });
 inventoryCharacter.Weapons.Add(new WeaponItem
 {
@@ -94,10 +103,10 @@ inventoryCharacter.Weapons.Add(new WeaponItem
     AmmoCost = "10", AmmoMass = "0.25", AmmoCount = "4"
 });
 var inventorySummary = CharacterRules.Calculate(inventoryCharacter);
-Assert(inventorySummary.InventoryBaseCost == 740,
-    "Inventory base cost must total equipment, weapons, and purchased ammo.");
-Assert(inventorySummary.RemainingCBills == 260,
-    "Inventory cost must multiply each item's and ammo pack's cost by quantity.");
+Assert(inventorySummary.InventoryBaseCost == 775,
+    "Inventory base cost must total equipment, weapons, purchased patches, and purchased ammo.");
+Assert(inventorySummary.RemainingCBills == 225,
+    "Inventory cost must multiply each item, patch, and ammo pack cost by quantity.");
 Assert(inventorySummary.InventoryMass == 10m,
     "Inventory mass must multiply each item's and ammo pack's mass by quantity.");
 var companionInventoryCharacter = new Character();

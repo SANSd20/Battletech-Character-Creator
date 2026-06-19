@@ -114,7 +114,7 @@ public static class LegacyCharacterSerializer
         foreach (var item in c.Equipment)
         {
             WriteValue(writer, "equip", string.Join(';', item.Name, item.Cost, item.Mass,
-                item.Locations, item.Armor, item.Notes, item.Count));
+                item.Locations, item.Armor, item.Notes, item.PatchCount, item.Count));
         }
 
         foreach (var pair in c.EquipmentLocations)
@@ -184,11 +184,14 @@ public static class LegacyCharacterSerializer
     private static void AddEquipment(Character c, string value)
     {
         var f = value.Split(';');
-        if (f.Length != 7) return;
+        if (f.Length is not (7 or 8)) return;
         c.Equipment.Add(new EquipmentItem
         {
             Name = f[0], Cost = f[1], Mass = f[2], Locations = f[3],
-            Armor = f[4], Notes = f[5], Count = f[6]
+            Armor = f[4],
+            Notes = f[5],
+            PatchCount = f.Length == 8 ? f[6] : "0",
+            Count = f.Length == 8 ? f[7] : f[6]
         });
     }
 

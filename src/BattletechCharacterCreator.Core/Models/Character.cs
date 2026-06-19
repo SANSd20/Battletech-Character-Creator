@@ -62,6 +62,7 @@ public sealed class EquipmentItem
     public string Locations { get; set; } = "";
     public string Armor { get; set; } = "";
     public string Notes { get; set; } = "";
+    public string PatchCount { get; set; } = "0";
     public string Count { get; set; } = "1";
 }
 

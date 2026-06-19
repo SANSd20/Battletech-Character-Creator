@@ -519,6 +519,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Locations = item.Locations,
             Armor = item.Armor,
             Notes = item.Notes,
+            PatchCount = "0",
             Count = "1"
         });
         Recalculate();

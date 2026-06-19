@@ -79,7 +79,8 @@ public static class CharacterRules
         var wealthLevel = TraitLevel("Wealth", wealthXp);
         var startingCBills = StartingCBills(wealthLevel) + character.CBillModifier;
         var inventoryCost = character.Equipment.Sum(item =>
-                BasePurchaseCost(item.Cost) * ItemCount(item.Count)) +
+                BasePurchaseCost(item.Cost) * ItemCount(item.Count) +
+                SecondaryPurchaseCost(item.Cost) * OptionalItemCount(item.PatchCount)) +
             character.Weapons.Sum(item =>
                 BasePurchaseCost(item.Cost) * ItemCount(item.Count) +
                 BasePurchaseCost(item.AmmoCost) * OptionalItemCount(item.AmmoCount));
@@ -194,11 +195,23 @@ public static class CharacterRules
 
     public static int BasePurchaseCost(string value)
     {
-        var baseValue = value.Split('/', 2)[0]
+        var baseValue = CostPart(value, 0)
             .Replace(",", "", StringComparison.Ordinal)
             .Replace("*", "", StringComparison.Ordinal)
             .Trim();
         return int.TryParse(baseValue, System.Globalization.NumberStyles.Integer,
+            System.Globalization.CultureInfo.InvariantCulture, out var parsed)
+            ? parsed
+            : 0;
+    }
+
+    public static int SecondaryPurchaseCost(string value)
+    {
+        var secondaryValue = CostPart(value, 1)
+            .Replace(",", "", StringComparison.Ordinal)
+            .Replace("*", "", StringComparison.Ordinal)
+            .Trim();
+        return int.TryParse(secondaryValue, System.Globalization.NumberStyles.Integer,
             System.Globalization.CultureInfo.InvariantCulture, out var parsed)
             ? parsed
             : 0;
@@ -218,6 +231,12 @@ public static class CharacterRules
 
     public static int OptionalItemCount(string value) =>
         int.TryParse(value, out var parsed) && parsed > 0 ? parsed : 0;
+
+    private static string CostPart(string value, int index)
+    {
+        var parts = value.Split('/');
+        return index < parts.Length ? parts[index] : "";
+    }
 
     private static int FindValue(IEnumerable<NamedValue> values, string name) =>
         values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;
