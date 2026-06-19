@@ -72,7 +72,7 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **90% complete**. There is not yet a stable
+The .NET migration is approximately **91% complete**. There is not yet a stable
 or packaged release.
 
 ### Completed
@@ -93,6 +93,7 @@ or packaged release.
   and ammo inventory details
 - Error report generation for unexpected UI failures and recoverable editor
   operation failures
+- Windows x64 folder publish profile documented in `docs/RELEASE.md`
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
@@ -104,7 +105,8 @@ or packaged release.
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery
 - Complete the final rulebook audit
-- Create a Windows installer and packaged release
+- Create a Windows installer from the verified publish output and cut a packaged
+  release
 
 ## License
 Only for Non-commercial use.

@@ -5,6 +5,7 @@ obj/
 *.user
 .appdata/
 .dotnet-home/
+artifacts/
 debug/
 *.o
 *.exe
@@ -25,3 +26,4 @@ character-sheet-*.png
 character-sheet-*.pdf
 1 A Time of War-The BattleTech RPG — Corrected Third Printing.pdf
 1r A Time of War-The BattleTech RPG Character Record Sheet.pdf
+2 A Time of War Companion — First Printing Corrected with Errata v1.1.pdf
