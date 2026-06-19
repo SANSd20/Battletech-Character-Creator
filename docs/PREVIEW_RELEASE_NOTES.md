@@ -21,6 +21,7 @@ release.
 - Error report generation for unexpected and recoverable app failures
 - Error reports include app version, runtime, process, and launch diagnostics
 - Per-user Windows installer and release package manifest/checksum output
+- Release packaging guard against stale installers when release checks are skipped
 
 ## Verification
 

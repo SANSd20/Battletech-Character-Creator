@@ -63,6 +63,7 @@ June 18, 2026.
 - Error report generation for unexpected and recoverable app failures
 - Error reports include app version, runtime, process, and launch diagnostics
 - Per-user Windows installer
+- Release packaging guard against stale installers when release checks are skipped
 
 ## Known Gaps
 

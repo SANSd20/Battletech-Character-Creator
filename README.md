@@ -104,7 +104,8 @@ release.
 - Full installer install, launch-smoke, and uninstall verification
 - Automated release-check script covering tests, app smokes, publish, and
   installer dry-run
-- Preview release packaging script with installer checksum and manifest output
+- Preview release packaging script with installer checksum, stale-installer
+  guard, and manifest output
 - Preview release notes included in packaged release artifacts
 - GitHub-ready preview release draft included in packaged release artifacts
 - GitHub release publish helper with package, checksum, and manifest validation

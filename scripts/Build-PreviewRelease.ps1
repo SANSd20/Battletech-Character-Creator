@@ -1,7 +1,8 @@
 param(
     [string]$Version = "0.1.0-preview",
     [switch]$SkipReleaseChecks,
-    [switch]$AllowDirty
+    [switch]$AllowDirty,
+    [switch]$AllowStaleInstaller
 )
 
 $ErrorActionPreference = "Stop"
@@ -36,6 +37,18 @@ if (!(Test-Path -LiteralPath $installerPath)) {
     throw "Installer not found: $installerPath"
 }
 
+$headCommitTime = [DateTimeOffset]::FromUnixTimeSeconds(
+    [int64](git log -1 --format=%ct)).UtcDateTime
+$installerInfo = Get-Item -LiteralPath $installerPath
+if ($SkipReleaseChecks -and !$AllowStaleInstaller -and
+    $installerInfo.LastWriteTimeUtc -lt $headCommitTime) {
+    throw @"
+Installer predates the current commit: $installerPath
+Run scripts\Run-ReleaseChecks.ps1 or rerun without -SkipReleaseChecks to rebuild it.
+Use -AllowStaleInstaller only when intentionally repackaging an older installer.
+"@
+}
+
 if (Test-Path -LiteralPath $releaseDir) {
     Remove-Item -LiteralPath $releaseDir -Recurse -Force
 }
@@ -53,6 +66,7 @@ $releaseDraft.Replace("{{INSTALLER_SHA256}}", $hash.Hash) |
 $commit = git rev-parse --short HEAD
 $created = Get-Date -Format "yyyy-MM-dd HH:mm:ss K"
 $installerSize = (Get-Item -LiteralPath $releaseInstaller).Length
+$installerBuilt = $installerInfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss K")
 
 @(
     "A Time of War Character Creator Preview Release",
@@ -62,6 +76,7 @@ $installerSize = (Get-Item -LiteralPath $releaseInstaller).Length
     "Created: $created",
     "Installer: $installerName",
     "Installer bytes: $installerSize",
+    "Installer built: $installerBuilt",
     "Release notes: PREVIEW_RELEASE_NOTES.md",
     "GitHub release draft: GITHUB_RELEASE.md",
     "SHA256: $($hash.Hash)",
