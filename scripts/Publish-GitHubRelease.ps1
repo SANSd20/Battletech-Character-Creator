@@ -66,6 +66,17 @@ if ($manifestText -notmatch "Commit:\s*$currentCommit\b") {
     throw "Release manifest commit does not match HEAD ($currentCommit). Rebuild the package after committing."
 }
 
+$installerSize = (Get-Item -LiteralPath $installerPath).Length
+if ($manifestText -notmatch "SHA256:\s*$actualHash\b") {
+    throw "Release manifest SHA256 does not match installer hash. Rebuild the package."
+}
+if ($manifestText -notmatch "Installer bytes:\s*$installerSize\b") {
+    throw "Release manifest installer size does not match installer. Rebuild the package."
+}
+if ($manifestText -notmatch "Installer built:\s*\d{4}-\d{2}-\d{2}") {
+    throw "Release manifest does not include the installer build timestamp. Rebuild the package."
+}
+
 $assetPaths = @(
     $installerPath,
     $checksumPath,
