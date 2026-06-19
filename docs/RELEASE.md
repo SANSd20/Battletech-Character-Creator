@@ -49,13 +49,15 @@ without executing the installer:
 .\scripts\Test-Installer.ps1 -DryRun
 ```
 
-Before a packaged release, run:
+Before a packaged release, run the automated release check:
 
 ```powershell
-dotnet run --project tests\BattletechCharacterCreator.Tests
-dotnet run --project src\BattletechCharacterCreator.App -- --smoke-inventory
-dotnet run --project src\BattletechCharacterCreator.App -- --smoke-sheet-export=artifacts\smoke-sheet-export.pdf
-dotnet publish src\BattletechCharacterCreator.App /p:PublishProfile=win-x64-folder
-makensis /DVERSION=0.1.0-preview niss\atow_setup.nsi
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Run-ReleaseChecks.ps1
+```
+
+Then, outside restricted sandboxes, run the full installer install/uninstall
+smoke:
+
+```powershell
 .\scripts\Test-Installer.ps1
 ```
