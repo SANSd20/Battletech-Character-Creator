@@ -63,7 +63,9 @@ smoke:
 ```
 
 Status note: the full installer smoke test passed on June 18, 2026. Repeat it
-before each packaged release after rebuilding the installer.
+before each packaged release after rebuilding the installer. The smoke test
+also checks that the installed app can write diagnostic metadata to its launch
+report.
 
 Package the preview release with:
 

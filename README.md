@@ -100,7 +100,8 @@ release.
 - Windows x64 folder publish profile documented in `docs/RELEASE.md`
 - Locally compile-verified per-user NSIS installer script for the .NET publish
   output
-- Installer smoke-test script for install, launch, and uninstall verification
+- Installer smoke-test script for install, launch diagnostics, and uninstall
+  verification
 - Full installer install, launch-smoke, and uninstall verification
 - Automated release-check script covering tests, app smokes, publish, and
   installer dry-run

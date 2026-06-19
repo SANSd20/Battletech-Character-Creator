@@ -62,6 +62,7 @@ June 18, 2026.
 - Official character-sheet PDF preview and export
 - Error report generation for unexpected and recoverable app failures
 - Error reports include app version, runtime, process, and launch diagnostics
+- Installer smoke validates diagnostic metadata from the installed app
 - Per-user Windows installer
 - Release packaging guard against stale installers when release checks are skipped
 

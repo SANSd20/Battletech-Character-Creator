@@ -1,6 +1,7 @@
 param(
     [string]$InstallerPath = "niss\atow-character-creator-0.1.0-preview-setup.exe",
     [string]$InstallDir = (Join-Path $env:TEMP "A-Time-of-War-Installer-Smoke"),
+    [string]$ExpectedVersion = "0.1.0-preview",
     [switch]$DryRun
 )
 
@@ -33,6 +34,7 @@ if ($DryRun) {
     Write-Host "Would verify: $resourceFile"
     Write-Host "Would verify: $sheetFile"
     Write-Host "Would smoke: $installedExe --smoke-error-report=$smokeReport"
+    Write-Host "Would verify smoke report diagnostic metadata"
     Write-Host "Would uninstall: $uninstaller /S"
     exit 0
 }
@@ -69,6 +71,19 @@ if ($smokeProcess.ExitCode -ne 0) {
 }
 if (!(Test-Path -LiteralPath $smokeReport)) {
     throw "Installed app smoke report was not created."
+}
+$report = Get-Content -LiteralPath $smokeReport -Raw
+$requiredReportText = @(
+    "Process architecture:",
+    "Command line:"
+)
+if (![string]::IsNullOrWhiteSpace($ExpectedVersion)) {
+    $requiredReportText += "Version: $ExpectedVersion"
+}
+foreach ($text in $requiredReportText) {
+    if (!$report.Contains($text)) {
+        throw "Installed app smoke report did not include diagnostic metadata: $text"
+    }
 }
 
 $uninstallProcess = Start-Process -FilePath $uninstaller `
