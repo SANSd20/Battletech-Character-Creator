@@ -72,7 +72,7 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **88% complete**. There is not yet a stable
+The .NET migration is approximately **89% complete**. There is not yet a stable
 or packaged release.
 
 ### Completed
@@ -91,6 +91,7 @@ or packaged release.
 - Legacy `.btcc` character save and load compatibility
 - Official character-sheet PDF preview and export, including purchased patch
   and ammo inventory details
+- Application-level error report generation for unexpected UI failures
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
@@ -100,7 +101,7 @@ or packaged release.
 - Expand reload, patch repair rules, ammunition modifier, vehicle, and prosthetic enhancement
   purchasing details
 - Continue interface polish and usability testing
-- Strengthen error handling and recovery
+- Continue strengthening error handling and recovery
 - Complete the final rulebook audit
 - Create a Windows installer and packaged release
 

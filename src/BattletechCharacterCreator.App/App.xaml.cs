@@ -9,9 +9,56 @@ namespace BattletechCharacterCreator.App;
 
 public partial class App : Application
 {
+    public App()
+    {
+        DispatcherUnhandledException += (_, e) =>
+        {
+            var reportPath = AppErrorReporter.WriteReport(
+                e.Exception,
+                "Unhandled UI exception");
+            MessageBox.Show(
+                $"Something went wrong, but a report was saved here:\n\n{reportPath}",
+                "A Time of War application error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            e.Handled = true;
+        };
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            if (e.ExceptionObject is Exception exception)
+            {
+                AppErrorReporter.WriteReport(
+                    exception,
+                    "Unhandled application exception");
+            }
+        };
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            AppErrorReporter.WriteReport(
+                e.Exception,
+                "Unobserved background task exception");
+            e.SetObserved();
+        };
+    }
+
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        var errorReportArgument = e.Args.FirstOrDefault(
+            argument => argument.StartsWith("--smoke-error-report=",
+                StringComparison.Ordinal));
+        if (errorReportArgument is not null)
+        {
+            var outputPath = Path.GetFullPath(
+                errorReportArgument["--smoke-error-report=".Length..]);
+            AppErrorReporter.WriteReport(
+                new InvalidOperationException("Smoke error report"),
+                "Smoke test",
+                outputPath);
+            Shutdown(0);
+            return;
+        }
 
         if (e.Args.Contains("--smoke-wizard", StringComparer.Ordinal))
         {
