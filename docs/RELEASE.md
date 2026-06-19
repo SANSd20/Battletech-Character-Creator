@@ -36,6 +36,19 @@ local app data folder, creates Start Menu shortcuts for
 `BattletechCharacterCreator.App.exe`, and registers an uninstaller under the
 current user.
 
+To smoke-test the built installer on a normal Windows session:
+
+```powershell
+.\scripts\Test-Installer.ps1
+```
+
+In restricted environments, use dry-run mode to validate paths and commands
+without executing the installer:
+
+```powershell
+.\scripts\Test-Installer.ps1 -DryRun
+```
+
 Before a packaged release, run:
 
 ```powershell
@@ -44,4 +57,5 @@ dotnet run --project src\BattletechCharacterCreator.App -- --smoke-inventory
 dotnet run --project src\BattletechCharacterCreator.App -- --smoke-sheet-export=artifacts\smoke-sheet-export.pdf
 dotnet publish src\BattletechCharacterCreator.App /p:PublishProfile=win-x64-folder
 makensis /DVERSION=0.1.0-preview niss\atow_setup.nsi
+.\scripts\Test-Installer.ps1
 ```

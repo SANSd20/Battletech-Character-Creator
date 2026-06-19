@@ -1,0 +1,87 @@
+param(
+    [string]$InstallerPath = "niss\atow-character-creator-0.1.0-preview-setup.exe",
+    [string]$InstallDir = (Join-Path $env:TEMP "A-Time-of-War-Installer-Smoke"),
+    [switch]$DryRun
+)
+
+$ErrorActionPreference = "Stop"
+
+function Resolve-RepoPath([string]$Path) {
+    if ([System.IO.Path]::IsPathRooted($Path)) {
+        return $Path
+    }
+    return Join-Path (Get-Location) $Path
+}
+
+$installer = Resolve-RepoPath $InstallerPath
+$installTarget = Resolve-RepoPath $InstallDir
+$installedExe = Join-Path $installTarget "BattletechCharacterCreator.App.exe"
+$resourceFile = Join-Path $installTarget "Resources\equiplist.dat"
+$sheetFile = Join-Path $installTarget "Assets\Sheets\CharacterRecordSheet.png"
+$smokeReport = Join-Path $installTarget "installer-smoke-report.txt"
+$uninstaller = Join-Path $installTarget "uninstall.exe"
+
+if (!(Test-Path -LiteralPath $installer)) {
+    throw "Installer not found: $installer"
+}
+
+if ($DryRun) {
+    Write-Host "Installer: $installer"
+    Write-Host "Install target: $installTarget"
+    Write-Host "Would run: $installer /S /D=$installTarget"
+    Write-Host "Would verify: $installedExe"
+    Write-Host "Would verify: $resourceFile"
+    Write-Host "Would verify: $sheetFile"
+    Write-Host "Would smoke: $installedExe --smoke-error-report=$smokeReport"
+    Write-Host "Would uninstall: $uninstaller /S"
+    exit 0
+}
+
+if (Test-Path -LiteralPath $installTarget) {
+    Remove-Item -LiteralPath $installTarget -Recurse -Force
+}
+
+$installProcess = Start-Process -FilePath $installer `
+    -ArgumentList @("/S", "/D=$installTarget") `
+    -WindowStyle Hidden `
+    -PassThru
+$installProcess.WaitForExit()
+if ($installProcess.ExitCode -ne 0) {
+    throw "Installer exited with code $($installProcess.ExitCode)."
+}
+
+foreach ($path in @($installedExe, $resourceFile, $sheetFile, $uninstaller)) {
+    if (!(Test-Path -LiteralPath $path)) {
+        throw "Installed file missing: $path"
+    }
+}
+
+$smokeProcess = Start-Process -FilePath $installedExe `
+    -ArgumentList "--smoke-error-report=$smokeReport" `
+    -WindowStyle Hidden `
+    -PassThru
+if (!$smokeProcess.WaitForExit(30000)) {
+    $smokeProcess.Kill()
+    throw "Installed app smoke test timed out."
+}
+if ($smokeProcess.ExitCode -ne 0) {
+    throw "Installed app smoke test exited with code $($smokeProcess.ExitCode)."
+}
+if (!(Test-Path -LiteralPath $smokeReport)) {
+    throw "Installed app smoke report was not created."
+}
+
+$uninstallProcess = Start-Process -FilePath $uninstaller `
+    -ArgumentList "/S" `
+    -WindowStyle Hidden `
+    -PassThru
+$uninstallProcess.WaitForExit()
+if ($uninstallProcess.ExitCode -ne 0) {
+    throw "Uninstaller exited with code $($uninstallProcess.ExitCode)."
+}
+
+if (Test-Path -LiteralPath $installedExe) {
+    throw "Installed app remained after uninstall: $installedExe"
+}
+
+Write-Host "Installer smoke test passed."

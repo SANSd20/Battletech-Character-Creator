@@ -72,7 +72,7 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **93% complete**. There is not yet a stable
+The .NET migration is approximately **94% complete**. There is not yet a stable
 or packaged release.
 
 ### Completed
@@ -96,6 +96,7 @@ or packaged release.
 - Windows x64 folder publish profile documented in `docs/RELEASE.md`
 - Locally compile-verified per-user NSIS installer script for the .NET publish
   output
+- Installer smoke-test script for install, launch, and uninstall verification
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
@@ -107,7 +108,8 @@ or packaged release.
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery
 - Complete the final rulebook audit
-- Verify the Windows installer on a clean machine and cut a packaged release
+- Run the installer smoke test outside the sandbox on a clean machine and cut a
+  packaged release
 
 ## License
 Only for Non-commercial use.
