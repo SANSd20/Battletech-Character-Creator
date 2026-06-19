@@ -73,6 +73,7 @@ June 18, 2026.
 - GitHub release validation cross-checks manifest installer metadata
 - GitHub release validation cross-checks the packaged release version
 - GitHub release validation checks the draft notes match the requested version
+- GitHub release validation checks preview notes match the requested version
 
 ## Known Gaps
 

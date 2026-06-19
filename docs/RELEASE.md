@@ -106,7 +106,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Publish-GitHubReleas
 
 The publish helper checks that the installer, checksum, release notes, GitHub
 release draft, and manifest are present. It also verifies that the checksum
-matches the installer, that the GitHub release draft includes the requested
-version and current installer hash, and that the manifest was generated from
-the current clean commit and requested version with matching installer hash,
-size, and build timestamp before creating the prerelease.
+matches the installer, that the preview notes and GitHub release draft include
+the requested version, that the draft includes the current installer hash, and
+that the manifest was generated from the current clean commit and requested
+version with matching installer hash, size, and build timestamp before creating
+the prerelease.

@@ -116,7 +116,7 @@ release.
 - Preview release notes included in packaged release artifacts
 - GitHub-ready preview release draft included in packaged release artifacts
 - GitHub release publish helper with package, checksum, manifest, and installer
-  metadata/version/draft validation
+  metadata/version/notes validation
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
