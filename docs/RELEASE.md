@@ -16,9 +16,18 @@ artifacts\publish\win-x64
 ```
 
 This profile creates a framework-dependent build. Test machines need the .NET
-10 Desktop Runtime installed. A future installer should use this folder as its
-input, create Start Menu shortcuts for `BattletechCharacterCreator.App.exe`,
-and include the bundled `Resources` and `Assets` folders produced by publish.
+10 Desktop Runtime installed.
+
+After publishing, build the per-user NSIS installer with:
+
+```powershell
+makensis /DVERSION=0.1.0-preview niss\atow_setup.nsi
+```
+
+The installer uses the published folder as input, installs under the user's
+local app data folder, creates Start Menu shortcuts for
+`BattletechCharacterCreator.App.exe`, and registers an uninstaller under the
+current user.
 
 Before a packaged release, run:
 
@@ -27,4 +36,5 @@ dotnet run --project tests\BattletechCharacterCreator.Tests
 dotnet run --project src\BattletechCharacterCreator.App -- --smoke-inventory
 dotnet run --project src\BattletechCharacterCreator.App -- --smoke-sheet-export=artifacts\smoke-sheet-export.pdf
 dotnet publish src\BattletechCharacterCreator.App /p:PublishProfile=win-x64-folder
+makensis /DVERSION=0.1.0-preview niss\atow_setup.nsi
 ```
