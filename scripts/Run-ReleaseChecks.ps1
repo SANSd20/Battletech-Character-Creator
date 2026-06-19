@@ -25,6 +25,18 @@ function Find-MakeNsis {
     throw "makensis was not found. Install NSIS or pass -SkipInstallerBuild."
 }
 
+function Assert-DiagnosticReport([string]$Path, [string]$Name) {
+    if (!(Test-Path -LiteralPath $Path)) {
+        throw "$Name output was not created."
+    }
+    $report = Get-Content -LiteralPath $Path -Raw
+    if (!$report.Contains("Version: $Version") -or
+        !$report.Contains("Process architecture:") -or
+        !$report.Contains("Command line:")) {
+        throw "$Name output did not include diagnostic metadata for version $Version."
+    }
+}
+
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $repoRoot
 
@@ -90,29 +102,13 @@ Invoke-Step "Sheet export smoke" {
 Invoke-Step "Error report smoke" {
     dotnet run --project src\BattletechCharacterCreator.App `
         /p:UseSharedCompilation=false -- --smoke-error-report=$errorReportPath
-    if (!(Test-Path -LiteralPath $errorReportPath)) {
-        throw "Error report smoke output was not created."
-    }
-    $report = Get-Content -LiteralPath $errorReportPath -Raw
-    if (!$report.Contains("Version: 0.1.0-preview") -or
-        !$report.Contains("Process architecture:") -or
-        !$report.Contains("Command line:")) {
-        throw "Error report smoke output did not include diagnostic metadata."
-    }
+    Assert-DiagnosticReport $errorReportPath "Error report smoke"
 }
 
 Invoke-Step "Operation report smoke" {
     dotnet run --project src\BattletechCharacterCreator.App `
         /p:UseSharedCompilation=false -- --smoke-operation-error-report=$operationReportPath
-    if (!(Test-Path -LiteralPath $operationReportPath)) {
-        throw "Operation report smoke output was not created."
-    }
-    $report = Get-Content -LiteralPath $operationReportPath -Raw
-    if (!$report.Contains("Version: 0.1.0-preview") -or
-        !$report.Contains("Process architecture:") -or
-        !$report.Contains("Command line:")) {
-        throw "Operation report smoke output did not include diagnostic metadata."
-    }
+    Assert-DiagnosticReport $operationReportPath "Operation report smoke"
 }
 
 Invoke-Step "Solution build" {
@@ -134,7 +130,8 @@ if (!$SkipInstallerBuild) {
     Invoke-Step "Installer smoke dry-run" {
         powershell -NoProfile -ExecutionPolicy Bypass `
             -File scripts\Test-Installer.ps1 -DryRun `
-            -InstallerPath "niss\atow-character-creator-$Version-setup.exe"
+            -InstallerPath "niss\atow-character-creator-$Version-setup.exe" `
+            -ExpectedVersion $Version
     }
 }
 

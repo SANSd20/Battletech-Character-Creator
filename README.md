@@ -97,6 +97,8 @@ release.
 - Error report generation for unexpected UI failures and recoverable editor
   operation failures
 - Error reports include app version, runtime, process, and launch diagnostics
+- Release checks validate diagnostic report versions against the requested
+  release version
 - Windows x64 folder publish profile documented in `docs/RELEASE.md`
 - Locally compile-verified per-user NSIS installer script for the .NET publish
   output
