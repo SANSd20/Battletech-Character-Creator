@@ -24,6 +24,13 @@ After publishing, build the per-user NSIS installer with:
 makensis /DVERSION=0.1.0-preview niss\atow_setup.nsi
 ```
 
+If `makensis` is not on `PATH`, the default NSIS install location can be used
+directly:
+
+```powershell
+& 'C:\Program Files (x86)\NSIS\makensis.exe' /DVERSION=0.1.0-preview niss\atow_setup.nsi
+```
+
 The installer uses the published folder as input, installs under the user's
 local app data folder, creates Start Menu shortcuts for
 `BattletechCharacterCreator.App.exe`, and registers an uninstaller under the

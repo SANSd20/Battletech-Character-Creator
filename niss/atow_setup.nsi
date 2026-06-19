@@ -2,10 +2,8 @@
   !define VERSION "0.1.0-preview"
 !endif
 
-!cd "${__FILEDIR__}\.."
-
 !ifndef PUBLISH_DIR
-  !define PUBLISH_DIR "artifacts\publish\win-x64"
+  !define PUBLISH_DIR "..\artifacts\publish\win-x64"
 !endif
 
 !define APP_NAME "A Time of War Character Creator"

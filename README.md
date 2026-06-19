@@ -72,7 +72,7 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **92% complete**. There is not yet a stable
+The .NET migration is approximately **93% complete**. There is not yet a stable
 or packaged release.
 
 ### Completed
@@ -94,7 +94,8 @@ or packaged release.
 - Error report generation for unexpected UI failures and recoverable editor
   operation failures
 - Windows x64 folder publish profile documented in `docs/RELEASE.md`
-- Per-user NSIS installer script for the .NET publish output
+- Locally compile-verified per-user NSIS installer script for the .NET publish
+  output
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
