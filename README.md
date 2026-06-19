@@ -103,8 +103,8 @@ release.
 - Installer smoke-test script for install, launch diagnostics, and uninstall
   verification
 - Full installer install, launch-smoke, and uninstall verification
-- Automated release-check script covering tests, app smokes, publish, and
-  installer dry-run
+- Automated release-check script covering tests, app smokes, sheet export
+  output, publish, and installer dry-run
 - Preview release packaging script with installer checksum, stale-installer
   guard, and manifest output
 - Preview release notes included in packaged release artifacts

@@ -33,11 +33,12 @@ New-Item -ItemType Directory -Force -Path $appData | Out-Null
 $env:APPDATA = $appData
 
 $sheetExportPath = Join-Path $appData "release-smoke-sheet-export.pdf"
+$sheetExportErrorPath = $sheetExportPath + ".error.txt"
 $errorReportPath = Join-Path $appData "release-smoke-error-report.txt"
 $operationReportPath = Join-Path $appData "release-smoke-operation-error-report.txt"
 
 Remove-Item -LiteralPath $sheetExportPath -ErrorAction SilentlyContinue
-Remove-Item -LiteralPath ($sheetExportPath + ".error.txt") -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath $sheetExportErrorPath -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath $errorReportPath -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath $operationReportPath -ErrorAction SilentlyContinue
 
@@ -74,6 +75,16 @@ Invoke-Step "Inventory smoke" {
 Invoke-Step "Sheet export smoke" {
     dotnet run --project src\BattletechCharacterCreator.App `
         /p:UseSharedCompilation=false -- --smoke-sheet-export=$sheetExportPath
+    if (Test-Path -LiteralPath $sheetExportErrorPath) {
+        $exportError = Get-Content -LiteralPath $sheetExportErrorPath -Raw
+        throw "Sheet export smoke wrote an error report: $exportError"
+    }
+    if (!(Test-Path -LiteralPath $sheetExportPath)) {
+        throw "Sheet export smoke output was not created."
+    }
+    if ((Get-Item -LiteralPath $sheetExportPath).Length -le 0) {
+        throw "Sheet export smoke output was empty."
+    }
 }
 
 Invoke-Step "Error report smoke" {

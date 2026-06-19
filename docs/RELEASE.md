@@ -55,6 +55,9 @@ Before a packaged release, run the automated release check:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Run-ReleaseChecks.ps1
 ```
 
+The release check verifies that the character-sheet export smoke creates a
+nonempty PDF and does not write an export error report.
+
 Then, outside restricted sandboxes, run the full installer install/uninstall
 smoke:
 
