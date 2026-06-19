@@ -40,6 +40,13 @@ function Assert-DiagnosticReport([string]$Path, [string]$Name) {
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $repoRoot
 
+$appProjectPath = Join-Path $repoRoot "src\BattletechCharacterCreator.App\BattletechCharacterCreator.App.csproj"
+[xml]$appProject = Get-Content -LiteralPath $appProjectPath
+$appVersion = $appProject.Project.PropertyGroup.InformationalVersion
+if ($appVersion -ne $Version) {
+    throw "App InformationalVersion ($appVersion) does not match release version ($Version)."
+}
+
 $appData = Join-Path $repoRoot ".appdata"
 New-Item -ItemType Directory -Force -Path $appData | Out-Null
 $env:APPDATA = $appData

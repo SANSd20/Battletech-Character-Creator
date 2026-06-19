@@ -57,7 +57,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Run-ReleaseChecks.ps
 
 The release check verifies that the character-sheet export smoke creates a
 nonempty PDF and does not write an export error report. It also validates that
-smoke-test diagnostic reports include the requested release version.
+the app project version and smoke-test diagnostic reports include the requested
+release version.
 
 Then, outside restricted sandboxes, run the full installer install/uninstall
 smoke:
