@@ -81,6 +81,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             summary = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(InventoryStatus));
+            OnPropertyChanged(nameof(InventoryStatusBrush));
         }
     }
     public IReadOnlyList<PrerequisiteIssue> PrerequisiteIssues
@@ -138,6 +140,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public string Notes { get => Character.Notes; set => Character.Notes = value; }
     public object Equipment => Character.Equipment;
     public object Weapons => Character.Weapons;
+    public string InventoryStatus =>
+        Summary.UnresolvedInventoryPrices > 0
+            ? $"{Summary.UnresolvedInventoryPrices} inventory price(s) need manual pricing."
+            : Summary.RemainingCBills < 0
+                ? $"Inventory is over budget by {-Summary.RemainingCBills} C-Bills."
+                : $"Inventory has {Summary.RemainingCBills} C-Bills remaining.";
+    public Brush InventoryStatusBrush =>
+        Summary.UnresolvedInventoryPrices > 0
+            ? Brushes.DarkGoldenrod
+            : Summary.RemainingCBills < 0
+                ? Brushes.Firebrick
+                : Brushes.DarkGreen;
     public bool IncludeCompanionContent
     {
         get => includeCompanionContent;
@@ -341,14 +355,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectedWeaponCatalogItem = Catalog.Weapons.Single(item =>
             item.Name == "Shock Staff");
         SelectedTraitName = "Mutation";
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Wildcard smoke item",
+            Cost = "*",
+            Mass = "0",
+            Count = "2"
+        });
+        Recalculate();
         if (SelectedEquipmentSourceLabel != "A Time of War Companion" ||
             SelectedWeaponSourceLabel != "A Time of War Companion" ||
             SelectedTraitSourceLabel != "A Time of War Companion" ||
             !SelectedTraitDescription.Contains("genetic conditions",
+                StringComparison.Ordinal) ||
+            Summary.UnresolvedInventoryPrices != 2 ||
+            !InventoryStatus.Contains("2 inventory price(s)",
                 StringComparison.Ordinal))
         {
             throw new InvalidOperationException(
-                "Companion catalog source labels and notes were not shown in the editor.");
+                "Companion catalog labels, notes, or inventory warnings were not shown in the editor.");
         }
         IncludeCompanionContent = false;
     }

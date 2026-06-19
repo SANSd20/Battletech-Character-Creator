@@ -55,6 +55,7 @@ June 18, 2026.
 - Character editor with XP controls for attributes, skills, and traits
 - Legacy `.btcc` save/load compatibility
 - Searchable equipment and weapon catalogs with C-Bill and mass summaries
+- Inventory status warnings for over-budget and manually priced wildcard items
 - Opt-in *A Time of War Companion* equipment and weapon catalog content
 - Opt-in *A Time of War Companion* expanded trait reference entries
 - Skill and Trait editor reference panels with source labels and rule notes

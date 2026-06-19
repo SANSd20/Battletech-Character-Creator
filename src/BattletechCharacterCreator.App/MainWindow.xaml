@@ -660,19 +660,24 @@
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <StackPanel Grid.Row="3" Orientation="Horizontal"
-                                    HorizontalAlignment="Right" Margin="0,8,4,0">
-                            <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
-                            <TextBlock Text="Base cost:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.InventoryBaseCost}" Margin="6,0,20,0"/>
-                            <TextBlock Text="Inventory mass:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.InventoryMass}" Margin="6,0,20,0"/>
-                            <TextBlock Text="Capacity remaining:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.RemainingCapacity}" Margin="6,0,20,0"/>
-                            <TextBlock Text="Unpriced:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.UnresolvedInventoryPrices}" Margin="6,0,0,0"/>
-                        </StackPanel>
+                        <DockPanel Grid.Row="3" Margin="0,8,4,0">
+                            <TextBlock Text="{Binding InventoryStatus}"
+                                       Foreground="{Binding InventoryStatusBrush}"
+                                       FontWeight="SemiBold"
+                                       DockPanel.Dock="Left"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
+                                <TextBlock Text="Base cost:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.InventoryBaseCost}" Margin="6,0,20,0"/>
+                                <TextBlock Text="Inventory mass:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.InventoryMass}" Margin="6,0,20,0"/>
+                                <TextBlock Text="Capacity remaining:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.RemainingCapacity}" Margin="6,0,20,0"/>
+                                <TextBlock Text="Unpriced:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.UnresolvedInventoryPrices}" Margin="6,0,0,0"/>
+                            </StackPanel>
+                        </DockPanel>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Weapons">
@@ -730,19 +735,24 @@
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="180"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <StackPanel Grid.Row="3" Orientation="Horizontal"
-                                    HorizontalAlignment="Right" Margin="0,8,4,0">
-                            <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
-                            <TextBlock Text="Base cost:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.InventoryBaseCost}" Margin="6,0,20,0"/>
-                            <TextBlock Text="Inventory mass:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.InventoryMass}" Margin="6,0,20,0"/>
-                            <TextBlock Text="Capacity remaining:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.RemainingCapacity}" Margin="6,0,20,0"/>
-                            <TextBlock Text="Unpriced:" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding Summary.UnresolvedInventoryPrices}" Margin="6,0,0,0"/>
-                        </StackPanel>
+                        <DockPanel Grid.Row="3" Margin="0,8,4,0">
+                            <TextBlock Text="{Binding InventoryStatus}"
+                                       Foreground="{Binding InventoryStatusBrush}"
+                                       FontWeight="SemiBold"
+                                       DockPanel.Dock="Left"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <TextBlock Text="Remaining C-Bills:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.RemainingCBills}" Margin="6,0,20,0"/>
+                                <TextBlock Text="Base cost:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.InventoryBaseCost}" Margin="6,0,20,0"/>
+                                <TextBlock Text="Inventory mass:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.InventoryMass}" Margin="6,0,20,0"/>
+                                <TextBlock Text="Capacity remaining:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.RemainingCapacity}" Margin="6,0,20,0"/>
+                                <TextBlock Text="Unpriced:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Summary.UnresolvedInventoryPrices}" Margin="6,0,0,0"/>
+                            </StackPanel>
+                        </DockPanel>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Notes">
