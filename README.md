@@ -72,7 +72,7 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **96% complete**. There is not yet a stable
+The .NET migration is approximately **97% complete**. There is not yet a stable
 or packaged release.
 
 ### Completed
@@ -100,6 +100,7 @@ or packaged release.
 - Full installer install, launch-smoke, and uninstall verification
 - Automated release-check script covering tests, app smokes, publish, and
   installer dry-run
+- Preview release packaging script with installer checksum and manifest output
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
@@ -111,7 +112,7 @@ or packaged release.
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery
 - Complete the final rulebook audit
-- Cut a packaged preview release
+- Publish a packaged preview release
 
 ## License
 Only for Non-commercial use.
