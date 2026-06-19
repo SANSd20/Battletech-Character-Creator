@@ -27,6 +27,7 @@ release.
 - Release packaging guard against stale installers when release checks are skipped
 - GitHub release validation cross-checks manifest installer metadata
 - GitHub release validation cross-checks the packaged release version
+- GitHub release validation checks the draft notes match the requested version
 
 ## Verification
 

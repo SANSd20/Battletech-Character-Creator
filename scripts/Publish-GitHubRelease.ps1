@@ -49,6 +49,9 @@ if (!$checksumText.Contains($actualHash)) {
 }
 
 $notesText = Get-Content -LiteralPath $notesPath -Raw
+if (!$notesText.Contains($Version)) {
+    throw "GitHub release draft does not mention requested version ($Version). Rebuild the package."
+}
 if (!$notesText.Contains($actualHash)) {
     throw "GitHub release draft does not include the current installer hash. Rebuild the package."
 }
