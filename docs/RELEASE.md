@@ -80,3 +80,20 @@ notes, a GitHub release draft, and a manifest to:
 ```text
 artifacts\release\0.1.0-preview
 ```
+
+Validate the prepared GitHub release without publishing it:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Publish-GitHubRelease.ps1 -DryRun
+```
+
+To publish the preview with GitHub CLI after signing in with `gh auth login`:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Publish-GitHubRelease.ps1
+```
+
+The publish helper checks that the installer, checksum, release notes, GitHub
+release draft, and manifest are present. It also verifies that the checksum
+matches the installer and that the manifest was generated from the current clean
+commit before creating the prerelease.

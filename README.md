@@ -103,6 +103,7 @@ release.
 - Preview release packaging script with installer checksum and manifest output
 - Preview release notes included in packaged release artifacts
 - GitHub-ready preview release draft included in packaged release artifacts
+- GitHub release publish helper with package, checksum, and manifest validation
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
@@ -114,7 +115,7 @@ release.
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery
 - Complete the final rulebook audit
-- Publish the prepared preview release on GitHub
+- Publish the prepared preview release on GitHub after account authentication
 
 ## License
 Only for Non-commercial use.
