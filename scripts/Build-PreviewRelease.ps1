@@ -17,6 +17,8 @@ $checksumPath = Join-Path $releaseDir "$installerName.sha256"
 $manifestPath = Join-Path $releaseDir "release-manifest.txt"
 $notesSourcePath = Join-Path $repoRoot "docs\PREVIEW_RELEASE_NOTES.md"
 $notesOutputPath = Join-Path $releaseDir "PREVIEW_RELEASE_NOTES.md"
+$releaseDraftSourcePath = Join-Path $repoRoot "docs\GITHUB_RELEASE_$Version.md"
+$releaseDraftOutputPath = Join-Path $releaseDir "GITHUB_RELEASE.md"
 
 if (!$SkipReleaseChecks) {
     powershell -NoProfile -ExecutionPolicy Bypass `
@@ -41,6 +43,7 @@ New-Item -ItemType Directory -Force -Path $releaseDir | Out-Null
 
 Copy-Item -LiteralPath $installerPath -Destination $releaseInstaller
 Copy-Item -LiteralPath $notesSourcePath -Destination $notesOutputPath
+Copy-Item -LiteralPath $releaseDraftSourcePath -Destination $releaseDraftOutputPath
 
 $hash = Get-FileHash -LiteralPath $releaseInstaller -Algorithm SHA256
 "$($hash.Hash)  $installerName" | Set-Content -LiteralPath $checksumPath
@@ -58,6 +61,7 @@ $installerSize = (Get-Item -LiteralPath $releaseInstaller).Length
     "Installer: $installerName",
     "Installer bytes: $installerSize",
     "Release notes: PREVIEW_RELEASE_NOTES.md",
+    "GitHub release draft: GITHUB_RELEASE.md",
     "SHA256: $($hash.Hash)",
     "",
     "Prerequisites:",

@@ -72,8 +72,8 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **98% complete**. There is not yet a stable
-or packaged release.
+The .NET migration is approximately **99% complete**. There is not yet a stable
+release.
 
 ### Completed
 
@@ -102,6 +102,7 @@ or packaged release.
   installer dry-run
 - Preview release packaging script with installer checksum and manifest output
 - Preview release notes included in packaged release artifacts
+- GitHub-ready preview release draft included in packaged release artifacts
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
@@ -113,7 +114,7 @@ or packaged release.
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery
 - Complete the final rulebook audit
-- Publish the packaged preview release
+- Publish the prepared preview release on GitHub
 
 ## License
 Only for Non-commercial use.
