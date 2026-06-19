@@ -14,6 +14,7 @@ release.
 - Character editor with XP controls for attributes, skills, and traits
 - Legacy `.btcc` save/load compatibility
 - Searchable equipment and weapon catalogs with C-Bill and mass summaries
+- Equipment and weapon catalog filters for faster inventory selection
 - Inventory status warnings for over-budget, overloaded, and manually priced wildcard items
 - Opt-in *A Time of War Companion* equipment and weapon catalog content
 - Opt-in *A Time of War Companion* expanded trait reference entries

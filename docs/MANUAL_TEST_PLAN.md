@@ -33,6 +33,7 @@ pass.
 ## Inventory and Companion Content
 
 - Add and remove one core equipment item and one core weapon.
+- Filter the equipment and weapon catalogs and confirm unrelated rows are hidden.
 - Confirm C-Bill, mass, and remaining carrying-capacity totals update.
 - Add an item with wildcard/manual pricing and confirm the warning is visible.
 - Enable Companion content and confirm Companion equipment, weapons, and traits

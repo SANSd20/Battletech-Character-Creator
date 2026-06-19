@@ -28,6 +28,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private Brush ruleStatusBrush = Brushes.DarkGreen;
     private string skillFilter = "";
     private string traitFilter = "";
+    private string equipmentCatalogFilter = "";
+    private string weaponCatalogFilter = "";
     private string? selectedSkillName;
     private string? selectedTraitName;
     private readonly string resourcePath;
@@ -40,6 +42,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public ObservableCollection<XpEditorRow> TraitRows { get; } = [];
     public ICollectionView SkillRowsView { get; }
     public ICollectionView TraitRowsView { get; }
+    public ICollectionView EquipmentCatalogView { get; private set; } =
+        CollectionViewSource.GetDefaultView(Array.Empty<EquipmentCatalogItem>());
+    public ICollectionView WeaponCatalogView { get; private set; } =
+        CollectionViewSource.GetDefaultView(Array.Empty<WeaponCatalogItem>());
 
     public MainWindow() : this(new Character())
     {
@@ -50,6 +56,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         character = initialCharacter;
         resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
         Catalog = ResourceCatalog.Load(resourcePath);
+        RebuildCatalogViews();
         summary = CharacterRules.Calculate(character);
         SkillRowsView = CollectionViewSource.GetDefaultView(SkillRows);
         SkillRowsView.Filter = MatchesSkillFilter;
@@ -245,6 +252,26 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             TraitRowsView.Refresh();
         }
     }
+    public string EquipmentCatalogFilter
+    {
+        get => equipmentCatalogFilter;
+        set
+        {
+            equipmentCatalogFilter = value ?? "";
+            OnPropertyChanged();
+            EquipmentCatalogView.Refresh();
+        }
+    }
+    public string WeaponCatalogFilter
+    {
+        get => weaponCatalogFilter;
+        set
+        {
+            weaponCatalogFilter = value ?? "";
+            OnPropertyChanged();
+            WeaponCatalogView.Refresh();
+        }
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -364,12 +391,42 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Character.Equipment.Clear();
         Recalculate();
 
+        EquipmentCatalogFilter = "Flak";
+        if (EquipmentCatalogView.Cast<EquipmentCatalogItem>()
+            .Any(item => !MatchesCatalogText(
+                EquipmentCatalogFilter,
+                item.Name,
+                item.Category,
+                item.Notes,
+                item.SourceLabel)))
+        {
+            throw new InvalidOperationException(
+                "Editor equipment catalog filtering returned an unrelated row.");
+        }
+        EquipmentCatalogFilter = "";
+
         IncludeCompanionContent = true;
         if (!Catalog.Options.IncludeCompanion)
         {
             throw new InvalidOperationException(
                 "The Companion catalog toggle did not reload catalog options.");
         }
+        EquipmentCatalogFilter = "vintage";
+        WeaponCatalogFilter = "shock";
+        if (!EquipmentCatalogView.Cast<EquipmentCatalogItem>()
+                .Any(item => item.Name == "Vintage Bulletproof Vest") ||
+            EquipmentCatalogView.Cast<EquipmentCatalogItem>()
+                .Any(item => item.Name == "Flak/Jacket") ||
+            !WeaponCatalogView.Cast<WeaponCatalogItem>()
+                .Any(item => item.Name == "Shock Staff") ||
+            WeaponCatalogView.Cast<WeaponCatalogItem>()
+                .Any(item => item.Name == "Katana"))
+        {
+            throw new InvalidOperationException(
+                "Editor catalog filters did not narrow equipment and weapon options.");
+        }
+        EquipmentCatalogFilter = "";
+        WeaponCatalogFilter = "";
         SelectedEquipmentCatalogItem = Catalog.Equipment.Single(item =>
             item.Name == "Vintage Bulletproof Vest");
         SelectedWeaponCatalogItem = Catalog.Weapons.Single(item =>
@@ -714,6 +771,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectedWeaponCatalogItem = null;
         SelectedSkillName = null;
         SelectedTraitName = null;
+        RebuildCatalogViews();
         OnPropertyChanged(nameof(Catalog));
     }
 
@@ -838,6 +896,43 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         item is XpEditorRow row &&
         (TraitFilter.Length == 0 ||
          row.Name.Contains(TraitFilter, StringComparison.OrdinalIgnoreCase));
+
+    private bool MatchesEquipmentCatalogFilter(object item) =>
+        item is EquipmentCatalogItem equipment &&
+        MatchesCatalogText(
+            EquipmentCatalogFilter,
+            equipment.Name,
+            equipment.Category,
+            equipment.Notes,
+            equipment.SourceLabel);
+
+    private bool MatchesWeaponCatalogFilter(object item) =>
+        item is WeaponCatalogItem weapon &&
+        MatchesCatalogText(
+            WeaponCatalogFilter,
+            weapon.Name,
+            weapon.Category,
+            weapon.Skill,
+            weapon.Notes,
+            weapon.SourceLabel);
+
+    private static bool MatchesCatalogText(
+        string filter,
+        params string[] fields) =>
+        filter.Length == 0 ||
+        fields.Any(field => field.Contains(
+            filter,
+            StringComparison.OrdinalIgnoreCase));
+
+    private void RebuildCatalogViews()
+    {
+        EquipmentCatalogView = CollectionViewSource.GetDefaultView(Catalog.Equipment);
+        EquipmentCatalogView.Filter = MatchesEquipmentCatalogFilter;
+        WeaponCatalogView = CollectionViewSource.GetDefaultView(Catalog.Weapons);
+        WeaponCatalogView.Filter = MatchesWeaponCatalogFilter;
+        OnPropertyChanged(nameof(EquipmentCatalogView));
+        OnPropertyChanged(nameof(WeaponCatalogView));
+    }
 
     private void EditorFieldChanged(object sender, KeyboardFocusChangedEventArgs e) =>
         Recalculate();

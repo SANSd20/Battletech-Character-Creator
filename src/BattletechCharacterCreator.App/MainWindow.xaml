@@ -618,10 +618,20 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <CheckBox Content="Companion"
-                                  IsChecked="{Binding IncludeCompanionContent}"
-                                  HorizontalAlignment="Left"
-                                  Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="260"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Content="Companion"
+                                      IsChecked="{Binding IncludeCompanionContent}"
+                                      VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="2"
+                                     Text="{Binding EquipmentCatalogFilter, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Filter equipment catalog"
+                                     VerticalContentAlignment="Center"/>
+                        </Grid>
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -629,7 +639,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <ComboBox ItemsSource="{Binding Catalog.Equipment}"
+                            <ComboBox ItemsSource="{Binding EquipmentCatalogView}"
                                       SelectedItem="{Binding SelectedEquipmentCatalogItem}"
                                       DisplayMemberPath="Name"
                                       IsEditable="True"
@@ -688,10 +698,20 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <CheckBox Content="Companion"
-                                  IsChecked="{Binding IncludeCompanionContent}"
-                                  HorizontalAlignment="Left"
-                                  Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="260"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Content="Companion"
+                                      IsChecked="{Binding IncludeCompanionContent}"
+                                      VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="2"
+                                     Text="{Binding WeaponCatalogFilter, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Filter weapon catalog"
+                                     VerticalContentAlignment="Center"/>
+                        </Grid>
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -699,7 +719,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <ComboBox ItemsSource="{Binding Catalog.Weapons}"
+                            <ComboBox ItemsSource="{Binding WeaponCatalogView}"
                                       SelectedItem="{Binding SelectedWeaponCatalogItem}"
                                       DisplayMemberPath="Name"
                                       IsEditable="True"
