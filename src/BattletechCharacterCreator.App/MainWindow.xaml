@@ -437,7 +437,10 @@
                                 <ColumnDefinition Width="92"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Orientation="Horizontal">
-                                <ComboBox x:Name="SkillPicker" ItemsSource="{Binding Catalog.SkillNames}" Width="285"/>
+                                <ComboBox x:Name="SkillPicker"
+                                          ItemsSource="{Binding Catalog.SkillNames}"
+                                          SelectedItem="{Binding SelectedSkillName}"
+                                          Width="285"/>
                                 <Button Click="AddSkill_Click">Add</Button>
                                 <Button Click="RemoveSkill_Click">Remove</Button>
                             </StackPanel>
@@ -456,6 +459,33 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
+                        <Border DockPanel.Dock="Top"
+                                BorderBrush="#CECDC8"
+                                BorderThickness="1"
+                                Padding="8,5"
+                                Margin="0,0,0,7"
+                                Background="#FAFAF7">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock FontWeight="SemiBold" Text="{Binding SelectedSkillSourceLabel}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding SelectedSkillReference}"/>
+                                <TextBlock Grid.Row="1"
+                                           Grid.ColumnSpan="5"
+                                           Text="{Binding SelectedSkillDescription}"
+                                           TextWrapping="Wrap"
+                                           MaxHeight="58"/>
+                            </Grid>
+                        </Border>
                         <DataGrid x:Name="SkillsGrid" ItemsSource="{Binding SkillRowsView}"
                                   AutoGenerateColumns="False" CanUserAddRows="False"
                                   IsReadOnly="True" RowStyle="{StaticResource XpRow}">
@@ -499,7 +529,10 @@
                                 <ColumnDefinition Width="92"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Orientation="Horizontal">
-                                <ComboBox x:Name="TraitPicker" ItemsSource="{Binding Catalog.TraitNames}" Width="285"/>
+                                <ComboBox x:Name="TraitPicker"
+                                          ItemsSource="{Binding Catalog.TraitNames}"
+                                          SelectedItem="{Binding SelectedTraitName}"
+                                          Width="285"/>
                                 <Button Click="AddTrait_Click">Add</Button>
                                 <Button Click="RemoveTrait_Click">Remove</Button>
                             </StackPanel>
@@ -518,6 +551,33 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
+                        <Border DockPanel.Dock="Top"
+                                BorderBrush="#CECDC8"
+                                BorderThickness="1"
+                                Padding="8,5"
+                                Margin="0,0,0,7"
+                                Background="#FAFAF7">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock FontWeight="SemiBold" Text="{Binding SelectedTraitSourceLabel}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding SelectedTraitReference}"/>
+                                <TextBlock Grid.Row="1"
+                                           Grid.ColumnSpan="5"
+                                           Text="{Binding SelectedTraitDescription}"
+                                           TextWrapping="Wrap"
+                                           MaxHeight="58"/>
+                            </Grid>
+                        </Border>
                         <DataGrid x:Name="TraitsGrid" ItemsSource="{Binding TraitRowsView}"
                                   AutoGenerateColumns="False" CanUserAddRows="False"
                                   IsReadOnly="True" RowStyle="{StaticResource XpRow}">

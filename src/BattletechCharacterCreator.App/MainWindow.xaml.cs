@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,6 +28,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private Brush ruleStatusBrush = Brushes.DarkGreen;
     private string skillFilter = "";
     private string traitFilter = "";
+    private string? selectedSkillName;
+    private string? selectedTraitName;
     private readonly string resourcePath;
     private bool includeCompanionContent;
     private EquipmentCatalogItem? selectedEquipmentCatalogItem;
@@ -170,6 +173,42 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
     public string SelectedWeaponSourceLabel =>
         SelectedWeaponCatalogItem?.SourceLabel ?? "";
+    public string? SelectedSkillName
+    {
+        get => selectedSkillName;
+        set
+        {
+            selectedSkillName = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SelectedSkillSourceLabel));
+            OnPropertyChanged(nameof(SelectedSkillReference));
+            OnPropertyChanged(nameof(SelectedSkillDescription));
+        }
+    }
+    public string SelectedSkillSourceLabel =>
+        SelectedSkillCatalogItem?.SourceLabel ?? "";
+    public string SelectedSkillReference =>
+        SelectedSkillCatalogItem?.Rules ?? "";
+    public string SelectedSkillDescription =>
+        PlainCatalogText(SelectedSkillCatalogItem?.Description ?? "");
+    public string? SelectedTraitName
+    {
+        get => selectedTraitName;
+        set
+        {
+            selectedTraitName = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SelectedTraitSourceLabel));
+            OnPropertyChanged(nameof(SelectedTraitReference));
+            OnPropertyChanged(nameof(SelectedTraitDescription));
+        }
+    }
+    public string SelectedTraitSourceLabel =>
+        SelectedTraitCatalogItem?.SourceLabel ?? "";
+    public string SelectedTraitReference =>
+        SelectedTraitCatalogItem?.Reference ?? "";
+    public string SelectedTraitDescription =>
+        PlainCatalogText(SelectedTraitCatalogItem?.Description ?? "");
     public string SkillFilter
     {
         get => skillFilter;
@@ -192,6 +231,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    private SkillCatalogItem? SelectedSkillCatalogItem =>
+        SelectedSkillName is { Length: > 0 } name
+            ? Catalog.Skills.FirstOrDefault(item => item.Name == name)
+            : null;
+
+    private TraitCatalogItem? SelectedTraitCatalogItem =>
+        SelectedTraitName is { Length: > 0 } name
+            ? Catalog.Traits.FirstOrDefault(item => item.Name == name)
+            : null;
 
     public void SmokeSaveAndReload(string path)
     {
@@ -291,11 +340,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             item.Name == "Vintage Bulletproof Vest");
         SelectedWeaponCatalogItem = Catalog.Weapons.Single(item =>
             item.Name == "Shock Staff");
+        SelectedTraitName = "Mutation";
         if (SelectedEquipmentSourceLabel != "A Time of War Companion" ||
-            SelectedWeaponSourceLabel != "A Time of War Companion")
+            SelectedWeaponSourceLabel != "A Time of War Companion" ||
+            SelectedTraitSourceLabel != "A Time of War Companion" ||
+            !SelectedTraitDescription.Contains("genetic conditions",
+                StringComparison.Ordinal))
         {
             throw new InvalidOperationException(
-                "Companion catalog source labels were not shown in the editor.");
+                "Companion catalog source labels and notes were not shown in the editor.");
         }
         IncludeCompanionContent = false;
     }
@@ -614,6 +667,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             new ResourceCatalogOptions(includeCompanionContent));
         SelectedEquipmentCatalogItem = null;
         SelectedWeaponCatalogItem = null;
+        SelectedSkillName = null;
+        SelectedTraitName = null;
         OnPropertyChanged(nameof(Catalog));
     }
 
@@ -829,6 +884,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    private static string PlainCatalogText(string text) =>
+        WebUtility.HtmlDecode(text)
+            .Replace("<br>", Environment.NewLine, StringComparison.OrdinalIgnoreCase)
+            .Replace("<br/>", Environment.NewLine, StringComparison.OrdinalIgnoreCase)
+            .Replace("<br />", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
 
     public enum XpKind
     {

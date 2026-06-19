@@ -89,6 +89,7 @@ release.
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
   cosmetic adaptation kits, plus advanced combat practice equipment, light
   support vehicles, and expanded trait references
+- Skill and Trait editor reference panels with source labels and rule notes
 - Legacy `.btcc` character save and load compatibility
 - Official character-sheet PDF preview and export, including purchased patch
   and ammo inventory details
