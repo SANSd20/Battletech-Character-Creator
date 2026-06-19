@@ -72,7 +72,7 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **87% complete**. There is not yet a stable
+The .NET migration is approximately **88% complete**. There is not yet a stable
 or packaged release.
 
 ### Completed
@@ -89,7 +89,8 @@ or packaged release.
   cosmetic adaptation kits, plus advanced combat practice equipment and light
   support vehicles
 - Legacy `.btcc` character save and load compatibility
-- Official character-sheet PDF preview and export
+- Official character-sheet PDF preview and export, including purchased patch
+  and ammo inventory details
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining

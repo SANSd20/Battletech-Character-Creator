@@ -165,18 +165,14 @@ public static class CharacterSheetExporter
             if (row >= 16) break;
             var y = 1406 + row++ * 54;
             canvas.Text(200, y, $"{weapon.Count} x {weapon.Name}", 26, 950);
-            canvas.Text(1220, y,
-                $"Dmg: {weapon.Damage}, Ammo: {weapon.Shots}, Range: {weapon.Range}, Weight: {weapon.Mass}",
-                22, 1100);
+            canvas.Text(1220, y, WeaponInventoryDetails(weapon), 22, 1100);
         }
         foreach (var item in character.Equipment)
         {
             if (row >= 16) break;
             var y = 1406 + row++ * 54;
             canvas.Text(200, y, $"{item.Count} x {item.Name}", 26, 950);
-            canvas.Text(1220, y,
-                $"Armor: {item.Armor}, Weight: {item.Mass}, {item.Notes}",
-                22, 1100);
+            canvas.Text(1220, y, EquipmentInventoryDetails(item), 22, 1100);
         }
         canvas.Text(300, 2388, summary.RemainingCBills.ToString(), 30);
         canvas.Text(1670, 435,
@@ -299,6 +295,29 @@ public static class CharacterSheetExporter
     private static string[] Split(string value) =>
         value.Split('/', StringSplitOptions.RemoveEmptyEntries |
             StringSplitOptions.TrimEntries);
+
+    private static string WeaponInventoryDetails(WeaponItem weapon)
+    {
+        var details =
+            $"Dmg: {weapon.Damage}, Ammo: {weapon.Shots}, Range: {weapon.Range}, Weight: {weapon.Mass}";
+        var ammoCount = CharacterRules.OptionalItemCount(weapon.AmmoCount);
+        return ammoCount > 0
+            ? $"{details}, Ammo packs: {ammoCount}"
+            : details;
+    }
+
+    private static string EquipmentInventoryDetails(EquipmentItem item)
+    {
+        var details = $"Armor: {item.Armor}, Weight: {item.Mass}";
+        var patchCount = CharacterRules.OptionalItemCount(item.PatchCount);
+        if (patchCount > 0)
+        {
+            details += $", Patches: {patchCount}";
+        }
+        return string.IsNullOrWhiteSpace(item.Notes)
+            ? details
+            : $"{details}, {item.Notes}";
+    }
 
     private static SheetImage LoadImage(string path)
     {

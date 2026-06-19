@@ -311,6 +311,29 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     public void SmokeExportCharacterSheet(string path)
     {
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Smoke Patch Armor",
+            Cost = "500/100",
+            Mass = "3.1",
+            Armor = "1/4/0/2",
+            PatchCount = "2",
+            Count = "1"
+        });
+        Character.Weapons.Add(new WeaponItem
+        {
+            Skill = "Small Arms",
+            Name = "Smoke Ammo Weapon",
+            Damage = "2B/3",
+            Range = "8/18/40/90",
+            Cost = "500",
+            Mass = "0.5",
+            Shots = "9",
+            AmmoCost = "12",
+            AmmoMass = "0.06",
+            AmmoCount = "3",
+            Count = "1"
+        });
         CharacterSheetExporter.Export(Character, Catalog, path);
         var bytes = File.ReadAllBytes(path);
         var text = System.Text.Encoding.ASCII.GetString(bytes);
@@ -320,7 +343,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             !text.StartsWith("%PDF-1.4", StringComparison.Ordinal) ||
             !text.Contains($"/Count {expectedPages}", StringComparison.Ordinal) ||
             !text.Contains(EscapeSmokeText(Character.Name),
-                StringComparison.Ordinal))
+                StringComparison.Ordinal) ||
+            !text.Contains("Patches: 2", StringComparison.Ordinal) ||
+            !text.Contains("Ammo packs: 3", StringComparison.Ordinal))
         {
             throw new InvalidOperationException(
                 "Character sheet PDF export did not produce a complete document.");
