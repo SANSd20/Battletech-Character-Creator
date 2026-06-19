@@ -15,6 +15,8 @@ $releaseDir = Join-Path $repoRoot "artifacts\release\$Version"
 $releaseInstaller = Join-Path $releaseDir $installerName
 $checksumPath = Join-Path $releaseDir "$installerName.sha256"
 $manifestPath = Join-Path $releaseDir "release-manifest.txt"
+$notesSourcePath = Join-Path $repoRoot "docs\PREVIEW_RELEASE_NOTES.md"
+$notesOutputPath = Join-Path $releaseDir "PREVIEW_RELEASE_NOTES.md"
 
 if (!$SkipReleaseChecks) {
     powershell -NoProfile -ExecutionPolicy Bypass `
@@ -38,6 +40,7 @@ if (Test-Path -LiteralPath $releaseDir) {
 New-Item -ItemType Directory -Force -Path $releaseDir | Out-Null
 
 Copy-Item -LiteralPath $installerPath -Destination $releaseInstaller
+Copy-Item -LiteralPath $notesSourcePath -Destination $notesOutputPath
 
 $hash = Get-FileHash -LiteralPath $releaseInstaller -Algorithm SHA256
 "$($hash.Hash)  $installerName" | Set-Content -LiteralPath $checksumPath
@@ -54,6 +57,7 @@ $installerSize = (Get-Item -LiteralPath $releaseInstaller).Length
     "Created: $created",
     "Installer: $installerName",
     "Installer bytes: $installerSize",
+    "Release notes: PREVIEW_RELEASE_NOTES.md",
     "SHA256: $($hash.Hash)",
     "",
     "Prerequisites:",

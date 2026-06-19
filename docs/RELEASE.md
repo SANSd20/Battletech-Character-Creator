@@ -74,7 +74,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Build-PreviewRelease
 Run this from a clean working tree. The package script records the current Git
 commit in the release manifest and stops if uncommitted changes are present.
 
-The package script writes the installer, a SHA-256 checksum, and a manifest to:
+The package script writes the installer, a SHA-256 checksum, preview release
+notes, and a manifest to:
 
 ```text
 artifacts\release\0.1.0-preview
