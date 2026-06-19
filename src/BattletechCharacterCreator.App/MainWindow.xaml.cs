@@ -547,6 +547,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Shots = item.Shots,
             AmmoCost = item.AmmoCost,
             AmmoMass = item.AmmoMass,
+            AmmoCount = "0",
             Notes = item.Notes,
             Count = "1"
         });

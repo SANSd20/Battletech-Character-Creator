@@ -665,6 +665,7 @@
                                 <DataGridTextColumn Header="Shots" Binding="{Binding Shots}" Width="90"/>
                                 <DataGridTextColumn Header="Ammo cost" Binding="{Binding AmmoCost}" Width="90"/>
                                 <DataGridTextColumn Header="Ammo mass" Binding="{Binding AmmoMass}" Width="90"/>
+                                <DataGridTextColumn Header="Ammo qty" Binding="{Binding AmmoCount}" Width="80"/>
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="180"/>
                             </DataGrid.Columns>
                         </DataGrid>

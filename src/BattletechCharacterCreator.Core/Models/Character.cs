@@ -76,6 +76,7 @@ public sealed class WeaponItem
     public string Shots { get; set; } = "";
     public string AmmoCost { get; set; } = "";
     public string AmmoMass { get; set; } = "";
+    public string AmmoCount { get; set; } = "0";
     public string Notes { get; set; } = "";
     public string Count { get; set; } = "1";
 }

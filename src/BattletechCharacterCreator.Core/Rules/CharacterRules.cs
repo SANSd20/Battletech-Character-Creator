@@ -81,15 +81,20 @@ public static class CharacterRules
         var inventoryCost = character.Equipment.Sum(item =>
                 BasePurchaseCost(item.Cost) * ItemCount(item.Count)) +
             character.Weapons.Sum(item =>
-                BasePurchaseCost(item.Cost) * ItemCount(item.Count));
+                BasePurchaseCost(item.Cost) * ItemCount(item.Count) +
+                BasePurchaseCost(item.AmmoCost) * OptionalItemCount(item.AmmoCount));
         var inventoryMass = character.Equipment.Sum(item =>
                 CatalogMass(item.Mass) * ItemCount(item.Count)) +
             character.Weapons.Sum(item =>
-                CatalogMass(item.Mass) * ItemCount(item.Count));
+                CatalogMass(item.Mass) * ItemCount(item.Count) +
+                CatalogMass(item.AmmoMass) * OptionalItemCount(item.AmmoCount));
         var unresolvedInventoryPrices = character.Equipment.Sum(item =>
                 HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0) +
             character.Weapons.Sum(item =>
-                HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0);
+                (HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0) +
+                (HasUnresolvedPurchaseCost(item.AmmoCost)
+                    ? OptionalItemCount(item.AmmoCount)
+                    : 0));
         var capacity = CarryingCapacity(strength);
 
         return new CharacterSummary(
@@ -210,6 +215,9 @@ public static class CharacterRules
 
     public static int ItemCount(string value) =>
         int.TryParse(value, out var parsed) && parsed > 0 ? parsed : 1;
+
+    public static int OptionalItemCount(string value) =>
+        int.TryParse(value, out var parsed) && parsed > 0 ? parsed : 0;
 
     private static int FindValue(IEnumerable<NamedValue> values, string name) =>
         values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;

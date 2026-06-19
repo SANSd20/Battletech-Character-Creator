@@ -72,7 +72,7 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **85% complete**. There is not yet a stable
+The .NET migration is approximately **86% complete**. There is not yet a stable
 or packaged release.
 
 ### Completed
@@ -83,7 +83,7 @@ or packaged release.
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
 - Character editor with guided Attribute, Trait, and Skill XP controls
 - Searchable equipment and weapon catalogs with visible quantity-aware
-  base-price totals and unresolved-price counts
+  base-price totals, purchased ammo totals, and unresolved-price counts
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
   cosmetic adaptation kits, plus advanced combat practice equipment and light
@@ -96,7 +96,7 @@ or packaged release.
 
 - Continue importing and modeling selected optional content from
   *A Time of War Companion*
-- Expand reload, patch, ammunition, vehicle, and prosthetic enhancement
+- Expand reload, patch, ammunition modifier, vehicle, and prosthetic enhancement
   purchasing details
 - Continue interface polish and usability testing
 - Strengthen error handling and recovery
