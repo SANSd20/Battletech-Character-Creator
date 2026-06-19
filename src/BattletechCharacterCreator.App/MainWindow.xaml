@@ -129,11 +129,6 @@
                             </StackPanel>
                         </Grid>
 
-                        <TextBlock Text="Home planet" Style="{StaticResource EditorLabel}"/>
-                        <ComboBox ItemsSource="{Binding Catalog.Planets}"
-                                  Text="{Binding Character.HomePlanet, UpdateSourceTrigger=PropertyChanged}"
-                                  IsEditable="True"
-                                  SelectionChanged="EditorSelectionChanged"/>
                         <TextBlock Text="Phenotype" Style="{StaticResource EditorLabel}"/>
                         <ComboBox ItemsSource="{Binding Catalog.Phenotypes}"
                                   Text="{Binding Character.Phenotype, UpdateSourceTrigger=PropertyChanged}"
@@ -153,11 +148,14 @@
                                           SelectionChanged="EditorSelectionChanged"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="Age" Style="{StaticResource EditorLabel}"/>
-                                <TextBox Text="{Binding Age, UpdateSourceTrigger=PropertyChanged}"
+                                <TextBlock Text="Year of birth" Style="{StaticResource EditorLabel}"/>
+                                <TextBox Text="{Binding BirthYear, UpdateSourceTrigger=PropertyChanged}"
                                          LostKeyboardFocus="EditorFieldChanged"/>
                             </StackPanel>
                         </Grid>
+                        <TextBlock Text="Game year" Style="{StaticResource EditorLabel}"/>
+                        <TextBox Text="{Binding GameYear, UpdateSourceTrigger=PropertyChanged}"
+                                 LostKeyboardFocus="EditorFieldChanged"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>

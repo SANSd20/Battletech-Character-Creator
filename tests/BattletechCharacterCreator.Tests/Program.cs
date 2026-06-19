@@ -24,6 +24,8 @@ character.Weapons.Add(new WeaponItem
 character.RealLife = "Solaris VII Games";
 character.BirthAffiliation = "Federated Suns";
 character.BirthSubAffiliation = "Crucis March";
+character.BirthYear = 3028;
+character.GameYear = 3054;
 character.ClanCaste = "MechWarrior";
 character.ClanTrainingField = "MechWarrior";
 character.Phenotype = "Phenotype/MechWarrior";
@@ -59,6 +61,16 @@ Assert(loaded.RealLifeHistory.SequenceEqual(character.RealLifeHistory),
 Assert(loaded.BirthAffiliation == character.BirthAffiliation &&
     loaded.BirthSubAffiliation == character.BirthSubAffiliation,
     "Order birth affiliation details must round-trip.");
+Assert(loaded.BirthYear == character.BirthYear &&
+    loaded.GameYear == character.GameYear &&
+    loaded.Age == 26,
+    "Birth year, game year, and calculated age must round-trip.");
+var legacyAgeCharacter = LegacyCharacterSerializer.Read(new StringReader(
+    "age:32"));
+Assert(legacyAgeCharacter.GameYear == 3045 &&
+    legacyAgeCharacter.BirthYear == 3013 &&
+    legacyAgeCharacter.Age == 32,
+    "Legacy age-only files must load as birth year and game year.");
 Assert(loaded.ClanCaste == character.ClanCaste &&
     loaded.ClanTrainingField == character.ClanTrainingField &&
     loaded.Phenotype == character.Phenotype,

@@ -21,7 +21,19 @@ public sealed class Character
     public string Phenotype { get; set; } = "Phenotype/Normal Human";
     public string HomePlanet { get; set; } = "";
     public string Sex { get; set; } = "Male";
-    public int Age { get; set; } = 21;
+    public int BirthYear { get; set; } = 3024;
+    public int GameYear { get; set; } = 3045;
+    public int Age
+    {
+        get => Math.Max(0, GameYear - BirthYear);
+        set
+        {
+            if (value > 0)
+            {
+                BirthYear = GameYear - value;
+            }
+        }
+    }
     public string HairColor { get; set; } = "";
     public string EyeColor { get; set; } = "";
     public int Height { get; set; } = 175;

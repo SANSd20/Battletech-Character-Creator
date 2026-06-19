@@ -11,6 +11,8 @@ pass.
 - Confirm the first window offers Character Wizard and Character Editor.
 - Open the Character Editor directly and confirm it starts without an error.
 - Open the Character Wizard from the first window and create a character.
+- Confirm Basic Information asks for year of birth and game year, not Home
+  planet or age.
 
 ## Wizard Paths
 

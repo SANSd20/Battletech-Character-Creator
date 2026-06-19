@@ -96,6 +96,8 @@ public static class LegacyCharacterSerializer
         WriteValue(writer, "phenotype", c.Phenotype);
         WriteValue(writer, "nameplanet", c.HomePlanet);
         WriteValue(writer, "sex", c.Sex);
+        WriteValue(writer, "birthyear", c.BirthYear);
+        WriteValue(writer, "gameyear", c.GameYear);
         WriteValue(writer, "age", c.Age);
         WriteValue(writer, "haircolor", c.HairColor);
         WriteValue(writer, "eyecolor", c.EyeColor);
@@ -161,6 +163,8 @@ public static class LegacyCharacterSerializer
             case "phenotype": c.Phenotype = value; break;
             case "nameplanet": c.HomePlanet = value; break;
             case "sex": c.Sex = value; break;
+            case "birthyear": c.BirthYear = ParseInt(value, c.BirthYear); break;
+            case "gameyear": c.GameYear = ParseInt(value, c.GameYear); break;
             case "age": c.Age = ParseInt(value, c.Age); break;
             case "haircolor": c.HairColor = value; break;
             case "eyecolor": c.EyeColor = value; break;

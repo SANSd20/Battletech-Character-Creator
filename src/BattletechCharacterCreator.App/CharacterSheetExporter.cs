@@ -155,7 +155,7 @@ public static class CharacterSheetExporter
         canvas.Text(200, 969,
             $"Careers: {string.Join(" -> ", character.RealLifeHistory)}", 30, 2050);
         canvas.Text(200, 1033,
-            $"Homeworld: {character.HomePlanet}   Sex: {character.Sex}   Age: {character.Age}",
+            $"Sex: {character.Sex}   Born: {character.BirthYear}   Year: {character.GameYear}   Age: {character.Age}",
             24, 700);
         canvas.WrappedText(970, 585, character.Notes, 22, 1300, 64, 8);
 

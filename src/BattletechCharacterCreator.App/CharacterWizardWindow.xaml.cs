@@ -50,7 +50,6 @@ public partial class CharacterWizardWindow : Window
 
         var resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
         var resources = ResourceCatalog.Load(resourcePath);
-        HomePlanetPicker.ItemsSource = resources.Planets;
         HairColorPicker.ItemsSource = resources.HairColors;
         EyeColorPicker.ItemsSource = resources.EyeColors;
         SexPicker.ItemsSource = new[] { "Male", "Female" };
@@ -307,8 +306,14 @@ public partial class CharacterWizardWindow : Window
         {
             0 when string.IsNullOrWhiteSpace(CharacterName.Text) =>
                 "Enter a character name.",
-            0 when !TryReadPositiveNumber(AgeInput, out _) =>
-                "Enter a valid age.",
+            0 when !TryReadPositiveNumber(BirthYearInput, out _) =>
+                "Enter a valid year of birth.",
+            0 when !TryReadPositiveNumber(GameYearInput, out _) =>
+                "Enter a valid game year.",
+            0 when TryReadPositiveNumber(BirthYearInput, out var birthYear) &&
+                TryReadPositiveNumber(GameYearInput, out var gameYear) &&
+                gameYear < birthYear =>
+                "Enter a game year that is the same as or later than the year of birth.",
             0 when !TryReadPositiveNumber(HeightInput, out _) =>
                 "Enter a valid height.",
             0 when !TryReadPositiveNumber(WeightInput, out _) =>
@@ -1436,8 +1441,7 @@ public partial class CharacterWizardWindow : Window
 
         ReviewCharacterSummary.Text =
             $"{character.Name}{Environment.NewLine}" +
-            $"{character.Sex}, age {character.Age}{Environment.NewLine}" +
-            $"Homeworld: {ValueOrDash(character.HomePlanet)}{Environment.NewLine}" +
+            $"{character.Sex}, born {character.BirthYear}, game year {character.GameYear}, age {character.Age}{Environment.NewLine}" +
             $"Height / Weight: {character.Height} cm / {character.Weight} kg{Environment.NewLine}" +
             $"Hair / Eyes: {ValueOrDash(character.HairColor)} / {ValueOrDash(character.EyeColor)}";
 
@@ -1487,9 +1491,11 @@ public partial class CharacterWizardWindow : Window
             throw new InvalidOperationException("Choose a primary language.");
 
         var character = LifePathEngine.CreateBase(CharacterName.Text.Trim(), language);
-        character.HomePlanet = HomePlanetPicker.Text.Trim();
         character.Sex = SexPicker.SelectedItem as string ?? "Male";
-        character.Age = TryReadPositiveNumber(AgeInput, out var age) ? age : 21;
+        character.BirthYear = TryReadPositiveNumber(BirthYearInput, out var birthYear)
+            ? birthYear : 3024;
+        character.GameYear = TryReadPositiveNumber(GameYearInput, out var gameYear)
+            ? gameYear : 3045;
         character.Height = TryReadPositiveNumber(HeightInput, out var height)
             ? height : 175;
         character.Weight = TryReadPositiveNumber(WeightInput, out var weight)

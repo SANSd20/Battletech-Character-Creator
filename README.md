@@ -83,6 +83,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - First-launch choice window for opening the Character Wizard or Character
   Editor
 - Character wizard from basic information through Stage 4
+- Basic information uses year of birth and game year, with age calculated for
+  summaries and exports
 - All affiliations and 68 corrected sub-affiliations
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
 - Character editor with guided Attribute, Trait, and Skill XP controls

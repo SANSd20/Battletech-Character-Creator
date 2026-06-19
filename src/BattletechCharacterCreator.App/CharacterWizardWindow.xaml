@@ -86,12 +86,12 @@
                     <TextBlock Text="BASIC INFORMATION" Style="{StaticResource SectionTitle}"/>
                     <TextBlock Text="Character name" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="CharacterName" Text="New Character"/>
-                    <TextBlock Text="Home planet" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="HomePlanetPicker" IsEditable="True"/>
                     <TextBlock Text="Sex" Style="{StaticResource FieldLabel}"/>
                     <ComboBox x:Name="SexPicker"/>
-                    <TextBlock Text="Age" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="AgeInput" Text="21"/>
+                    <TextBlock Text="Year of birth" Style="{StaticResource FieldLabel}"/>
+                    <TextBox x:Name="BirthYearInput" Text="3024"/>
+                    <TextBlock Text="Game year" Style="{StaticResource FieldLabel}"/>
+                    <TextBox x:Name="GameYearInput" Text="3045"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2" Margin="0,51,0,0">
                     <TextBlock Text="Height (cm)" Style="{StaticResource FieldLabel}"/>

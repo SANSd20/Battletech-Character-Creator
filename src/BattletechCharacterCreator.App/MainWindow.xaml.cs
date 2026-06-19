@@ -141,7 +141,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
     public string Sex { get => Character.Sex; set => Character.Sex = value; }
-    public int Age { get => Character.Age; set => Character.Age = value; }
+    public int BirthYear { get => Character.BirthYear; set => Character.BirthYear = value; }
+    public int GameYear { get => Character.GameYear; set => Character.GameYear = value; }
     public int CharacterHeight { get => Character.Height; set => Character.Height = value; }
     public int Weight { get => Character.Weight; set => Character.Weight = value; }
     public string Notes { get => Character.Notes; set => Character.Notes = value; }
@@ -871,6 +872,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         OnPropertyChanged(nameof(Character));
         OnPropertyChanged(nameof(CharacterName));
         OnPropertyChanged(nameof(SubAffiliation));
+        OnPropertyChanged(nameof(BirthYear));
+        OnPropertyChanged(nameof(GameYear));
     }
 
     private void RebuildXpRows()
@@ -1013,6 +1016,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             expected.SubAffiliation == actual.SubAffiliation &&
             expected.BirthAffiliation == actual.BirthAffiliation &&
             expected.BirthSubAffiliation == actual.BirthSubAffiliation &&
+            expected.BirthYear == actual.BirthYear &&
+            expected.GameYear == actual.GameYear &&
             expected.ClanCaste == actual.ClanCaste &&
             expected.ClanTrainingField == actual.ClanTrainingField &&
             expected.Phenotype == actual.Phenotype &&
