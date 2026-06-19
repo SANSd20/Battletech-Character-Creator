@@ -79,6 +79,8 @@ release.
 ### Completed
 
 - .NET 10 and WPF application foundation
+- First-launch choice window for opening the Character Wizard or Character
+  Editor
 - Character wizard from basic information through Stage 4
 - All affiliations and 68 corrected sub-affiliations
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
@@ -109,8 +111,8 @@ release.
 - Installer smoke-test script for install, launch diagnostics, and uninstall
   verification, including installed-app sheet export
 - Full installer install, launch-smoke, and uninstall verification
-- Automated release-check script covering tests, app smokes, sheet export
-  output, publish, and installer dry-run
+- Automated release-check script covering tests, start window, app smokes,
+  sheet export output, publish, and installer dry-run
 - Preview release packaging script with installer checksum, stale-installer
   guard, and manifest output
 - Preview release notes included in packaged release artifacts

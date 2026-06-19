@@ -76,6 +76,11 @@ Invoke-Step "Migration tests" {
         /p:UseSharedCompilation=false
 }
 
+Invoke-Step "Start window smoke" {
+    dotnet run --project src\BattletechCharacterCreator.App `
+        /p:UseSharedCompilation=false -- --smoke-start
+}
+
 Invoke-Step "Wizard smoke" {
     dotnet run --project src\BattletechCharacterCreator.App `
         /p:UseSharedCompilation=false -- --smoke-wizard

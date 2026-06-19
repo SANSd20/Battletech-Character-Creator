@@ -7,6 +7,7 @@ release.
 ## Highlights
 
 - Life Module character wizard from basic information through Stage 4
+- First-launch choice window for opening the Character Wizard or Character Editor
 - All corrected-printing affiliations and 68 sub-affiliations
 - All 24 corrected-printing Stage 4 base modules, including variant paths
 - Two ordered Stage 4 careers with repeat and prerequisite handling
@@ -38,6 +39,7 @@ release.
 Before this preview was packaged, the automated release checks passed:
 
 - Migration tests
+- Start window smoke
 - Wizard smoke
 - Clan round-trip smoke
 - Representative life-path smoke
