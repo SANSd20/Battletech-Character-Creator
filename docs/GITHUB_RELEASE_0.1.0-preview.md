@@ -65,6 +65,7 @@ June 18, 2026.
 - Error reports include app version, runtime, process, and launch diagnostics
 - Release checks validate diagnostic report versions against the requested version
 - Release checks verify the app project version matches the requested version
+- Release checks verify Windows assembly/file versions match the release version
 - Installer smoke validates diagnostic metadata from the installed app
 - Installer smoke validates character-sheet PDF export from the installed app
 - Per-user Windows installer

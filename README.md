@@ -101,6 +101,8 @@ release.
   release version
 - Release checks verify the app project version matches the requested release
   version
+- Release checks verify Windows assembly/file versions match the release
+  version number
 - Windows x64 folder publish profile documented in `docs/RELEASE.md`
 - Locally compile-verified per-user NSIS installer script for the .NET publish
   output

@@ -46,6 +46,16 @@ $appVersion = $appProject.Project.PropertyGroup.InformationalVersion
 if ($appVersion -ne $Version) {
     throw "App InformationalVersion ($appVersion) does not match release version ($Version)."
 }
+$numericVersion = ($Version -split "-", 2)[0]
+$expectedAssemblyVersion = "$numericVersion.0"
+$assemblyVersion = $appProject.Project.PropertyGroup.AssemblyVersion
+$fileVersion = $appProject.Project.PropertyGroup.FileVersion
+if ($assemblyVersion -ne $expectedAssemblyVersion) {
+    throw "App AssemblyVersion ($assemblyVersion) does not match expected release assembly version ($expectedAssemblyVersion)."
+}
+if ($fileVersion -ne $expectedAssemblyVersion) {
+    throw "App FileVersion ($fileVersion) does not match expected release file version ($expectedAssemblyVersion)."
+}
 
 $appData = Join-Path $repoRoot ".appdata"
 New-Item -ItemType Directory -Force -Path $appData | Out-Null
