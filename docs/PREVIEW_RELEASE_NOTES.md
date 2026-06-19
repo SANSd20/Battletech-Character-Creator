@@ -14,6 +14,7 @@ release.
 - Legacy `.btcc` save/load compatibility
 - Searchable equipment and weapon catalogs with C-Bill and mass summaries
 - Opt-in *A Time of War Companion* equipment and weapon catalog content
+- Opt-in *A Time of War Companion* expanded trait reference entries
 - Official character-sheet PDF preview and export
 - Error report generation for unexpected and recoverable app failures
 - Per-user Windows installer and release package manifest/checksum output

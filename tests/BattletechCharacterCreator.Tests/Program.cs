@@ -75,6 +75,9 @@ Assert(CharacterRules.SkillLevel(64, [new NamedValue("Fast Learner", 300)]) == 3
     "Fast Learner reduces skill thresholds by 20 percent.");
 Assert(CharacterRules.TraitLevel("Wealth", -95) == -1,
     "Negative trait XP uses floor semantics.");
+Assert(CharacterRules.TraitLevel("Mutation", 450) == 3 &&
+    CharacterRules.TraitLevel("Mutation", -650) == -5,
+    "Companion Mutation trait XP must clamp to its printed range.");
 Assert(CharacterRules.StartingCBills(3) == 10_000, "Wealth level determines starting C-Bills.");
 Assert(CharacterRules.BasePurchaseCost("500/100") == 500,
     "Slash-separated catalog costs must expose the base purchase price.");
@@ -170,9 +173,13 @@ static void CheckResourceCatalog()
         catalog.Traits.Count == 76 &&
         catalog.Careers.Count == 26,
         "Skill, trait, and career reference catalogs must be complete.");
+    Assert(companionCatalog.Traits.Count == 82,
+        "Companion-enabled traits must include the expanded trait import.");
     Assert(catalog.SkillDescriptions.Count == 92 &&
         catalog.TraitDescriptions.Count == 56,
         "All available skill and trait descriptions must be imported.");
+    Assert(companionCatalog.TraitDescriptions.Count == 62,
+        "Companion-enabled trait descriptions must include expanded trait notes.");
     Assert(catalog.Equipment.Any(item =>
             item.Category == "persarmor" &&
             item.Name == "Flak/Jacket" &&
@@ -213,8 +220,10 @@ static void CheckResourceCatalog()
         catalog.Equipment.All(item => item.Name != "Mermaid Adaptation Kit") &&
         catalog.Equipment.All(item => item.Name != "Field Simulation Server") &&
         catalog.Equipment.All(item => item.Name != "Hoodling Sensor HoverJeep") &&
-        catalog.Weapons.All(item => item.Name != "Shock Staff"),
-        "Companion equipment and weapons must be hidden by default.");
+        catalog.Weapons.All(item => item.Name != "Shock Staff") &&
+        catalog.Traits.All(item => item.Name != "Mutation") &&
+        catalog.Traits.All(item => item.Name != "Rank - Expanded Rules"),
+        "Companion equipment, weapons, and traits must be hidden by default.");
     var companionArmor = companionCatalog.Equipment.Single(item =>
         item.Name == "Vintage Bulletproof Vest");
     var companionImplant = companionCatalog.Equipment.Single(item =>
@@ -243,6 +252,12 @@ static void CheckResourceCatalog()
         item.Name == "Shock Staff");
     var companionSupportWeapon = companionCatalog.Weapons.Single(item =>
         item.Name == "Snub-Nose Support PPC");
+    var companionMutation = companionCatalog.Traits.Single(item =>
+        item.Name == "Mutation");
+    var companionRankRules = companionCatalog.Traits.Single(item =>
+        item.Name == "Rank - Expanded Rules");
+    var companionImplantRules = companionCatalog.Traits.Single(item =>
+        item.Name == "Implant/Prosthetic - Expanded Rules");
     Assert(companionArmor.Source == RulebookSource.Companion &&
         companionArmor.Armor == "1/4/0/2" &&
         companionArmor.SourceLabel == "A Time of War Companion" &&
@@ -279,8 +294,15 @@ static void CheckResourceCatalog()
         companionWeapon.Damage == "2E/6" &&
         companionSupportWeapon.Source == RulebookSource.Companion &&
         companionSupportWeapon.Skill == "Support Weapons" &&
-        companionSupportWeapon.Mass == "1600",
-        "Companion starter equipment and weapons must retain source-tagged fields.");
+        companionSupportWeapon.Mass == "1600" &&
+        companionMutation.Source == RulebookSource.Companion &&
+        companionMutation.Reference == "Companion p.55" &&
+        companionMutation.Description.Contains("-5 to +3 TP") &&
+        companionRankRules.Source == RulebookSource.Companion &&
+        companionRankRules.Description.Contains("faction-specific military rank") &&
+        companionImplantRules.Source == RulebookSource.Companion &&
+        companionImplantRules.Description.Contains("advanced implant"),
+        "Companion catalog entries must retain source-tagged fields and notes.");
     Assert(new EquipmentCatalogItem("", "Test", "", "", "", "", "",
             RulebookSource.Companion).SourceLabel == "A Time of War Companion",
         "Companion catalog entries must have a user-facing source label.");

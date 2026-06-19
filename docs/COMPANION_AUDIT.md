@@ -68,7 +68,10 @@ core corrected-printing character creation rules.
 3. Extend equipment data only where needed for Companion-only fields such as
    maintenance, modification, legality, or conversion notes.
 4. Add expanded trait metadata after the trait model can represent richer
-   source notes, costs, restrictions, and linked equipment effects.
+   source notes, costs, restrictions, and linked equipment effects. Started:
+   expanded Rank, Title/Bloodname, Vehicle, Custom Vehicle,
+   Implant/Prosthetic, and Mutation reference entries are imported behind the
+   Companion catalog toggle.
 5. Add character templates as explicit presets, not as ordinary Life Module
    steps, so players can choose between guided creation and ready-made starts.
 6. Defer creatures, world-building, campaign systems, and high-power NPC rules
@@ -126,9 +129,11 @@ represented as Companion equipment entries with their vehicle ratings in the
 armor/rating field and vehicle armor, fuel, range, speed, crew, passenger, and
 cargo details preserved in notes.
 
-Expanded traits should follow after the editor supports source-tagged rule notes
-and richer trait effects. Character templates should wait until the start screen
-and wizard can offer presets without confusing them with standard Life Module
+Expanded trait references now have a first source-tagged import behind the
+Companion catalog toggle. Full expanded trait mechanics should follow after the
+editor can represent source-tagged rule notes, restrictions, and linked
+equipment effects. Character templates should wait until the start screen and
+wizard can offer presets without confusing them with standard Life Module
 choices.
 
 ## Known Risks

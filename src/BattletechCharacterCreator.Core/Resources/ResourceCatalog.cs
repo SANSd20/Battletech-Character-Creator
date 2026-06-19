@@ -95,7 +95,7 @@ public sealed class ResourceCatalog
         ResourceCatalogOptions options)
     {
         var skillDescriptions = ReadDescriptions(directory, "skillsdesc.dat");
-        var traitDescriptions = ReadDescriptions(directory, "traitsdesc.dat");
+        var traitDescriptions = ReadTraitDescriptions(directory, options);
         var subskills = ReadSubskills(directory);
         var skills = ReadPairs(directory, "allskills.dat")
             .Select(pair => new SkillCatalogItem(
@@ -104,12 +104,7 @@ public sealed class ResourceCatalog
                 FindDescription(skillDescriptions, pair.Name),
                 subskills.GetValueOrDefault(BaseName(pair.Name), [])))
             .ToArray();
-        var traits = ReadPairs(directory, "alltraits.dat")
-            .Select(pair => new TraitCatalogItem(
-                pair.Name,
-                pair.Value,
-                FindDescription(traitDescriptions, pair.Name)))
-            .ToArray();
+        var traits = ReadTraits(directory, options, traitDescriptions);
         var equipment = ReadEquipment(directory, options);
         var weapons = ReadWeapons(directory, options);
         var filteredSkills = FilterBySource(skills, options).ToArray();
@@ -216,6 +211,46 @@ public sealed class ResourceCatalog
                     .Distinct(StringComparer.Ordinal)
                     .ToArray(),
                 StringComparer.Ordinal);
+
+    private static TraitCatalogItem[] ReadTraits(
+        string directory,
+        ResourceCatalogOptions options,
+        IReadOnlyDictionary<string, string> descriptions)
+    {
+        var items = ReadPairs(directory, "alltraits.dat")
+            .Select(pair => new TraitCatalogItem(
+                pair.Name,
+                pair.Value,
+                FindDescription(descriptions, pair.Name),
+                RulebookSource.CoreRulebook));
+        return options.IncludeCompanion
+            ? items.Concat(ReadPairs(directory, "companion_alltraits.dat")
+                    .Select(pair => new TraitCatalogItem(
+                        pair.Name,
+                        pair.Value,
+                        FindDescription(descriptions, pair.Name),
+                        RulebookSource.Companion)))
+                .ToArray()
+            : items.ToArray();
+    }
+
+    private static IReadOnlyDictionary<string, string> ReadTraitDescriptions(
+        string directory,
+        ResourceCatalogOptions options)
+    {
+        var descriptions = ReadDescriptions(directory, "traitsdesc.dat");
+        if (!options.IncludeCompanion)
+        {
+            return descriptions;
+        }
+
+        return descriptions
+            .Concat(ReadDescriptions(directory, "companion_traitsdesc.dat"))
+            .ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value,
+                StringComparer.Ordinal);
+    }
 
     private static IReadOnlyDictionary<string, string> ReadDescriptions(
         string directory,

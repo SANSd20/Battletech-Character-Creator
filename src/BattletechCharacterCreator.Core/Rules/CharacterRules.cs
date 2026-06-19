@@ -38,6 +38,7 @@ public static class CharacterRules
         ["In For Life"] = (-3, 0),
         ["Introvert"] = (-1, 0),
         ["Lost Limb"] = (-5, -1),
+        ["Mutation"] = (-5, 3),
         ["Pain Resistance"] = (0, 3),
         ["Patient"] = (0, 1),
         ["Phenotype"] = (0, 0),
