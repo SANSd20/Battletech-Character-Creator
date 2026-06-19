@@ -60,6 +60,7 @@ June 18, 2026.
 - Skill and Trait editor reference panels with source labels and rule notes
 - Official character-sheet PDF preview and export
 - Error report generation for unexpected and recoverable app failures
+- Error reports include app version, runtime, process, and launch diagnostics
 - Per-user Windows installer
 
 ## Known Gaps

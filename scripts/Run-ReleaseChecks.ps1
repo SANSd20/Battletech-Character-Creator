@@ -82,6 +82,12 @@ Invoke-Step "Error report smoke" {
     if (!(Test-Path -LiteralPath $errorReportPath)) {
         throw "Error report smoke output was not created."
     }
+    $report = Get-Content -LiteralPath $errorReportPath -Raw
+    if (!$report.Contains("Version: 0.1.0-preview") -or
+        !$report.Contains("Process architecture:") -or
+        !$report.Contains("Command line:")) {
+        throw "Error report smoke output did not include diagnostic metadata."
+    }
 }
 
 Invoke-Step "Operation report smoke" {
@@ -89,6 +95,12 @@ Invoke-Step "Operation report smoke" {
         /p:UseSharedCompilation=false -- --smoke-operation-error-report=$operationReportPath
     if (!(Test-Path -LiteralPath $operationReportPath)) {
         throw "Operation report smoke output was not created."
+    }
+    $report = Get-Content -LiteralPath $operationReportPath -Raw
+    if (!$report.Contains("Version: 0.1.0-preview") -or
+        !$report.Contains("Process architecture:") -or
+        !$report.Contains("Command line:")) {
+        throw "Operation report smoke output did not include diagnostic metadata."
     }
 }
 

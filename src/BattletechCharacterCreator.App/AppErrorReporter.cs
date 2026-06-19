@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -54,10 +55,25 @@ public static class AppErrorReporter
         builder.AppendLine("A Time of War Character Creator Error Report");
         builder.AppendLine($"Created: {DateTimeOffset.Now:O}");
         builder.AppendLine($"Context: {context}");
+        builder.AppendLine($"Version: {ApplicationVersion()}");
+        builder.AppendLine($"Executable: {Environment.ProcessPath ?? "Unknown"}");
+        builder.AppendLine($"Working directory: {Environment.CurrentDirectory}");
+        builder.AppendLine($"Command line: {Environment.CommandLine}");
+        builder.AppendLine($"Process architecture: {RuntimeInformation.ProcessArchitecture}");
         builder.AppendLine($"OS: {RuntimeInformation.OSDescription}");
         builder.AppendLine($".NET: {RuntimeInformation.FrameworkDescription}");
         builder.AppendLine();
         builder.AppendLine(exception.ToString());
         return builder.ToString();
+    }
+
+    private static string ApplicationVersion()
+    {
+        var assembly = Assembly.GetEntryAssembly() ?? typeof(AppErrorReporter).Assembly;
+        return assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion ??
+            assembly.GetName().Version?.ToString() ??
+            "Unknown";
     }
 }
