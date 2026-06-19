@@ -74,7 +74,8 @@ Layouts and details may continue to change before the first stable release.
 ## Development status
 
 The .NET migration is approximately **99% complete**. There is not yet a stable
-release.
+release. Automated release checks and installer smoke tests are passing; the
+next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 
 ### Completed
 
@@ -119,10 +120,12 @@ release.
 - GitHub-ready preview release draft included in packaged release artifacts
 - GitHub release publish helper with package, checksum, manifest, and installer
   metadata/version/notes validation
+- Manual preview test plan in `docs/MANUAL_TEST_PLAN.md`
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
 
 ### Remaining
 
+- Run the manual preview test plan on the installed app
 - Continue importing and modeling selected optional mechanics from
   *A Time of War Companion*
 - Expand reload, patch repair rules, ammunition modifier, vehicle, and prosthetic enhancement

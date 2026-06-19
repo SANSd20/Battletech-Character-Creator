@@ -72,6 +72,12 @@ before each packaged release after rebuilding the installer. The smoke test
 also checks that the installed app can write diagnostic metadata to its launch
 report and export a nonempty character-sheet PDF.
 
+After automated checks pass, run the installed-app manual preview checklist:
+
+```text
+docs\MANUAL_TEST_PLAN.md
+```
+
 Package the preview release with:
 
 ```powershell

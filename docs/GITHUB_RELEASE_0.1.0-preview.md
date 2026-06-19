@@ -47,6 +47,8 @@ Before packaging, the automated release checks passed:
 The full installer install, launch-smoke, and uninstall test passed on
 June 18, 2026.
 
+Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
+
 ## Highlights
 
 - Life Module character wizard from basic information through Stage 4
@@ -76,6 +78,7 @@ June 18, 2026.
 - GitHub release validation cross-checks the packaged release version
 - GitHub release validation checks the draft notes match the requested version
 - GitHub release validation checks preview notes match the requested version
+- Manual preview test plan for installed-app testing
 
 ## Known Gaps
 
