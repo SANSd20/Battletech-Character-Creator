@@ -27,6 +27,18 @@ public sealed record EraSubAffiliationAvailabilityRule(
         (ToYear is null || year <= ToYear);
 }
 
+public sealed record EraCatalogItemAvailabilityRule(
+    string ItemName,
+    int? FromYear,
+    int? ToYear,
+    string Note,
+    string Source)
+{
+    public bool IsAvailable(int year) =>
+        (FromYear is null || year >= FromYear) &&
+        (ToYear is null || year <= ToYear);
+}
+
 public static class EraAvailabilityCatalog
 {
     public static IReadOnlyList<EraAvailabilityRule> AffiliationRules { get; } =
@@ -56,6 +68,35 @@ public static class EraAvailabilityCatalog
         new("rasalhague", "Ghost Bear Dominion", 3060, null,
             "Ghost Bear Dominion choices are hidden until the Civil War era context.",
             "BATTLETECH ERA REPORT 3062")
+    ];
+
+    public static IReadOnlyList<EraCatalogItemAvailabilityRule> EquipmentRules { get; } =
+    [
+        new("Cybernetic Eye (IR)", 3062, null,
+            "Advanced cybernetics should be checked against the campaign era before purchase.",
+            "BATTLETECH ERA REPORT 3062"),
+        new("Pain Shunt", 3062, null,
+            "Advanced combat implants should be checked against the campaign era before purchase.",
+            "BATTLETECH ERA REPORT 3062"),
+        new("Flight Wings", 3062, null,
+            "Extreme prosthetics should be checked against the campaign era before purchase.",
+            "BATTLETECH ERA REPORT 3062"),
+        new("Field Simulation Server", 3062, null,
+            "Advanced combat practice equipment should be checked against the campaign era before purchase.",
+            "BATTLETECH ERA REPORT 3062"),
+        new("Hoodling Sensor HoverJeep", 3145, null,
+            "Late Dark Age vehicle availability should be checked against the campaign era before purchase.",
+            "BattleTech: Era Report 3145")
+    ];
+
+    public static IReadOnlyList<EraCatalogItemAvailabilityRule> WeaponRules { get; } =
+    [
+        new("Shock Staff", 3052, null,
+            "Advanced personal weapons should be checked against the campaign era before purchase.",
+            "BattleTech: Era Report: 3052"),
+        new("Snub-Nose Support PPC", 3052, null,
+            "Advanced support weapons should be checked against the campaign era before purchase.",
+            "BattleTech: Era Report: 3052")
     ];
 
     public static bool IsAffiliationAvailable(LifePathModule module, int year) =>
@@ -155,6 +196,37 @@ public static class EraAvailabilityCatalog
             $"{rule.Note} Source: {rule.Source}.";
     }
 
+    public static string BuildEquipmentAvailabilityNote(
+        EquipmentCatalogItem item,
+        int year) =>
+        BuildCatalogItemAvailabilityNote(
+            item.Name,
+            year,
+            FindEquipmentRule(item.Name));
+
+    public static string BuildWeaponAvailabilityNote(
+        WeaponCatalogItem item,
+        int year) =>
+        BuildCatalogItemAvailabilityNote(
+            item.Name,
+            year,
+            FindWeaponRule(item.Name));
+
+    private static string BuildCatalogItemAvailabilityNote(
+        string itemName,
+        int year,
+        EraCatalogItemAvailabilityRule? rule)
+    {
+        if (rule is null)
+        {
+            return $"Era availability: no additional era limit is tracked for {itemName}.";
+        }
+
+        var status = rule.IsAvailable(year) ? "available" : "check availability";
+        return $"Era availability: {itemName} is {status} in {year}. " +
+            $"{rule.Note} Source: {rule.Source}.";
+    }
+
     private static EraAvailabilityRule? FindAffiliationRule(string moduleId) =>
         AffiliationRules.FirstOrDefault(rule =>
             rule.ModuleId.Equals(moduleId, StringComparison.Ordinal));
@@ -165,4 +237,12 @@ public static class EraAvailabilityCatalog
         SubAffiliationRules.FirstOrDefault(rule =>
             rule.ParentModuleId.Equals(parentModuleId, StringComparison.Ordinal) &&
             rule.SubAffiliationName.Equals(subAffiliationName, StringComparison.Ordinal));
+
+    private static EraCatalogItemAvailabilityRule? FindEquipmentRule(string itemName) =>
+        EquipmentRules.FirstOrDefault(rule =>
+            rule.ItemName.Equals(itemName, StringComparison.Ordinal));
+
+    private static EraCatalogItemAvailabilityRule? FindWeaponRule(string itemName) =>
+        WeaponRules.FirstOrDefault(rule =>
+            rule.ItemName.Equals(itemName, StringComparison.Ordinal));
 }

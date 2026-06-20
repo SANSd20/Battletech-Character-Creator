@@ -356,6 +356,10 @@ static void CheckEraInference()
 
 static void CheckEraAvailability()
 {
+    var resources = Path.Combine(AppContext.BaseDirectory, "Resources");
+    var companionCatalog = ResourceCatalog.Load(
+        resources,
+        new ResourceCatalogOptions(IncludeCompanion: true));
     var starLeagueAffiliations = EraAvailabilityCatalog.FilterAffiliations(
         LifePathCatalog.Affiliations,
         2750);
@@ -377,6 +381,20 @@ static void CheckEraAvailability()
             2750).Contains("hidden for 2750", StringComparison.Ordinal) &&
         EraAvailabilityCatalog.EarliestAffiliationYear("homeworld-clan") == 2830,
         "Era availability summaries and earliest-year helpers must stay stable.");
+
+    Assert(EraAvailabilityCatalog.BuildEquipmentAvailabilityNote(
+            companionCatalog.Equipment.Single(item =>
+                item.Name == "Hoodling Sensor HoverJeep"),
+            3062).Contains("check availability", StringComparison.Ordinal) &&
+        EraAvailabilityCatalog.BuildEquipmentAvailabilityNote(
+            companionCatalog.Equipment.Single(item =>
+                item.Name == "Hoodling Sensor HoverJeep"),
+            3145).Contains("available", StringComparison.Ordinal) &&
+        EraAvailabilityCatalog.BuildWeaponAvailabilityNote(
+            companionCatalog.Weapons.Single(item =>
+                item.Name == "Shock Staff"),
+            3045).Contains("check availability", StringComparison.Ordinal),
+        "Era equipment and weapon availability notes must track selected campaign years.");
 
     var rasalhague = LifePathCatalog.Affiliations.Single(module =>
         module.Id == "rasalhague");

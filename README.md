@@ -99,6 +99,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   selection
 - Selected equipment and weapon detail panels showing source, cost, mass, and
   combat notes before adding items
+- Selected equipment and weapon detail panels show campaign-year era
+  availability warnings for tracked advanced or later-era items
 - Inventory status warnings for over-budget, overloaded, and manually priced wildcard items
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
@@ -141,8 +143,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Run the manual preview test plan on the installed app
 - Continue importing and modeling selected optional mechanics from
   *A Time of War Companion*
-- Add era-aware equipment availability warnings and template behavior from the
-  local Era Digest and Era Report source audit
+- Add era-aware template behavior from the local Era Digest and Era Report
+  source audit
 - Expand reload, patch repair rules, ammunition modifier, vehicle, and prosthetic enhancement
   purchasing details
 - Continue interface polish and usability testing

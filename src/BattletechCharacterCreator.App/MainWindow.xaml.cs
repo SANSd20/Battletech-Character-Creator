@@ -153,6 +153,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             OnPropertyChanged();
             OnPropertyChanged(nameof(InferredEraLabel));
             OnPropertyChanged(nameof(EraAvailabilitySummary));
+            OnPropertyChanged(nameof(SelectedEquipmentEraAvailability));
+            OnPropertyChanged(nameof(SelectedWeaponEraAvailability));
             OnPropertyChanged(nameof(Character));
             Recalculate();
         }
@@ -201,6 +203,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             OnPropertyChanged(nameof(SelectedEquipmentSourceLabel));
             OnPropertyChanged(nameof(SelectedEquipmentSummary));
             OnPropertyChanged(nameof(SelectedEquipmentNotes));
+            OnPropertyChanged(nameof(SelectedEquipmentEraAvailability));
         }
     }
     public string SelectedEquipmentSourceLabel =>
@@ -211,6 +214,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             : "";
     public string SelectedEquipmentNotes =>
         PlainCatalogText(SelectedEquipmentCatalogItem?.Notes ?? "");
+    public string SelectedEquipmentEraAvailability =>
+        SelectedEquipmentCatalogItem is { } item
+            ? EraAvailabilityCatalog.BuildEquipmentAvailabilityNote(
+                item,
+                Character.GameYear)
+            : "";
     public WeaponCatalogItem? SelectedWeaponCatalogItem
     {
         get => selectedWeaponCatalogItem;
@@ -221,6 +230,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             OnPropertyChanged(nameof(SelectedWeaponSourceLabel));
             OnPropertyChanged(nameof(SelectedWeaponSummary));
             OnPropertyChanged(nameof(SelectedWeaponNotes));
+            OnPropertyChanged(nameof(SelectedWeaponEraAvailability));
         }
     }
     public string SelectedWeaponSourceLabel =>
@@ -233,6 +243,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectedWeaponCatalogItem is { } item
             ? PlainCatalogText(
                 $"Shots {item.Shots}; Ammo {item.AmmoCost} C-Bills / {item.AmmoMass} kg. {item.Notes}")
+            : "";
+    public string SelectedWeaponEraAvailability =>
+        SelectedWeaponCatalogItem is { } item
+            ? EraAvailabilityCatalog.BuildWeaponAvailabilityNote(
+                item,
+                Character.GameYear)
             : "";
     public string? SelectedSkillName
     {
@@ -481,8 +497,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         EquipmentCatalogFilter = "";
         WeaponCatalogFilter = "";
+        GameYear = 3045;
         SelectedEquipmentCatalogItem = Catalog.Equipment.Single(item =>
-            item.Name == "Vintage Bulletproof Vest");
+            item.Name == "Hoodling Sensor HoverJeep");
         SelectedWeaponCatalogItem = Catalog.Weapons.Single(item =>
             item.Name == "Shock Staff");
         SelectedTraitName = "Mutation";
@@ -495,11 +512,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         });
         Recalculate();
         if (SelectedEquipmentSourceLabel != "A Time of War Companion" ||
-            !SelectedEquipmentSummary.Contains("Cost 500/100", StringComparison.Ordinal) ||
+            !SelectedEquipmentSummary.Contains("Cost 92000", StringComparison.Ordinal) ||
             SelectedEquipmentNotes.Length == 0 ||
+            !SelectedEquipmentEraAvailability.Contains("check availability",
+                StringComparison.Ordinal) ||
             SelectedWeaponSourceLabel != "A Time of War Companion" ||
             !SelectedWeaponSummary.Contains("Damage 2E/6", StringComparison.Ordinal) ||
             !SelectedWeaponNotes.Contains("Shots", StringComparison.Ordinal) ||
+            !SelectedWeaponEraAvailability.Contains("check availability",
+                StringComparison.Ordinal) ||
             SelectedTraitSourceLabel != "A Time of War Companion" ||
             !SelectedTraitDescription.Contains("genetic conditions",
                 StringComparison.Ordinal) ||
@@ -509,6 +530,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             throw new InvalidOperationException(
                 "Companion catalog labels, notes, or inventory warnings were not shown in the editor.");
+        }
+        GameYear = 3145;
+        if (!SelectedEquipmentEraAvailability.Contains("available",
+                StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Selected equipment era availability did not update when the campaign year changed.");
         }
         IncludeCompanionContent = false;
     }
@@ -910,6 +938,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         OnPropertyChanged(nameof(GameYear));
         OnPropertyChanged(nameof(InferredEraLabel));
         OnPropertyChanged(nameof(EraAvailabilitySummary));
+        OnPropertyChanged(nameof(SelectedEquipmentEraAvailability));
+        OnPropertyChanged(nameof(SelectedWeaponEraAvailability));
     }
 
     private void RebuildXpRows()

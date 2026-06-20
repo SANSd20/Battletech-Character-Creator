@@ -40,5 +40,7 @@ override the core character-creation rules in the corrected third printing.
 - Era notes on the basic information or Stage 0 screen. Done: the wizard and
   editor summarize hidden affiliation and tracked sub-affiliation choices for
   the selected game year.
-- Era-aware equipment availability and warnings.
+- Era-aware equipment availability and warnings. Done: selected equipment and
+  weapon detail panels show campaign-year warnings for tracked advanced or
+  later-era items without hard-blocking purchases.
 - Character templates or quick-start examples for specific eras.

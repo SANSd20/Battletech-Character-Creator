@@ -475,6 +475,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -686,7 +687,13 @@
                                            Grid.ColumnSpan="3"
                                            Text="{Binding SelectedEquipmentNotes}"
                                            TextWrapping="Wrap"
-                                           MaxHeight="44"/>
+                                           MaxHeight="34"/>
+                                <TextBlock Grid.Row="2"
+                                           Grid.ColumnSpan="3"
+                                           Text="{Binding SelectedEquipmentEraAvailability}"
+                                           TextWrapping="Wrap"
+                                           Foreground="#6D4A00"
+                                           FontWeight="SemiBold"/>
                             </Grid>
                         </Border>
                         <DataGrid Grid.Row="3" x:Name="EquipmentGrid"
@@ -780,6 +787,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -795,7 +803,13 @@
                                            Grid.ColumnSpan="3"
                                            Text="{Binding SelectedWeaponNotes}"
                                            TextWrapping="Wrap"
-                                           MaxHeight="44"/>
+                                           MaxHeight="34"/>
+                                <TextBlock Grid.Row="2"
+                                           Grid.ColumnSpan="3"
+                                           Text="{Binding SelectedWeaponEraAvailability}"
+                                           TextWrapping="Wrap"
+                                           Foreground="#6D4A00"
+                                           FontWeight="SemiBold"/>
                             </Grid>
                         </Border>
                         <DataGrid Grid.Row="3" x:Name="WeaponsGrid"
