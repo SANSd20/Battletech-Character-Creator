@@ -136,6 +136,11 @@ equipment effects. Character templates should wait until the start screen and
 wizard can offer presets without confusing them with standard Life Module
 choices.
 
+The MW3 Skill Conversions table on PDF page 102 / printed page 100 has also
+been audited. Every distinct AToW Skill column value is now present in the app's
+skill catalog, including `/Any` conversion targets that remain placeholders
+until a player chooses the concrete subskill. See `docs/MW3_CONVERSION_AUDIT.md`.
+
 ## Known Risks
 
 Companion rules are optional and sometimes alter assumptions from the core book.

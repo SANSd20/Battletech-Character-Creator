@@ -21,6 +21,7 @@ release.
 - Opt-in *A Time of War Companion* equipment and weapon catalog content
 - Opt-in *A Time of War Companion* expanded trait reference entries
 - Skill and Trait editor reference panels with source labels and rule notes
+- MW3-to-AToW conversion skill targets from the Companion conversion table
 - Official character-sheet PDF preview and export
 - Release checks verify that character-sheet export produces a nonempty PDF
 - Error report generation for unexpected and recoverable app failures

@@ -90,3 +90,31 @@ Tracking/Urban;INT+WIL,8/SA
 Tracking/Wilds;INT+WIL,8/SA
 Training;INT+CHA,9/CA
 Zero-G Operations;RFL,7/SB
+# MW3 to AToW conversion targets from A Time of War Companion p.100.
+Acrobatics/Any;RFL,7/SB
+Animal Handling/Any;WIL,7/SB
+Art/Any;DEX,8/CB
+Career/Any;INT,7/SB
+Comms/Any;INT,7/SB
+Driving/Ground Vehicle;RFL+DEX,8/SA
+Driving/Sea Vehicle;RFL+DEX,8/SA
+Interest/Any;INT,8/CB
+Interest/Chic;INT,8/CB
+Interest/Gambling;INT,8/CB
+Interest/Meditation;INT,8/CB
+Language/Any;INT+CHA,8/SA
+MedTech;INT,7/SB
+MedTech/Any;INT,7/SB
+Navigation/Any;INT,7/SB
+Protocol/Any;WIL+CHA,9/CA
+Science/Any;INT+WIL,9/CA
+Science/Chemistry;INT+WIL,9/CA
+Science/Linguistics;INT+WIL,9/CA
+Security Systems/Any;DEX+INT,9/CA
+Streetwise/Any;CHA,8/CB
+Survival/Any;BOD+INT,9/CA
+Surgery/Any;DEX+INT,9/CA
+Tactics/Any;INT+WIL,9/CA
+Technician/Any;DEX+INT,9/CA
+Thrown Weapons;DEX,7/SB
+Tracking/Any;INT+WIL,8/SA

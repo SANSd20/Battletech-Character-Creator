@@ -181,7 +181,7 @@ static void CheckResourceCatalog()
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,
         "Companion-enabled weapons must include the starter Companion import.");
-    Assert(catalog.Skills.Count == 92 &&
+    Assert(catalog.Skills.Count == 119 &&
         catalog.Traits.Count == 76 &&
         catalog.Careers.Count == 26,
         "Skill, trait, and career reference catalogs must be complete.");
@@ -206,6 +206,21 @@ static void CheckResourceCatalog()
         catalog.Skills.Single(item =>
             item.Name == "Acting").Description.Contains("Acting Skill"),
         "Skill descriptions and subskills must be linked to their entries.");
+    var mw3ConversionTargets = new[]
+    {
+        "Acrobatics/Any", "Animal Handling/Any", "Art/Any", "Career/Any",
+        "Comms/Any", "Driving/Ground Vehicle", "Driving/Sea Vehicle",
+        "Interest/Any", "Interest/Chic", "Interest/Gambling",
+        "Interest/Meditation", "Language/Any", "MedTech", "MedTech/Any",
+        "Navigation/Any", "Protocol/Any", "Science/Any",
+        "Science/Chemistry", "Science/Linguistics",
+        "Security Systems/Any", "Streetwise/Any", "Survival/Any",
+        "Surgery/Any", "Tactics/Any", "Technician/Any", "Thrown Weapons",
+        "Tracking/Any"
+    };
+    Assert(mw3ConversionTargets.All(target =>
+            catalog.Skills.Any(skill => skill.Name == target)),
+        "Every MW3-to-AToW conversion-table skill target must be available.");
     Assert(catalog.Traits.Single(item =>
             item.Name == "Alternate ID").Reference == "p.108" &&
         catalog.Traits.Single(item =>

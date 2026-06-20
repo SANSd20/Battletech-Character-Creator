@@ -19,6 +19,7 @@ t
 .edge-pdf*/
 .edge-sheet-preview/
 tmp-*.png
+tmp/
 start-window-*.png
 wizard-*.png
 editor-*.png

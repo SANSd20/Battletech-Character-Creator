@@ -100,6 +100,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   cosmetic adaptation kits, plus advanced combat practice equipment, light
   support vehicles, and expanded trait references
 - Skill and Trait editor reference panels with source labels and rule notes
+- MW3-to-AToW conversion skill targets from the Companion conversion table
 - Legacy `.btcc` character save and load compatibility
 - Official character-sheet PDF preview and export, including purchased patch
   and ammo inventory details
