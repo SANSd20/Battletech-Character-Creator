@@ -14,6 +14,11 @@ clearly labeled and opt-in so they do not silently change the core character
 creation flow. See `docs/COMPANION_AUDIT.md` for the Companion page map and
 import plan.
 
+Era Digest and Era Report PDFs are tracked as local reference sources for
+future era-aware defaults and campaign context. They are not committed to the
+repository and do not override core character-creation rules. See
+`docs/ERA_SOURCE_AUDIT.md`.
+
 ## Character Creation Page Map
 
 | Subject | PDF page | Printed page |

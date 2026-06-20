@@ -34,9 +34,10 @@ trait reference entries are also available behind the Companion toggle.
 Rules are verified against *A Time of War: The BattleTech RPG, Corrected Third
 Printing*. See `docs/RULES_SOURCE.md` for the authoritative page map and
 migration policy. Optional material from *A Time of War Companion* is tracked in
-`docs/COMPANION_AUDIT.md`. The original Qt application is an implementation
-reference, not the final authority when it conflicts with the corrected
-rulebook.
+`docs/COMPANION_AUDIT.md`. Local Era Digest and Era Report references are
+tracked in `docs/ERA_SOURCE_AUDIT.md` for future era-aware defaults and
+campaign context. The original Qt application is an implementation reference,
+not the final authority when it conflicts with the corrected rulebook.
 
 Build the new application with:
 
@@ -101,6 +102,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   support vehicles, and expanded trait references
 - Skill and Trait editor reference panels with source labels and rule notes
 - MW3-to-AToW conversion skill targets from the Companion conversion table
+- Local Era Digest and Era Report source audit for future era-aware behavior
 - Legacy `.btcc` character save and load compatibility
 - Official character-sheet PDF preview and export, including purchased patch
   and ammo inventory details
@@ -135,6 +137,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Run the manual preview test plan on the installed app
 - Continue importing and modeling selected optional mechanics from
   *A Time of War Companion*
+- Add era-aware defaults, notes, and availability filters from the local Era
+  Digest and Era Report source audit
 - Expand reload, patch repair rules, ammunition modifier, vehicle, and prosthetic enhancement
   purchasing details
 - Continue interface polish and usability testing
