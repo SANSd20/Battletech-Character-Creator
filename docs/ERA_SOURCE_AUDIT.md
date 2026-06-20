@@ -33,7 +33,10 @@ override the core character-creation rules in the corrected third printing.
 
 - Game-year presets for common eras. Done: the wizard and editor can set the
   game year from the local Era Digest and Era Report sources.
-- Era-aware affiliation and sub-affiliation availability filters.
-- Era notes on the basic information or Stage 0 screen.
+- Era-aware affiliation availability filters. Done: first-pass year filters hide
+  clearly later-era affiliations and order choices, with visible source notes.
+- Era-aware sub-affiliation availability filters.
+- Era notes on the basic information or Stage 0 screen. Done: the wizard and
+  editor summarize hidden affiliation choices for the selected game year.
 - Era-aware equipment availability and warnings.
 - Character templates or quick-start examples for specific eras.

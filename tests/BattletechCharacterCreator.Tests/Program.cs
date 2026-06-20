@@ -78,6 +78,7 @@ Assert(loaded.ClanCaste == character.ClanCaste &&
 
 CheckResourceCatalog();
 CheckEraPresets();
+CheckEraAvailability();
 
 Assert(CharacterRules.AttributeValue(99) == 1, "Sub-100 attributes have value 1.");
 Assert(CharacterRules.AttributeValue(400) == 4, "Attribute XP converts to its value.");
@@ -351,6 +352,31 @@ static void CheckEraPresets()
         EraPresetCatalog.Presets.Single(preset =>
             preset.Name == "Late Dark Age").Source == "BattleTech: Era Report 3145",
         "Era presets must keep source titles, ranges, and default years.");
+}
+
+static void CheckEraAvailability()
+{
+    var starLeagueAffiliations = EraAvailabilityCatalog.FilterAffiliations(
+        LifePathCatalog.Affiliations,
+        2750);
+    Assert(!starLeagueAffiliations.Any(module => module.Id == "comstar") &&
+        !starLeagueAffiliations.Any(module => module.Id == "invading-clan") &&
+        !starLeagueAffiliations.Any(module => module.Id == "word-of-blake"),
+        "Star League era availability must hide later affiliations.");
+
+    var clanInvasionAffiliations = EraAvailabilityCatalog.FilterAffiliations(
+        LifePathCatalog.Affiliations,
+        3052);
+    Assert(clanInvasionAffiliations.Any(module => module.Id == "comstar") &&
+        clanInvasionAffiliations.Any(module => module.Id == "word-of-blake") &&
+        clanInvasionAffiliations.Any(module => module.Id == "invading-clan"),
+        "Clan Invasion era availability must reveal order and invading Clan affiliations.");
+
+    Assert(EraAvailabilityCatalog.BuildAffiliationSummary(
+            LifePathCatalog.Affiliations,
+            2750).Contains("hidden for 2750", StringComparison.Ordinal) &&
+        EraAvailabilityCatalog.EarliestAffiliationYear("homeworld-clan") == 2830,
+        "Era availability summaries and earliest-year helpers must stay stable.");
 }
 
 static void CheckSample(

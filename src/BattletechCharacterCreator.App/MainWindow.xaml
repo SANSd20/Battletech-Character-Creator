@@ -160,6 +160,10 @@
                         <TextBlock Text="Game year" Style="{StaticResource EditorLabel}"/>
                         <TextBox Text="{Binding GameYear, UpdateSourceTrigger=PropertyChanged}"
                                  LostKeyboardFocus="EditorFieldChanged"/>
+                        <TextBlock Text="{Binding EraAvailabilitySummary}"
+                                   TextWrapping="Wrap"
+                                   Foreground="#5B5B56"
+                                   Margin="0,8,0,0"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>

@@ -10,6 +10,7 @@ release.
 - First-launch choice window for opening the Character Wizard or Character Editor
 - Basic information uses year of birth and game year, with calculated age
 - Era presets set the game year from the local Era Digest and Era Report audit
+- Era-aware affiliation availability filters with visible source notes
 - All corrected-printing affiliations and 68 sub-affiliations
 - All 24 corrected-printing Stage 4 base modules, including variant paths
 - Two ordered Stage 4 careers with repeat and prerequisite handling
@@ -28,6 +29,7 @@ release.
 - Release checks verify that character-sheet export produces a nonempty PDF
 - Error report generation for unexpected and recoverable app failures
 - Error reports include app version, runtime, process, and launch diagnostics
+- Wizard smoke failures now write an error report and exit cleanly
 - Release checks validate diagnostic report versions against the requested version
 - Release checks verify the app project version matches the requested version
 - Release checks verify Windows assembly/file versions match the release version

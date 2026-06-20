@@ -81,11 +81,20 @@ public partial class App : Application
                 DispatcherPriority.ApplicationIdle,
                 () =>
                 {
-                    wizard.SmokeAllSelections();
-                    wizard.SmokeEraPresetSelection();
-                    wizard.SmokeCreateCharacter();
-                    wizard.Close();
-                    Shutdown(0);
+                    try
+                    {
+                        wizard.SmokeAllSelections();
+                        wizard.SmokeEraPresetSelection();
+                        wizard.SmokeCreateCharacter();
+                        wizard.Close();
+                        Shutdown(0);
+                    }
+                    catch (Exception exception)
+                    {
+                        AppErrorReporter.WriteReport(exception, "Wizard smoke");
+                        wizard.Close();
+                        Shutdown(1);
+                    }
                 });
             wizard.Show();
             return;

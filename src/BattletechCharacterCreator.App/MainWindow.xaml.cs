@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using BattletechCharacterCreator.Core.LifePath;
 using BattletechCharacterCreator.Core.Models;
 using BattletechCharacterCreator.Core.Persistence;
 using BattletechCharacterCreator.Core.Resources;
@@ -144,7 +145,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
     public string Sex { get => Character.Sex; set => Character.Sex = value; }
     public int BirthYear { get => Character.BirthYear; set => Character.BirthYear = value; }
-    public int GameYear { get => Character.GameYear; set => Character.GameYear = value; }
+    public int GameYear
+    {
+        get => Character.GameYear;
+        set
+        {
+            Character.GameYear = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(EraAvailabilitySummary));
+            OnPropertyChanged(nameof(Character));
+            Recalculate();
+        }
+    }
     public EraPreset? SelectedEraPreset
     {
         get => selectedEraPreset;
@@ -155,12 +167,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 Character.GameYear = value.DefaultYear;
                 OnPropertyChanged(nameof(GameYear));
+                OnPropertyChanged(nameof(EraAvailabilitySummary));
                 OnPropertyChanged(nameof(Character));
                 Recalculate();
             }
             OnPropertyChanged();
         }
     }
+    public string EraAvailabilitySummary =>
+        EraAvailabilityCatalog.BuildAffiliationSummary(
+            LifePathCatalog.Affiliations,
+            Character.GameYear);
     public int CharacterHeight { get => Character.Height; set => Character.Height = value; }
     public int Weight { get => Character.Weight; set => Character.Weight = value; }
     public string Notes { get => Character.Notes; set => Character.Notes = value; }

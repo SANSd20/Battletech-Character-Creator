@@ -56,6 +56,7 @@ public partial class CharacterWizardWindow : Window
         SexPicker.ItemsSource = new[] { "Male", "Female" };
         SexPicker.SelectedIndex = 0;
 
+        RefreshEraAvailability();
         AffiliationPicker.ItemsSource = BirthAffiliations;
         ChildhoodPicker.ItemsSource = LifePathCatalog.Childhoods;
         LateChildhoodPicker.ItemsSource = LifePathCatalog.LateChildhoods;
@@ -81,6 +82,7 @@ public partial class CharacterWizardWindow : Window
 
     public void SelectAffiliationForCapture(string affiliationId)
     {
+        EnsureAffiliationAvailableForCapture(affiliationId);
         if (affiliationId is "comstar" or "word-of-blake")
         {
             OrderMemberCheck.IsChecked = true;
@@ -94,6 +96,18 @@ public partial class CharacterWizardWindow : Window
                 .First(module => module.Id == affiliationId);
         }
         RefreshModules();
+    }
+
+    private void EnsureAffiliationAvailableForCapture(string affiliationId)
+    {
+        if (EraAvailabilityCatalog.EarliestAffiliationYear(affiliationId) is not { } earliest ||
+            CurrentGameYear >= earliest)
+        {
+            return;
+        }
+
+        GameYearInput.Text = earliest.ToString();
+        RefreshEraAvailability();
     }
 
     public void SelectInvadingClanTestPath()
@@ -192,6 +206,17 @@ public partial class CharacterWizardWindow : Window
     public void SmokeEraPresetSelection()
     {
         EraPresetPicker.SelectedItem = EraPresetCatalog.Presets
+            .Single(preset => preset.Name == "Star League");
+        if (AffiliationPicker.Items
+            .Cast<LifePathModule>()
+            .Any(module => module.Id == "invading-clan") ||
+            OrderMemberCheck.IsEnabled)
+        {
+            throw new InvalidOperationException(
+                "Star League era availability did not hide later-era affiliations.");
+        }
+
+        EraPresetPicker.SelectedItem = EraPresetCatalog.Presets
             .Single(preset => preset.Name == "Clan Invasion");
         if (GameYearInput.Text != "3052")
         {
@@ -205,6 +230,15 @@ public partial class CharacterWizardWindow : Window
         {
             throw new InvalidOperationException(
                 "Era preset game year was not applied to the created character.");
+        }
+        if (!AffiliationPicker.Items
+            .Cast<LifePathModule>()
+            .Any(module => module.Id == "invading-clan") ||
+            !OrderMemberCheck.IsEnabled ||
+            !WordOfBlakeRadio.IsEnabled)
+        {
+            throw new InvalidOperationException(
+                "Clan Invasion era availability did not reveal later-era affiliations.");
         }
     }
 
@@ -572,7 +606,10 @@ public partial class CharacterWizardWindow : Window
     private LifePathModule? SelectedBirthAffiliation =>
         AffiliationPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedOrderAffiliation =>
-        OrderMemberCheck.IsChecked == true
+        OrderMemberCheck.IsChecked == true &&
+        IsAffiliationAvailable(WordOfBlakeRadio.IsChecked == true
+            ? "word-of-blake"
+            : "comstar")
             ? LifePathCatalog.Affiliations.First(module =>
                 module.Id == (WordOfBlakeRadio.IsChecked == true
                     ? "word-of-blake"
@@ -597,10 +634,16 @@ public partial class CharacterWizardWindow : Window
         SecondCareerCheck.IsChecked == true
             ? SecondRealLifePicker.SelectedItem as LifePathModule
             : null;
-    private static IReadOnlyList<LifePathModule> BirthAffiliations =>
-        LifePathCatalog.Affiliations
+    private int CurrentGameYear =>
+        TryReadPositiveNumber(GameYearInput, out var gameYear)
+            ? gameYear
+            : 3045;
+    private IReadOnlyList<LifePathModule> BirthAffiliations =>
+        EraAvailabilityCatalog.FilterAffiliations(
+            LifePathCatalog.Affiliations
             .Where(module => module.Id is not ("comstar" or "word-of-blake"))
-            .ToArray();
+            .ToArray(),
+            CurrentGameYear);
 
     private void ModuleSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -615,8 +658,70 @@ public partial class CharacterWizardWindow : Window
         if (EraPresetPicker.SelectedItem is EraPreset preset)
         {
             GameYearInput.Text = preset.DefaultYear.ToString();
+            RefreshEraAvailability();
         }
     }
+
+    private void GameYearInputChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!IsLoaded) return;
+        RefreshEraAvailability();
+        if (currentStep > 0)
+        {
+            RefreshModules();
+        }
+    }
+
+    private void RefreshEraAvailability()
+    {
+        if (AffiliationPicker is null) return;
+
+        var birthAffiliation = SelectedBirthAffiliation;
+        var availableBirthAffiliations = BirthAffiliations;
+        AffiliationPicker.ItemsSource = availableBirthAffiliations;
+        if (birthAffiliation is not null &&
+            availableBirthAffiliations.Any(module => module.Id == birthAffiliation.Id))
+        {
+            AffiliationPicker.SelectedItem = availableBirthAffiliations
+                .First(module => module.Id == birthAffiliation.Id);
+        }
+        else if (availableBirthAffiliations.Count > 0)
+        {
+            AffiliationPicker.SelectedIndex = 0;
+        }
+
+        var comStarAvailable = IsAffiliationAvailable("comstar");
+        var wordOfBlakeAvailable = IsAffiliationAvailable("word-of-blake");
+        ComStarRadio.IsEnabled = comStarAvailable;
+        WordOfBlakeRadio.IsEnabled = wordOfBlakeAvailable;
+        OrderMemberCheck.IsEnabled = comStarAvailable || wordOfBlakeAvailable;
+        if (OrderMemberCheck.IsChecked == true)
+        {
+            if (ComStarRadio.IsChecked == true && !comStarAvailable)
+            {
+                ComStarRadio.IsChecked = false;
+                WordOfBlakeRadio.IsChecked = wordOfBlakeAvailable;
+            }
+            if (WordOfBlakeRadio.IsChecked == true && !wordOfBlakeAvailable)
+            {
+                WordOfBlakeRadio.IsChecked = false;
+                ComStarRadio.IsChecked = comStarAvailable;
+            }
+            if ((ComStarRadio.IsChecked != true && WordOfBlakeRadio.IsChecked != true) ||
+                !OrderMemberCheck.IsEnabled)
+            {
+                OrderMemberCheck.IsChecked = false;
+            }
+        }
+
+        EraAvailabilitySummary.Text = EraAvailabilityCatalog.BuildAffiliationSummary(
+            LifePathCatalog.Affiliations,
+            CurrentGameYear);
+    }
+
+    private bool IsAffiliationAvailable(string id) =>
+        LifePathCatalog.Affiliations.FirstOrDefault(module => module.Id == id) is not { } module ||
+        EraAvailabilityCatalog.IsAffiliationAvailable(module, CurrentGameYear);
 
     private void RefreshModules()
     {
@@ -626,9 +731,9 @@ public partial class CharacterWizardWindow : Window
         var childhood = SelectedChildhood;
         var lateChildhood = SelectedLateChildhood;
         var school = SelectedSchool;
-        AffiliationDescription.Text = SelectedOrderAffiliation is null
-            ? birthAffiliation?.Description ?? ""
-            : $"{affiliation?.Description}{Environment.NewLine}{birthAffiliation?.Description}";
+        AffiliationDescription.Text = BuildAffiliationDescription(
+            affiliation,
+            birthAffiliation);
         ChildhoodDescription.Text = childhood?.Description ?? "";
         ChildhoodModuleCost.Text = childhood?.ModuleCost.ToString() ?? "";
         LateChildhoodDescription.Text = lateChildhood?.Description ?? "";
@@ -652,6 +757,22 @@ public partial class CharacterWizardWindow : Window
         BuildChoiceControls();
         refreshing = false;
         UpdatePreview();
+    }
+
+    private string BuildAffiliationDescription(
+        LifePathModule? affiliation,
+        LifePathModule? birthAffiliation)
+    {
+        var description = SelectedOrderAffiliation is null
+            ? birthAffiliation?.Description ?? ""
+            : $"{affiliation?.Description}{Environment.NewLine}{birthAffiliation?.Description}";
+        if (affiliation is null)
+        {
+            return description;
+        }
+
+        return $"{description}{Environment.NewLine}{Environment.NewLine}" +
+            EraAvailabilityCatalog.BuildModuleNote(affiliation, CurrentGameYear);
     }
 
     private void OrderSelectionChanged(object sender, RoutedEventArgs e)

@@ -95,7 +95,12 @@
                               DisplayMemberPath="DisplayName"
                               SelectionChanged="EraPresetSelectionChanged"/>
                     <TextBlock Text="Game year" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="GameYearInput" Text="3045"/>
+                    <TextBox x:Name="GameYearInput" Text="3045"
+                             TextChanged="GameYearInputChanged"/>
+                    <TextBlock x:Name="EraAvailabilitySummary"
+                               TextWrapping="Wrap"
+                               Foreground="#5B5B56"
+                               Margin="0,8,0,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2" Margin="0,51,0,0">
                     <TextBlock Text="Height (cm)" Style="{StaticResource FieldLabel}"/>
