@@ -90,6 +90,10 @@
                     <ComboBox x:Name="SexPicker"/>
                     <TextBlock Text="Year of birth" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="BirthYearInput" Text="3024"/>
+                    <TextBlock Text="Era preset" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox x:Name="EraPresetPicker"
+                              DisplayMemberPath="DisplayName"
+                              SelectionChanged="EraPresetSelectionChanged"/>
                     <TextBlock Text="Game year" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="GameYearInput" Text="3045"/>
                 </StackPanel>

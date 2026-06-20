@@ -77,6 +77,7 @@ Assert(loaded.ClanCaste == character.ClanCaste &&
     "Clan caste, training, and phenotype must round-trip.");
 
 CheckResourceCatalog();
+CheckEraPresets();
 
 Assert(CharacterRules.AttributeValue(99) == 1, "Sub-100 attributes have value 1.");
 Assert(CharacterRules.AttributeValue(400) == 4, "Attribute XP converts to its value.");
@@ -333,6 +334,23 @@ static void CheckResourceCatalog()
     Assert(new EquipmentCatalogItem("", "Test", "", "", "", "", "",
             RulebookSource.Companion).SourceLabel == "A Time of War Companion",
         "Companion catalog entries must have a user-facing source label.");
+}
+
+static void CheckEraPresets()
+{
+    Assert(EraPresetCatalog.Presets.Count == 7,
+        "Every local Era Digest and Era Report source must have a preset.");
+    Assert(EraPresetCatalog.Presets.Select(preset => preset.Name).SequenceEqual(
+            ["Age of War", "Star League", "Golden Century", "Clan Invasion",
+             "Civil War", "Dark Age", "Late Dark Age"]),
+        "Era presets must remain in chronological source order.");
+    Assert(EraPresetCatalog.Presets.Single(preset =>
+            preset.Name == "Age of War").DisplayName == "Age of War (2398-2571)" &&
+        EraPresetCatalog.Presets.Single(preset =>
+            preset.Name == "Clan Invasion").DefaultYear == 3052 &&
+        EraPresetCatalog.Presets.Single(preset =>
+            preset.Name == "Late Dark Age").Source == "BattleTech: Era Report 3145",
+        "Era presets must keep source titles, ranges, and default years.");
 }
 
 static void CheckSample(

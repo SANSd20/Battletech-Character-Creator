@@ -86,6 +86,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Character wizard from basic information through Stage 4
 - Basic information uses year of birth and game year, with age calculated for
   summaries and exports
+- Era presets set the game year from the local Era Digest and Era Report
+  source audit
 - All affiliations and 68 corrected sub-affiliations
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
 - Character editor with guided Attribute, Trait, and Skill XP controls
@@ -102,7 +104,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   support vehicles, and expanded trait references
 - Skill and Trait editor reference panels with source labels and rule notes
 - MW3-to-AToW conversion skill targets from the Companion conversion table
-- Local Era Digest and Era Report source audit for future era-aware behavior
+- Local Era Digest and Era Report source audit for era-aware behavior
 - Legacy `.btcc` character save and load compatibility
 - Official character-sheet PDF preview and export, including purchased patch
   and ammo inventory details
@@ -137,8 +139,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Run the manual preview test plan on the installed app
 - Continue importing and modeling selected optional mechanics from
   *A Time of War Companion*
-- Add era-aware defaults, notes, and availability filters from the local Era
-  Digest and Era Report source audit
+- Add deeper era-aware notes and availability filters from the local Era Digest
+  and Era Report source audit
 - Expand reload, patch repair rules, ammunition modifier, vehicle, and prosthetic enhancement
   purchasing details
 - Continue interface polish and usability testing

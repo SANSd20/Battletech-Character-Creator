@@ -36,6 +36,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool includeCompanionContent;
     private EquipmentCatalogItem? selectedEquipmentCatalogItem;
     private WeaponCatalogItem? selectedWeaponCatalogItem;
+    private EraPreset? selectedEraPreset;
 
     public ObservableCollection<XpEditorRow> AttributeRows { get; } = [];
     public ObservableCollection<XpEditorRow> SkillRows { get; } = [];
@@ -81,6 +82,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     public ResourceCatalog Catalog { get; private set; }
     public string[] SexOptions { get; } = ["Male", "Female"];
+    public IReadOnlyList<EraPreset> EraPresets => EraPresetCatalog.Presets;
     public CharacterSummary Summary
     {
         get => summary;
@@ -143,6 +145,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public string Sex { get => Character.Sex; set => Character.Sex = value; }
     public int BirthYear { get => Character.BirthYear; set => Character.BirthYear = value; }
     public int GameYear { get => Character.GameYear; set => Character.GameYear = value; }
+    public EraPreset? SelectedEraPreset
+    {
+        get => selectedEraPreset;
+        set
+        {
+            selectedEraPreset = value;
+            if (value is not null)
+            {
+                Character.GameYear = value.DefaultYear;
+                OnPropertyChanged(nameof(GameYear));
+                OnPropertyChanged(nameof(Character));
+                Recalculate();
+            }
+            OnPropertyChanged();
+        }
+    }
     public int CharacterHeight { get => Character.Height; set => Character.Height = value; }
     public int Weight { get => Character.Weight; set => Character.Weight = value; }
     public string Notes { get => Character.Notes; set => Character.Notes = value; }
@@ -352,6 +370,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 "Editor Skill filtering returned an unrelated row.");
         }
         SkillFilter = "";
+    }
+
+    public void SmokeEraPresetSelection()
+    {
+        SelectedEraPreset = EraPresetCatalog.Presets
+            .Single(preset => preset.Name == "Civil War");
+        if (GameYear != 3062 || Character.GameYear != 3062)
+        {
+            throw new InvalidOperationException(
+                "The editor era preset did not update the character game year.");
+        }
     }
 
     public void SmokeInventoryCatalog()

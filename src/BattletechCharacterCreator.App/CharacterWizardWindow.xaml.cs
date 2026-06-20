@@ -52,6 +52,7 @@ public partial class CharacterWizardWindow : Window
         var resources = ResourceCatalog.Load(resourcePath);
         HairColorPicker.ItemsSource = resources.HairColors;
         EyeColorPicker.ItemsSource = resources.EyeColors;
+        EraPresetPicker.ItemsSource = EraPresetCatalog.Presets;
         SexPicker.ItemsSource = new[] { "Male", "Female" };
         SexPicker.SelectedIndex = 0;
 
@@ -186,6 +187,25 @@ public partial class CharacterWizardWindow : Window
                 "The Homeworld Clan test path has an affiliation conflict.");
         }
         CreatedCharacter = character;
+    }
+
+    public void SmokeEraPresetSelection()
+    {
+        EraPresetPicker.SelectedItem = EraPresetCatalog.Presets
+            .Single(preset => preset.Name == "Clan Invasion");
+        if (GameYearInput.Text != "3052")
+        {
+            throw new InvalidOperationException(
+                "The Clan Invasion era preset did not set the game year.");
+        }
+
+        var character = BuildCharacter();
+        if (character.GameYear != 3052 ||
+            character.Age != character.GameYear - character.BirthYear)
+        {
+            throw new InvalidOperationException(
+                "Era preset game year was not applied to the created character.");
+        }
     }
 
     public void SelectLateChildhoodForCapture(string lateChildhoodId)
@@ -586,6 +606,16 @@ public partial class CharacterWizardWindow : Window
     {
         if (!IsLoaded) return;
         RefreshModules();
+    }
+
+    private void EraPresetSelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (EraPresetPicker.SelectedItem is EraPreset preset)
+        {
+            GameYearInput.Text = preset.DefaultYear.ToString();
+        }
     }
 
     private void RefreshModules()

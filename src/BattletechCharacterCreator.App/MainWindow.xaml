@@ -153,6 +153,10 @@
                                          LostKeyboardFocus="EditorFieldChanged"/>
                             </StackPanel>
                         </Grid>
+                        <TextBlock Text="Era preset" Style="{StaticResource EditorLabel}"/>
+                        <ComboBox ItemsSource="{Binding EraPresets}"
+                                  SelectedItem="{Binding SelectedEraPreset, UpdateSourceTrigger=PropertyChanged}"
+                                  DisplayMemberPath="DisplayName"/>
                         <TextBlock Text="Game year" Style="{StaticResource EditorLabel}"/>
                         <TextBox Text="{Binding GameYear, UpdateSourceTrigger=PropertyChanged}"
                                  LostKeyboardFocus="EditorFieldChanged"/>

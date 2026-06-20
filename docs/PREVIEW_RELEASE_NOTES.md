@@ -9,6 +9,7 @@ release.
 - Life Module character wizard from basic information through Stage 4
 - First-launch choice window for opening the Character Wizard or Character Editor
 - Basic information uses year of birth and game year, with calculated age
+- Era presets set the game year from the local Era Digest and Era Report audit
 - All corrected-printing affiliations and 68 sub-affiliations
 - All 24 corrected-printing Stage 4 base modules, including variant paths
 - Two ordered Stage 4 careers with repeat and prerequisite handling
@@ -22,7 +23,7 @@ release.
 - Opt-in *A Time of War Companion* expanded trait reference entries
 - Skill and Trait editor reference panels with source labels and rule notes
 - MW3-to-AToW conversion skill targets from the Companion conversion table
-- Local Era Digest and Era Report source audit for future era-aware behavior
+- Local Era Digest and Era Report source audit for era-aware behavior
 - Official character-sheet PDF preview and export
 - Release checks verify that character-sheet export produces a nonempty PDF
 - Error report generation for unexpected and recoverable app failures
