@@ -140,6 +140,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             Character.SubAffiliation = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(EraAvailabilitySummary));
             OnPropertyChanged(nameof(Character));
         }
     }
@@ -175,9 +176,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
     public string EraAvailabilitySummary =>
-        EraAvailabilityCatalog.BuildAffiliationSummary(
-            LifePathCatalog.Affiliations,
-            Character.GameYear);
+        BuildEraAvailabilitySummary();
     public int CharacterHeight { get => Character.Height; set => Character.Height = value; }
     public int Weight { get => Character.Weight; set => Character.Weight = value; }
     public string Notes { get => Character.Notes; set => Character.Notes = value; }
@@ -920,6 +919,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         OnPropertyChanged(nameof(SubAffiliation));
         OnPropertyChanged(nameof(BirthYear));
         OnPropertyChanged(nameof(GameYear));
+        OnPropertyChanged(nameof(EraAvailabilitySummary));
     }
 
     private void RebuildXpRows()
@@ -1004,6 +1004,27 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         WeaponCatalogView.Filter = MatchesWeaponCatalogFilter;
         OnPropertyChanged(nameof(EquipmentCatalogView));
         OnPropertyChanged(nameof(WeaponCatalogView));
+    }
+
+    private string BuildEraAvailabilitySummary()
+    {
+        var summaryText = EraAvailabilityCatalog.BuildAffiliationSummary(
+            LifePathCatalog.Affiliations,
+            Character.GameYear);
+        var affiliation = LifePathCatalog.Affiliations.FirstOrDefault(module =>
+            module.Name.Equals(Character.Affiliation, StringComparison.Ordinal));
+        var subAffiliation = affiliation?.SubAffiliations?.FirstOrDefault(module =>
+            module.Name.Equals(Character.SubAffiliation, StringComparison.Ordinal));
+        if (affiliation is null || subAffiliation is null)
+        {
+            return summaryText;
+        }
+
+        return $"{summaryText} " +
+            EraAvailabilityCatalog.BuildSubAffiliationNote(
+                affiliation.Id,
+                subAffiliation,
+                Character.GameYear);
     }
 
     private void EditorFieldChanged(object sender, KeyboardFocusChangedEventArgs e) =>

@@ -56,6 +56,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Basic information uses year of birth and game year, with calculated age
 - Era presets set the game year from the local Era Digest and Era Report audit
 - Era-aware affiliation availability filters with visible source notes
+- Era-aware Rasalhague sub-affiliation filters with visible source notes
 - All corrected-printing affiliations and 68 sub-affiliations
 - All 24 corrected-printing Stage 4 base modules, including variants
 - Two ordered Stage 4 careers with repeat and prerequisite handling

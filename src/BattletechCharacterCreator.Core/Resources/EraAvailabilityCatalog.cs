@@ -14,6 +14,19 @@ public sealed record EraAvailabilityRule(
         (ToYear is null || year <= ToYear);
 }
 
+public sealed record EraSubAffiliationAvailabilityRule(
+    string ParentModuleId,
+    string SubAffiliationName,
+    int? FromYear,
+    int? ToYear,
+    string Note,
+    string Source)
+{
+    public bool IsAvailable(int year) =>
+        (FromYear is null || year >= FromYear) &&
+        (ToYear is null || year <= ToYear);
+}
+
 public static class EraAvailabilityCatalog
 {
     public static IReadOnlyList<EraAvailabilityRule> AffiliationRules { get; } =
@@ -35,6 +48,16 @@ public static class EraAvailabilityCatalog
             "BattleTech: Era Digest: Golden Century")
     ];
 
+    public static IReadOnlyList<EraSubAffiliationAvailabilityRule> SubAffiliationRules { get; } =
+    [
+        new("rasalhague", "Clan War Expatriate", 3050, null,
+            "Clan War expatriate choices are hidden before the Clan Invasion.",
+            "BattleTech: Era Report: 3052"),
+        new("rasalhague", "Ghost Bear Dominion", 3060, null,
+            "Ghost Bear Dominion choices are hidden until the Civil War era context.",
+            "BATTLETECH ERA REPORT 3062")
+    ];
+
     public static bool IsAffiliationAvailable(LifePathModule module, int year) =>
         FindAffiliationRule(module.Id)?.IsAvailable(year) ?? true;
 
@@ -51,6 +74,28 @@ public static class EraAvailabilityCatalog
         int year) =>
         modules.Where(module => !IsAffiliationAvailable(module, year)).ToArray();
 
+    public static bool IsSubAffiliationAvailable(
+        string parentModuleId,
+        LifePathModule subAffiliation,
+        int year) =>
+        FindSubAffiliationRule(parentModuleId, subAffiliation.Name)?.IsAvailable(year) ?? true;
+
+    public static IReadOnlyList<LifePathModule> FilterSubAffiliations(
+        string parentModuleId,
+        IEnumerable<LifePathModule> modules,
+        int year) =>
+        modules
+            .Where(module => IsSubAffiliationAvailable(parentModuleId, module, year))
+            .ToArray();
+
+    public static IReadOnlyList<LifePathModule> HiddenSubAffiliations(
+        string parentModuleId,
+        IEnumerable<LifePathModule> modules,
+        int year) =>
+        modules
+            .Where(module => !IsSubAffiliationAvailable(parentModuleId, module, year))
+            .ToArray();
+
     public static string BuildAffiliationSummary(
         IEnumerable<LifePathModule> modules,
         int year)
@@ -62,6 +107,23 @@ public static class EraAvailabilityCatalog
         }
 
         return $"Era availability: {hidden.Count} affiliation option(s) hidden for {year}: " +
+            string.Join(", ", hidden.Select(module => module.Name)) + ".";
+    }
+
+    public static string BuildSubAffiliationSummary(
+        LifePathModule parentModule,
+        int year)
+    {
+        var hidden = HiddenSubAffiliations(
+            parentModule.Id,
+            parentModule.SubAffiliations ?? [],
+            year);
+        if (hidden.Count == 0)
+        {
+            return $"All tracked sub-affiliations are visible for {year}.";
+        }
+
+        return $"{hidden.Count} sub-affiliation option(s) hidden for {year}: " +
             string.Join(", ", hidden.Select(module => module.Name)) + ".";
     }
 
@@ -77,7 +139,30 @@ public static class EraAvailabilityCatalog
         return $"Era note: {module.Name} is {status} in {year}. {rule.Note} Source: {rule.Source}.";
     }
 
+    public static string BuildSubAffiliationNote(
+        string parentModuleId,
+        LifePathModule subAffiliation,
+        int year)
+    {
+        var rule = FindSubAffiliationRule(parentModuleId, subAffiliation.Name);
+        if (rule is null)
+        {
+            return $"Era note: no additional era availability limit is tracked for {subAffiliation.Name}.";
+        }
+
+        var status = rule.IsAvailable(year) ? "available" : "not available";
+        return $"Era note: {subAffiliation.Name} is {status} in {year}. " +
+            $"{rule.Note} Source: {rule.Source}.";
+    }
+
     private static EraAvailabilityRule? FindAffiliationRule(string moduleId) =>
         AffiliationRules.FirstOrDefault(rule =>
             rule.ModuleId.Equals(moduleId, StringComparison.Ordinal));
+
+    private static EraSubAffiliationAvailabilityRule? FindSubAffiliationRule(
+        string parentModuleId,
+        string subAffiliationName) =>
+        SubAffiliationRules.FirstOrDefault(rule =>
+            rule.ParentModuleId.Equals(parentModuleId, StringComparison.Ordinal) &&
+            rule.SubAffiliationName.Equals(subAffiliationName, StringComparison.Ordinal));
 }

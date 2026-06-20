@@ -35,8 +35,10 @@ override the core character-creation rules in the corrected third printing.
   game year from the local Era Digest and Era Report sources.
 - Era-aware affiliation availability filters. Done: first-pass year filters hide
   clearly later-era affiliations and order choices, with visible source notes.
-- Era-aware sub-affiliation availability filters.
+- Era-aware sub-affiliation availability filters. Done: first-pass filters hide
+  clearly later-era Rasalhague sub-affiliations, with visible source notes.
 - Era notes on the basic information or Stage 0 screen. Done: the wizard and
-  editor summarize hidden affiliation choices for the selected game year.
+  editor summarize hidden affiliation and tracked sub-affiliation choices for
+  the selected game year.
 - Era-aware equipment availability and warnings.
 - Character templates or quick-start examples for specific eras.

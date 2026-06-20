@@ -377,6 +377,26 @@ static void CheckEraAvailability()
             2750).Contains("hidden for 2750", StringComparison.Ordinal) &&
         EraAvailabilityCatalog.EarliestAffiliationYear("homeworld-clan") == 2830,
         "Era availability summaries and earliest-year helpers must stay stable.");
+
+    var rasalhague = LifePathCatalog.Affiliations.Single(module =>
+        module.Id == "rasalhague");
+    var preInvasionSubAffiliations = EraAvailabilityCatalog.FilterSubAffiliations(
+        rasalhague.Id,
+        rasalhague.SubAffiliations!,
+        3045);
+    var invasionSubAffiliations = EraAvailabilityCatalog.FilterSubAffiliations(
+        rasalhague.Id,
+        rasalhague.SubAffiliations!,
+        3052);
+    var civilWarSubAffiliations = EraAvailabilityCatalog.FilterSubAffiliations(
+        rasalhague.Id,
+        rasalhague.SubAffiliations!,
+        3062);
+    Assert(preInvasionSubAffiliations.Count == 0 &&
+        invasionSubAffiliations.Any(module => module.Name == "Clan War Expatriate") &&
+        !invasionSubAffiliations.Any(module => module.Name == "Ghost Bear Dominion") &&
+        civilWarSubAffiliations.Any(module => module.Name == "Ghost Bear Dominion"),
+        "Rasalhague sub-affiliation availability must follow the selected era.");
 }
 
 static void CheckSample(

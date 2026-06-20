@@ -240,6 +240,40 @@ public partial class CharacterWizardWindow : Window
             throw new InvalidOperationException(
                 "Clan Invasion era availability did not reveal later-era affiliations.");
         }
+
+        GameYearInput.Text = "3045";
+        RefreshEraAvailability();
+        SelectAffiliationForCapture("rasalhague");
+        if (SubAffiliationPicker.Items.Count != 0)
+        {
+            throw new InvalidOperationException(
+                "Pre-Invasion Rasalhague sub-affiliation availability did not hide later options.");
+        }
+
+        EraPresetPicker.SelectedItem = EraPresetCatalog.Presets
+            .Single(preset => preset.Name == "Clan Invasion");
+        SelectAffiliationForCapture("rasalhague");
+        var clanInvasionSubAffiliations = SubAffiliationPicker.Items
+            .Cast<LifePathModule>()
+            .Select(module => module.Name)
+            .ToArray();
+        if (!clanInvasionSubAffiliations.Contains("Clan War Expatriate") ||
+            clanInvasionSubAffiliations.Contains("Ghost Bear Dominion"))
+        {
+            throw new InvalidOperationException(
+                "Clan Invasion Rasalhague sub-affiliation availability is wrong.");
+        }
+
+        EraPresetPicker.SelectedItem = EraPresetCatalog.Presets
+            .Single(preset => preset.Name == "Civil War");
+        SelectAffiliationForCapture("rasalhague");
+        if (!SubAffiliationPicker.Items
+            .Cast<LifePathModule>()
+            .Any(module => module.Name == "Ghost Bear Dominion"))
+        {
+            throw new InvalidOperationException(
+                "Civil War Rasalhague sub-affiliation availability did not reveal Ghost Bear Dominion.");
+        }
     }
 
     public void SelectLateChildhoodForCapture(string lateChildhoodId)
@@ -401,6 +435,8 @@ public partial class CharacterWizardWindow : Window
 
     public void SmokeAllSelections()
     {
+        GameYearInput.Text = "3145";
+        RefreshEraAvailability();
         foreach (var affiliation in BirthAffiliations)
         {
             AffiliationPicker.SelectedItem = affiliation;
@@ -728,6 +764,7 @@ public partial class CharacterWizardWindow : Window
         refreshing = true;
         var affiliation = SelectedAffiliation;
         var birthAffiliation = SelectedBirthAffiliation;
+        var subAffiliation = SelectedSubAffiliation;
         var childhood = SelectedChildhood;
         var lateChildhood = SelectedLateChildhood;
         var school = SelectedSchool;
@@ -739,10 +776,25 @@ public partial class CharacterWizardWindow : Window
         LateChildhoodDescription.Text = lateChildhood?.Description ?? "";
         LateChildhoodModuleCost.Text = lateChildhood?.ModuleCost.ToString() ?? "";
         UpdateCareerSummary();
-        SubAffiliationPicker.ItemsSource = birthAffiliation?.SubAffiliations ?? [];
+        var subAffiliations = birthAffiliation is null
+            ? Array.Empty<LifePathModule>()
+            : EraAvailabilityCatalog.FilterSubAffiliations(
+                birthAffiliation.Id,
+                birthAffiliation.SubAffiliations ?? [],
+                CurrentGameYear);
+        SubAffiliationPicker.ItemsSource = subAffiliations;
         SubAffiliationPanel.Visibility = SubAffiliationPicker.Items.Count > 0
             ? Visibility.Visible : Visibility.Collapsed;
-        if (SubAffiliationPicker.Items.Count > 0) SubAffiliationPicker.SelectedIndex = 0;
+        if (subAffiliation is not null &&
+            subAffiliations.Any(module => module.Id == subAffiliation.Id))
+        {
+            SubAffiliationPicker.SelectedItem = subAffiliations
+                .First(module => module.Id == subAffiliation.Id);
+        }
+        else if (SubAffiliationPicker.Items.Count > 0)
+        {
+            SubAffiliationPicker.SelectedIndex = 0;
+        }
 
         CastePicker.ItemsSource = birthAffiliation?.Castes ?? [];
         CastePanel.Visibility = CastePicker.Items.Count > 0
@@ -771,8 +823,26 @@ public partial class CharacterWizardWindow : Window
             return description;
         }
 
+        var notes = new List<string>
+        {
+            EraAvailabilityCatalog.BuildModuleNote(affiliation, CurrentGameYear)
+        };
+        if (birthAffiliation is not null)
+        {
+            notes.Add(EraAvailabilityCatalog.BuildSubAffiliationSummary(
+                birthAffiliation,
+                CurrentGameYear));
+        }
+        if (SelectedSubAffiliation is { } subAffiliation)
+        {
+            notes.Add(EraAvailabilityCatalog.BuildSubAffiliationNote(
+                birthAffiliation?.Id ?? affiliation.Id,
+                subAffiliation,
+                CurrentGameYear));
+        }
+
         return $"{description}{Environment.NewLine}{Environment.NewLine}" +
-            EraAvailabilityCatalog.BuildModuleNote(affiliation, CurrentGameYear);
+            string.Join(Environment.NewLine, notes);
     }
 
     private void OrderSelectionChanged(object sender, RoutedEventArgs e)
