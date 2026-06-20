@@ -153,13 +153,13 @@
                                          LostKeyboardFocus="EditorFieldChanged"/>
                             </StackPanel>
                         </Grid>
-                        <TextBlock Text="Era preset" Style="{StaticResource EditorLabel}"/>
-                        <ComboBox ItemsSource="{Binding EraPresets}"
-                                  SelectedItem="{Binding SelectedEraPreset, UpdateSourceTrigger=PropertyChanged}"
-                                  DisplayMemberPath="DisplayName"/>
-                        <TextBlock Text="Game year" Style="{StaticResource EditorLabel}"/>
+                        <TextBlock Text="Campaign year" Style="{StaticResource EditorLabel}"/>
                         <TextBox Text="{Binding GameYear, UpdateSourceTrigger=PropertyChanged}"
                                  LostKeyboardFocus="EditorFieldChanged"/>
+                        <TextBlock Text="{Binding InferredEraLabel}"
+                                   FontWeight="SemiBold"
+                                   Foreground="#30302D"
+                                   Margin="0,8,0,0"/>
                         <TextBlock Text="{Binding EraAvailabilitySummary}"
                                    TextWrapping="Wrap"
                                    Foreground="#5B5B56"

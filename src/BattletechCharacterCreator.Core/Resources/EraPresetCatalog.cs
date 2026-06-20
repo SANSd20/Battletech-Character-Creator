@@ -31,4 +31,15 @@ public static class EraPresetCatalog
         new("Late Dark Age", 3145, null,
             "BattleTech: Era Report 3145")
     ];
+
+    public static EraPreset? InferEra(int year) =>
+        Presets
+            .Where(preset => preset.StartYear <= year)
+            .LastOrDefault(preset =>
+                preset.EndYear is null || year <= preset.EndYear);
+
+    public static string BuildInferredEraLabel(int year) =>
+        InferEra(year) is { } era
+            ? $"Inferred era: {era.DisplayName}"
+            : $"Inferred era: before tracked sources ({year})";
 }

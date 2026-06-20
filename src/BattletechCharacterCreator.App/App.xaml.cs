@@ -84,7 +84,7 @@ public partial class App : Application
                     try
                     {
                         wizard.SmokeAllSelections();
-                        wizard.SmokeEraPresetSelection();
+                        wizard.SmokeCampaignYearEraSelection();
                         wizard.SmokeCreateCharacter();
                         wizard.Close();
                         Shutdown(0);
@@ -223,7 +223,7 @@ public partial class App : Application
                 {
                     wizard.SmokeHomeworldClanCharacter();
                     var editor = new MainWindow(wizard.CreatedCharacter!);
-                    editor.SmokeEraPresetSelection();
+                    editor.SmokeCampaignYearEraSelection();
                     editor.SmokeXpAllocation();
                     editor.Close();
                     wizard.Close();

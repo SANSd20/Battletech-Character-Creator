@@ -86,8 +86,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Character wizard from basic information through Stage 4
 - Basic information uses year of birth and game year, with age calculated for
   summaries and exports
-- Era presets set the game year from the local Era Digest and Era Report
-  source audit
+- Campaign year infers the matching era from the local Era Digest and Era
+  Report source audit
 - Era-aware affiliation and sub-affiliation availability filters with visible
   era notes for Stage 0
 - All affiliations and 68 corrected sub-affiliations

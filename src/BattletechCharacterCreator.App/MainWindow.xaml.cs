@@ -37,7 +37,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool includeCompanionContent;
     private EquipmentCatalogItem? selectedEquipmentCatalogItem;
     private WeaponCatalogItem? selectedWeaponCatalogItem;
-    private EraPreset? selectedEraPreset;
 
     public ObservableCollection<XpEditorRow> AttributeRows { get; } = [];
     public ObservableCollection<XpEditorRow> SkillRows { get; } = [];
@@ -83,7 +82,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     public ResourceCatalog Catalog { get; private set; }
     public string[] SexOptions { get; } = ["Male", "Female"];
-    public IReadOnlyList<EraPreset> EraPresets => EraPresetCatalog.Presets;
     public CharacterSummary Summary
     {
         get => summary;
@@ -153,28 +151,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             Character.GameYear = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(InferredEraLabel));
             OnPropertyChanged(nameof(EraAvailabilitySummary));
             OnPropertyChanged(nameof(Character));
             Recalculate();
         }
     }
-    public EraPreset? SelectedEraPreset
-    {
-        get => selectedEraPreset;
-        set
-        {
-            selectedEraPreset = value;
-            if (value is not null)
-            {
-                Character.GameYear = value.DefaultYear;
-                OnPropertyChanged(nameof(GameYear));
-                OnPropertyChanged(nameof(EraAvailabilitySummary));
-                OnPropertyChanged(nameof(Character));
-                Recalculate();
-            }
-            OnPropertyChanged();
-        }
-    }
+    public string InferredEraLabel =>
+        EraPresetCatalog.BuildInferredEraLabel(Character.GameYear);
     public string EraAvailabilitySummary =>
         BuildEraAvailabilitySummary();
     public int CharacterHeight { get => Character.Height; set => Character.Height = value; }
@@ -388,14 +372,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SkillFilter = "";
     }
 
-    public void SmokeEraPresetSelection()
+    public void SmokeCampaignYearEraSelection()
     {
-        SelectedEraPreset = EraPresetCatalog.Presets
-            .Single(preset => preset.Name == "Civil War");
+        GameYear = 3062;
         if (GameYear != 3062 || Character.GameYear != 3062)
         {
             throw new InvalidOperationException(
-                "The editor era preset did not update the character game year.");
+                "The editor campaign year did not update the character game year.");
+        }
+
+        if (!InferredEraLabel.Contains("Civil War", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "The editor campaign year did not infer the Civil War era.");
         }
     }
 
@@ -919,6 +908,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         OnPropertyChanged(nameof(SubAffiliation));
         OnPropertyChanged(nameof(BirthYear));
         OnPropertyChanged(nameof(GameYear));
+        OnPropertyChanged(nameof(InferredEraLabel));
         OnPropertyChanged(nameof(EraAvailabilitySummary));
     }
 

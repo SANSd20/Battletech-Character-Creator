@@ -52,7 +52,6 @@ public partial class CharacterWizardWindow : Window
         var resources = ResourceCatalog.Load(resourcePath);
         HairColorPicker.ItemsSource = resources.HairColors;
         EyeColorPicker.ItemsSource = resources.EyeColors;
-        EraPresetPicker.ItemsSource = EraPresetCatalog.Presets;
         SexPicker.ItemsSource = new[] { "Male", "Female" };
         SexPicker.SelectedIndex = 0;
 
@@ -203,10 +202,15 @@ public partial class CharacterWizardWindow : Window
         CreatedCharacter = character;
     }
 
-    public void SmokeEraPresetSelection()
+    public void SmokeCampaignYearEraSelection()
     {
-        EraPresetPicker.SelectedItem = EraPresetCatalog.Presets
-            .Single(preset => preset.Name == "Star League");
+        GameYearInput.Text = "2750";
+        RefreshEraAvailability();
+        if (!InferredEraLabel.Text.Contains("Star League", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "The campaign year did not infer the Star League era.");
+        }
         if (AffiliationPicker.Items
             .Cast<LifePathModule>()
             .Any(module => module.Id == "invading-clan") ||
@@ -216,12 +220,12 @@ public partial class CharacterWizardWindow : Window
                 "Star League era availability did not hide later-era affiliations.");
         }
 
-        EraPresetPicker.SelectedItem = EraPresetCatalog.Presets
-            .Single(preset => preset.Name == "Clan Invasion");
+        GameYearInput.Text = "3052";
+        RefreshEraAvailability();
         if (GameYearInput.Text != "3052")
         {
             throw new InvalidOperationException(
-                "The Clan Invasion era preset did not set the game year.");
+                "The campaign year did not remain set to Clan Invasion.");
         }
 
         var character = BuildCharacter();
@@ -229,7 +233,7 @@ public partial class CharacterWizardWindow : Window
             character.Age != character.GameYear - character.BirthYear)
         {
             throw new InvalidOperationException(
-                "Era preset game year was not applied to the created character.");
+                "Campaign year era selection was not applied to the created character.");
         }
         if (!AffiliationPicker.Items
             .Cast<LifePathModule>()
@@ -250,8 +254,8 @@ public partial class CharacterWizardWindow : Window
                 "Pre-Invasion Rasalhague sub-affiliation availability did not hide later options.");
         }
 
-        EraPresetPicker.SelectedItem = EraPresetCatalog.Presets
-            .Single(preset => preset.Name == "Clan Invasion");
+        GameYearInput.Text = "3052";
+        RefreshEraAvailability();
         SelectAffiliationForCapture("rasalhague");
         var clanInvasionSubAffiliations = SubAffiliationPicker.Items
             .Cast<LifePathModule>()
@@ -264,8 +268,8 @@ public partial class CharacterWizardWindow : Window
                 "Clan Invasion Rasalhague sub-affiliation availability is wrong.");
         }
 
-        EraPresetPicker.SelectedItem = EraPresetCatalog.Presets
-            .Single(preset => preset.Name == "Civil War");
+        GameYearInput.Text = "3062";
+        RefreshEraAvailability();
         SelectAffiliationForCapture("rasalhague");
         if (!SubAffiliationPicker.Items
             .Cast<LifePathModule>()
@@ -397,11 +401,11 @@ public partial class CharacterWizardWindow : Window
             0 when !TryReadPositiveNumber(BirthYearInput, out _) =>
                 "Enter a valid year of birth.",
             0 when !TryReadPositiveNumber(GameYearInput, out _) =>
-                "Enter a valid game year.",
+                "Enter a valid campaign year.",
             0 when TryReadPositiveNumber(BirthYearInput, out var birthYear) &&
                 TryReadPositiveNumber(GameYearInput, out var gameYear) &&
                 gameYear < birthYear =>
-                "Enter a game year that is the same as or later than the year of birth.",
+                "Enter a campaign year that is the same as or later than the year of birth.",
             0 when !TryReadPositiveNumber(HeightInput, out _) =>
                 "Enter a valid height.",
             0 when !TryReadPositiveNumber(WeightInput, out _) =>
@@ -687,17 +691,6 @@ public partial class CharacterWizardWindow : Window
         RefreshModules();
     }
 
-    private void EraPresetSelectionChanged(
-        object sender,
-        SelectionChangedEventArgs e)
-    {
-        if (EraPresetPicker.SelectedItem is EraPreset preset)
-        {
-            GameYearInput.Text = preset.DefaultYear.ToString();
-            RefreshEraAvailability();
-        }
-    }
-
     private void GameYearInputChanged(object sender, TextChangedEventArgs e)
     {
         if (!IsLoaded) return;
@@ -752,6 +745,8 @@ public partial class CharacterWizardWindow : Window
 
         EraAvailabilitySummary.Text = EraAvailabilityCatalog.BuildAffiliationSummary(
             LifePathCatalog.Affiliations,
+            CurrentGameYear);
+        InferredEraLabel.Text = EraPresetCatalog.BuildInferredEraLabel(
             CurrentGameYear);
     }
 

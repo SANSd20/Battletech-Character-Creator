@@ -31,8 +31,8 @@ override the core character-creation rules in the corrected third printing.
 
 ## Candidate Features
 
-- Game-year presets for common eras. Done: the wizard and editor can set the
-  game year from the local Era Digest and Era Report sources.
+- Campaign-year era inference. Done: the wizard and editor infer the displayed
+  era from the campaign year using the local Era Digest and Era Report sources.
 - Era-aware affiliation availability filters. Done: first-pass year filters hide
   clearly later-era affiliations and order choices, with visible source notes.
 - Era-aware sub-affiliation availability filters. Done: first-pass filters hide

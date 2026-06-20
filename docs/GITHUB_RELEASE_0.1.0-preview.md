@@ -54,7 +54,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Life Module character wizard from basic information through Stage 4
 - First-launch choice window for opening the Character Wizard or Character Editor
 - Basic information uses year of birth and game year, with calculated age
-- Era presets set the game year from the local Era Digest and Era Report audit
+- Campaign year infers the matching era from the local Era Digest and Era Report audit
 - Era-aware affiliation availability filters with visible source notes
 - Era-aware Rasalhague sub-affiliation filters with visible source notes
 - All corrected-printing affiliations and 68 sub-affiliations
