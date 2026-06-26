@@ -102,7 +102,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   combat notes before adding items
 - Selected equipment and weapon detail panels show campaign-year era
   availability warnings for tracked advanced or later-era items
-- Inventory status warnings for over-budget, overloaded, and manually priced wildcard items
+- Inventory status warnings for over-budget, overloaded, manually priced wildcard items,
+  and prosthetic enhancements that need a prosthetic or implant host
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
   cosmetic adaptation kits, plus advanced combat practice equipment, light
@@ -145,8 +146,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Continue importing and modeling selected optional mechanics from
   *A Time of War Companion*
 - Expand era template coverage after manual preview feedback
-- Expand reload, patch repair rules, ammunition modifier, vehicle, and prosthetic enhancement
-  purchasing details
+- Expand reload, patch repair rules, ammunition modifier, and vehicle purchasing details
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery
 - Complete the final rulebook audit

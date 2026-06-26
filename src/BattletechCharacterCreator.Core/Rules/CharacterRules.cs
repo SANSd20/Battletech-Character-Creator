@@ -233,11 +233,33 @@ public static class CharacterRules
     public static int OptionalItemCount(string value) =>
         int.TryParse(value, out var parsed) && parsed > 0 ? parsed : 0;
 
+    public static int UnmountedProstheticEnhancements(Character character)
+    {
+        var enhancementCount = character.Equipment
+            .Where(item => IsProstheticEnhancement(item.Name))
+            .Sum(item => ItemCount(item.Count));
+        if (enhancementCount == 0) return 0;
+
+        var hostCount = character.Equipment
+            .Where(item => !IsProstheticEnhancement(item.Name) && IsProstheticOrImplantHost(item))
+            .Sum(item => ItemCount(item.Count));
+        return hostCount == 0 ? enhancementCount : 0;
+    }
+
     private static string CostPart(string value, int index)
     {
         var parts = value.Split('/');
         return index < parts.Length ? parts[index] : "";
     }
+
+    private static bool IsProstheticEnhancement(string name) =>
+        name.StartsWith("Prosthetic Enhancement - ", StringComparison.Ordinal);
+
+    private static bool IsProstheticOrImplantHost(EquipmentItem item) =>
+        item.Locations.Equals("Implant", StringComparison.OrdinalIgnoreCase) ||
+        item.Locations.Equals("Prosthetic", StringComparison.OrdinalIgnoreCase) ||
+        item.Name.Contains("Implant", StringComparison.OrdinalIgnoreCase) ||
+        item.Name.Contains("Prosthetic", StringComparison.OrdinalIgnoreCase);
 
     private static int FindValue(IEnumerable<NamedValue> values, string name) =>
         values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;

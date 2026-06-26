@@ -108,9 +108,10 @@ the extra limb cost requirement in notes.
 
 The fourth equipment batch covers prosthetic enhancements from PDF page 189.
 Because these are add-ons to prosthetic limbs rather than standalone weapons,
-they are represented as Companion equipment entries. Their attack profile,
-power use, reload notes, and utility modifiers are preserved in notes until the
-editor has a dedicated prosthetic enhancement model.
+they are represented as Companion equipment entries. The editor warns when a
+prosthetic enhancement is purchased without a prosthetic or implant host. Their
+attack profile, power use, reload notes, and utility modifiers are preserved in
+notes until the editor has a dedicated prosthetic enhancement model.
 
 The fifth equipment batch covers exotic cosmetic implants and prosthetics from
 PDF page 191: beauty and horror enhancements, cosmetic tail and wing
@@ -149,9 +150,9 @@ Treat each import as a feature with its own source label and regression tests.
 Equipment expansion may require new fields before every item can be represented
 cleanly. Current inventory totals count base purchase prices from slash, comma,
 and wildcard cost formats, include explicitly purchased armor patches and ammo
-packs, and report pure wildcard prices as unresolved, but reload, patch repair
-rules, ammunition modifier, vehicle, and prosthetic enhancement purchasing
-still need richer modeling.
+packs, report pure wildcard prices as unresolved, and warn when prosthetic
+enhancements are missing a prosthetic or implant host, but reload, patch repair
+rules, ammunition modifier, and vehicle purchasing still need richer modeling.
 Trait expansion may require more than the current name-and-XP model. Templates
 may need a preset pipeline that can create a complete character without passing
 through every normal wizard screen.

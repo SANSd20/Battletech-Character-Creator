@@ -180,20 +180,37 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public string Notes { get => Character.Notes; set => Character.Notes = value; }
     public object Equipment => Character.Equipment;
     public object Weapons => Character.Weapons;
-    public string InventoryStatus =>
-        Summary.UnresolvedInventoryPrices > 0
-            ? $"{Summary.UnresolvedInventoryPrices} inventory price(s) need manual pricing."
-            : Summary.RemainingCBills < 0
-                ? $"Inventory is over budget by {-Summary.RemainingCBills} C-Bills."
-                : Summary.RemainingCapacity < 0
-                    ? $"Inventory is over carrying capacity by {-Summary.RemainingCapacity:0.##} kg."
-                    : $"Inventory has {Summary.RemainingCBills} C-Bills and {Summary.RemainingCapacity:0.##} kg capacity remaining.";
+    public string InventoryStatus
+    {
+        get
+        {
+            if (Summary.UnresolvedInventoryPrices > 0)
+            {
+                return $"{Summary.UnresolvedInventoryPrices} inventory price(s) need manual pricing.";
+            }
+            if (Summary.RemainingCBills < 0)
+            {
+                return $"Inventory is over budget by {-Summary.RemainingCBills} C-Bills.";
+            }
+            if (Summary.RemainingCapacity < 0)
+            {
+                return $"Inventory is over carrying capacity by {-Summary.RemainingCapacity:0.##} kg.";
+            }
+
+            var unmountedEnhancements = CharacterRules.UnmountedProstheticEnhancements(Character);
+            return unmountedEnhancements > 0
+                ? $"{unmountedEnhancements} prosthetic enhancement(s) need a prosthetic or implant host."
+                : $"Inventory has {Summary.RemainingCBills} C-Bills and {Summary.RemainingCapacity:0.##} kg capacity remaining.";
+        }
+    }
     public Brush InventoryStatusBrush =>
         Summary.UnresolvedInventoryPrices > 0
             ? Brushes.DarkGoldenrod
             : Summary.RemainingCBills < 0 || Summary.RemainingCapacity < 0
                 ? Brushes.Firebrick
-                : Brushes.DarkGreen;
+                : CharacterRules.UnmountedProstheticEnhancements(Character) > 0
+                    ? Brushes.DarkGoldenrod
+                    : Brushes.DarkGreen;
     public bool IncludeCompanionContent
     {
         get => includeCompanionContent;
@@ -569,6 +586,33 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             throw new InvalidOperationException(
                 "Selected equipment era availability did not update when the campaign year changed.");
+        }
+        Character.Equipment.Clear();
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Prosthetic Enhancement - Vibroblade",
+            Cost = "1000",
+            Mass = "0",
+            Locations = "Prosthetic"
+        });
+        Recalculate();
+        if (!InventoryStatus.Contains("prosthetic enhancement", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Unmounted prosthetic enhancement warnings were not shown in the editor.");
+        }
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Gill Implant",
+            Cost = "8000",
+            Mass = "0",
+            Locations = "Implant"
+        });
+        Recalculate();
+        if (InventoryStatus.Contains("prosthetic enhancement", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Prosthetic enhancement warnings did not clear when an implant host was added.");
         }
         IncludeCompanionContent = false;
     }

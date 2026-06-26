@@ -150,6 +150,20 @@ Assert(companionInventorySummary.InventoryMass == 1606.2m,
     "Inventory mass must continue parsing comma and decimal quantities.");
 Assert(companionInventorySummary.UnresolvedInventoryPrices == 6,
     "Inventory summaries must count unresolved wildcard purchase prices by quantity.");
+var prostheticWarningCharacter = new Character();
+prostheticWarningCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Prosthetic Enhancement - Vibroblade", Cost = "1000", Mass = "0",
+    Locations = "Prosthetic", Count = "2"
+});
+Assert(CharacterRules.UnmountedProstheticEnhancements(prostheticWarningCharacter) == 2,
+    "Prosthetic enhancements must warn when no prosthetic or implant host is present.");
+prostheticWarningCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Gill Implant", Cost = "8000", Mass = "0", Locations = "Implant", Count = "1"
+});
+Assert(CharacterRules.UnmountedProstheticEnhancements(prostheticWarningCharacter) == 0,
+    "Prosthetic enhancement warnings must clear when an implant host is present.");
 
 CheckSample("newchar.btcc", 2_900, 100, 6, 18, 36);
 CheckSample("test.btcc", 4_212, 5_494, 6, 18, 36);
