@@ -164,6 +164,21 @@ prostheticWarningCharacter.Equipment.Add(new EquipmentItem
 });
 Assert(CharacterRules.UnmountedProstheticEnhancements(prostheticWarningCharacter) == 0,
     "Prosthetic enhancement warnings must clear when an implant host is present.");
+var vehicleWarningCharacter = new Character();
+vehicleWarningCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Hoodling Sensor HoverJeep", Cost = "92000", Mass = "0",
+    Locations = "Vehicle", Count = "2"
+});
+Assert(CharacterRules.UnbackedVehiclePurchases(vehicleWarningCharacter) == 2,
+    "Vehicle purchases must warn when no Vehicle or Custom Vehicle trait is present.");
+vehicleWarningCharacter.Traits.Add(new NamedValue("Vehicle", 100));
+Assert(CharacterRules.UnbackedVehiclePurchases(vehicleWarningCharacter) == 0,
+    "Vehicle purchase warnings must clear when the Vehicle trait is present.");
+vehicleWarningCharacter.Traits.Clear();
+vehicleWarningCharacter.Traits.Add(new NamedValue("Custom Vehicle", 100));
+Assert(CharacterRules.UnbackedVehiclePurchases(vehicleWarningCharacter) == 0,
+    "Vehicle purchase warnings must clear when the Custom Vehicle trait is present.");
 
 CheckSample("newchar.btcc", 2_900, 100, 6, 18, 36);
 CheckSample("test.btcc", 4_212, 5_494, 6, 18, 36);

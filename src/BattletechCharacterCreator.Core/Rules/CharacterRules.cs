@@ -246,6 +246,22 @@ public static class CharacterRules
         return hostCount == 0 ? enhancementCount : 0;
     }
 
+    public static int UnbackedVehiclePurchases(Character character)
+    {
+        var vehicleCount = character.Equipment
+            .Where(IsVehiclePurchase)
+            .Sum(item => ItemCount(item.Count));
+        if (vehicleCount == 0) return 0;
+
+        var hasVehicleTrait = character.Traits.Any(item =>
+            item.Value > 0 &&
+            (item.Name == "Vehicle" ||
+             item.Name == "Custom Vehicle" ||
+             item.Name.StartsWith("Vehicle/", StringComparison.Ordinal) ||
+             item.Name.StartsWith("Custom Vehicle/", StringComparison.Ordinal)));
+        return hasVehicleTrait ? 0 : vehicleCount;
+    }
+
     private static string CostPart(string value, int index)
     {
         var parts = value.Split('/');
@@ -260,6 +276,9 @@ public static class CharacterRules
         item.Locations.Equals("Prosthetic", StringComparison.OrdinalIgnoreCase) ||
         item.Name.Contains("Implant", StringComparison.OrdinalIgnoreCase) ||
         item.Name.Contains("Prosthetic", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsVehiclePurchase(EquipmentItem item) =>
+        item.Locations.Equals("Vehicle", StringComparison.OrdinalIgnoreCase);
 
     private static int FindValue(IEnumerable<NamedValue> values, string name) =>
         values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;

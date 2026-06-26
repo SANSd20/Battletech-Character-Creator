@@ -128,7 +128,8 @@ The seventh equipment batch covers light support vehicles from PDF page 196.
 Because the editor does not yet have a dedicated vehicle model, these are
 represented as Companion equipment entries with their vehicle ratings in the
 armor/rating field and vehicle armor, fuel, range, speed, crew, passenger, and
-cargo details preserved in notes.
+cargo details preserved in notes. The editor warns when a vehicle is purchased
+without positive Vehicle or Custom Vehicle trait support.
 
 Expanded trait references now have a first source-tagged import behind the
 Companion catalog toggle. Full expanded trait mechanics should follow after the
@@ -151,8 +152,10 @@ Equipment expansion may require new fields before every item can be represented
 cleanly. Current inventory totals count base purchase prices from slash, comma,
 and wildcard cost formats, include explicitly purchased armor patches and ammo
 packs, report pure wildcard prices as unresolved, and warn when prosthetic
-enhancements are missing a prosthetic or implant host, but reload, patch repair
-rules, ammunition modifier, and vehicle purchasing still need richer modeling.
+enhancements are missing a prosthetic or implant host, and warn when vehicle
+purchases are missing Vehicle or Custom Vehicle trait support, but reload, patch
+repair rules, ammunition modifier, and deeper vehicle purchasing still need
+richer modeling.
 Trait expansion may require more than the current name-and-XP model. Templates
 may need a preset pipeline that can create a complete character without passing
 through every normal wizard screen.

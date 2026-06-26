@@ -24,6 +24,8 @@ release.
 - Selected equipment and weapon detail panels show campaign-year era warnings
 - Inventory status warnings for over-budget, overloaded, manually priced wildcard items,
   and prosthetic enhancements that need a prosthetic or implant host
+- Inventory status warnings for vehicle purchases that need Vehicle or Custom Vehicle
+  trait support
 - Opt-in *A Time of War Companion* equipment and weapon catalog content
 - Opt-in *A Time of War Companion* expanded trait reference entries
 - Skill and Trait editor reference panels with source labels and rule notes
@@ -73,7 +75,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 ## Known Gaps
 
 - Remaining optional *A Time of War Companion* content is still being modeled
-- Reload, patch repair, ammunition modifier, and vehicle purchasing rules need
-  richer first-class support
+- Reload, patch repair, ammunition modifier, and deeper vehicle purchasing rules
+  need richer first-class support
 - Interface polish and usability testing are still ongoing
 - The final rulebook audit is not complete

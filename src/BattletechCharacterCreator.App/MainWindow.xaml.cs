@@ -198,8 +198,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
 
             var unmountedEnhancements = CharacterRules.UnmountedProstheticEnhancements(Character);
-            return unmountedEnhancements > 0
-                ? $"{unmountedEnhancements} prosthetic enhancement(s) need a prosthetic or implant host."
+            if (unmountedEnhancements > 0)
+            {
+                return $"{unmountedEnhancements} prosthetic enhancement(s) need a prosthetic or implant host.";
+            }
+
+            var unbackedVehicles = CharacterRules.UnbackedVehiclePurchases(Character);
+            return unbackedVehicles > 0
+                ? $"{unbackedVehicles} vehicle purchase(s) need Vehicle or Custom Vehicle trait support."
                 : $"Inventory has {Summary.RemainingCBills} C-Bills and {Summary.RemainingCapacity:0.##} kg capacity remaining.";
         }
     }
@@ -208,7 +214,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             ? Brushes.DarkGoldenrod
             : Summary.RemainingCBills < 0 || Summary.RemainingCapacity < 0
                 ? Brushes.Firebrick
-                : CharacterRules.UnmountedProstheticEnhancements(Character) > 0
+                : CharacterRules.UnmountedProstheticEnhancements(Character) > 0 ||
+                  CharacterRules.UnbackedVehiclePurchases(Character) > 0
                     ? Brushes.DarkGoldenrod
                     : Brushes.DarkGreen;
     public bool IncludeCompanionContent
@@ -613,6 +620,27 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             throw new InvalidOperationException(
                 "Prosthetic enhancement warnings did not clear when an implant host was added.");
+        }
+        Character.Equipment.Clear();
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Hoodling Sensor HoverJeep",
+            Cost = "92000",
+            Mass = "0",
+            Locations = "Vehicle"
+        });
+        Recalculate();
+        if (!InventoryStatus.Contains("vehicle purchase", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Vehicle trait support warnings were not shown in the editor.");
+        }
+        Character.Traits.Add(new NamedValue("Vehicle", 100));
+        Recalculate();
+        if (InventoryStatus.Contains("vehicle purchase", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Vehicle trait support warnings did not clear when the Vehicle trait was added.");
         }
         IncludeCompanionContent = false;
     }
