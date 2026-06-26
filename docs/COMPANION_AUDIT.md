@@ -153,11 +153,12 @@ cleanly. Current inventory totals count base purchase prices from slash, comma,
 and wildcard cost formats, include explicitly purchased armor patches and ammo
 packs, report pure wildcard prices as unresolved, count wildcard patch prices as
 unresolved, warn when armor patches are missing patch pricing, warn when
-ammo purchases are missing ammo cost or mass details, warn when prosthetic
-enhancements are missing a prosthetic or implant host, and warn when vehicle
-purchases are missing Vehicle or Custom Vehicle trait support, but reload,
-deeper patch repair rules, ammunition modifier rules, and deeper vehicle
-purchasing still need richer modeling.
+ammo purchases are missing ammo cost or mass details, warn when ammo purchases
+need reload or power-pack review, warn when prosthetic enhancements are missing a
+prosthetic or implant host, and warn when vehicle purchases are missing Vehicle
+or Custom Vehicle trait support, but deeper reload behavior, deeper patch repair
+rules, ammunition modifier rules, and deeper vehicle purchasing still need richer
+modeling.
 Trait expansion may require more than the current name-and-XP model. Templates
 may need a preset pipeline that can create a complete character without passing
 through every normal wizard screen.

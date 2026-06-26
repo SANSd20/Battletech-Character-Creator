@@ -195,6 +195,38 @@ ammoDetailWarningCharacter.Weapons.Add(new WeaponItem
 });
 Assert(CharacterRules.AmmoPurchasesNeedingDetails(ammoDetailWarningCharacter) == 0,
     "Ammo purchase warnings must clear when ammo cost and mass are present.");
+var reloadReviewCharacter = new Character();
+reloadReviewCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Missing shot capacity", Cost = "100", Mass = "1", Shots = "",
+    AmmoCost = "5", AmmoMass = "0.1", AmmoCount = "2"
+});
+Assert(CharacterRules.AmmoPurchasesNeedingReloadReview(reloadReviewCharacter) == 2,
+    "Ammo purchases must warn when weapon shot capacity is missing.");
+reloadReviewCharacter.Weapons.Clear();
+reloadReviewCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Power-pack weapon", Cost = "100", Mass = "1", Shots = "5 PPS",
+    AmmoCost = "5", AmmoMass = "0.1", AmmoCount = "3"
+});
+Assert(CharacterRules.AmmoPurchasesNeedingReloadReview(reloadReviewCharacter) == 3,
+    "Ammo purchases must warn when weapon shots use power-pack notation.");
+reloadReviewCharacter.Weapons.Clear();
+reloadReviewCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Mixed ammo weapon", Cost = "100", Mass = "1", Shots = "10, 10 PPS",
+    AmmoCost = "5", AmmoMass = "0.1", AmmoCount = "1"
+});
+Assert(CharacterRules.AmmoPurchasesNeedingReloadReview(reloadReviewCharacter) == 1,
+    "Ammo purchases must warn when weapon shots combine ammunition and power-pack notation.");
+reloadReviewCharacter.Weapons.Clear();
+reloadReviewCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Numeric ammo weapon", Cost = "100", Mass = "1", Shots = "10",
+    AmmoCost = "5", AmmoMass = "0.1", AmmoCount = "2"
+});
+Assert(CharacterRules.AmmoPurchasesNeedingReloadReview(reloadReviewCharacter) == 0,
+    "Ammo reload review warnings must clear for numeric shot capacity.");
 var prostheticWarningCharacter = new Character();
 prostheticWarningCharacter.Equipment.Add(new EquipmentItem
 {

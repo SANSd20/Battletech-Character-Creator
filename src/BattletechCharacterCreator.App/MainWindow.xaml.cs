@@ -209,6 +209,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return $"{ammoNeedingDetails} ammo purchase(s) need ammo cost and mass details.";
             }
 
+            var ammoNeedingReloadReview =
+                CharacterRules.AmmoPurchasesNeedingReloadReview(Character);
+            if (ammoNeedingReloadReview > 0)
+            {
+                return $"{ammoNeedingReloadReview} ammo purchase(s) need reload or power-pack review.";
+            }
+
             var unmountedEnhancements = CharacterRules.UnmountedProstheticEnhancements(Character);
             if (unmountedEnhancements > 0)
             {
@@ -228,6 +235,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 ? Brushes.Firebrick
                 : CharacterRules.PatchPurchasesNeedingPrice(Character) > 0 ||
                   CharacterRules.AmmoPurchasesNeedingDetails(Character) > 0 ||
+                  CharacterRules.AmmoPurchasesNeedingReloadReview(Character) > 0 ||
                   CharacterRules.UnmountedProstheticEnhancements(Character) > 0 ||
                   CharacterRules.UnbackedVehiclePurchases(Character) > 0
                     ? Brushes.DarkGoldenrod
@@ -659,6 +667,24 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Name = "Priced ammo weapon",
             Cost = "100",
             Mass = "1",
+            Shots = "5 PPS",
+            AmmoCost = "5",
+            AmmoMass = "0.1",
+            AmmoCount = "2"
+        });
+        Recalculate();
+        if (!InventoryStatus.Contains("reload or power-pack", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Ammo reload review warnings were not shown in the editor.");
+        }
+        Character.Weapons.Clear();
+        Character.Weapons.Add(new WeaponItem
+        {
+            Name = "Numeric ammo weapon",
+            Cost = "100",
+            Mass = "1",
+            Shots = "10",
             AmmoCost = "5",
             AmmoMass = "0.1",
             AmmoCount = "2"
@@ -667,7 +693,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (InventoryStatus.Contains("ammo purchase", StringComparison.Ordinal))
         {
             throw new InvalidOperationException(
-                "Ammo detail warnings did not clear when ammo cost and mass were present.");
+                "Ammo warnings did not clear when ammo cost, mass, and shot capacity were present.");
         }
         Character.Weapons.Clear();
         Character.Equipment.Add(new EquipmentItem

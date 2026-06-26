@@ -70,6 +70,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Inventory status warnings for over-budget, overloaded, manually priced wildcard items,
   armor patches that need patch pricing, ammo purchases that need ammo cost or
   mass details, and prosthetic enhancements that need a prosthetic or implant host
+- Inventory status warnings for ammo purchases that need reload or power-pack review
 - Inventory status warnings for vehicle purchases that need Vehicle or Custom Vehicle
   trait support
 - Opt-in *A Time of War Companion* equipment and weapon catalog content
@@ -98,7 +99,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 ## Known Gaps
 
 - Remaining optional *A Time of War Companion* content is still being modeled
-- Reload, deeper patch repair, ammunition modifier rules, and deeper vehicle purchasing
-  rules need richer first-class support
+- Deeper reload behavior, deeper patch repair, ammunition modifier rules, and
+  deeper vehicle purchasing rules need richer first-class support
 - Interface polish and usability testing are still ongoing
 - The final rulebook audit is not complete

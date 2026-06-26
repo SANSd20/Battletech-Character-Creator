@@ -250,6 +250,11 @@ public static class CharacterRules
             .Where(item => AmmoPurchaseNeedsDetails(item.AmmoCost, item.AmmoMass))
             .Sum(item => OptionalItemCount(item.AmmoCount));
 
+    public static int AmmoPurchasesNeedingReloadReview(Character character) =>
+        character.Weapons
+            .Where(item => AmmoPurchaseNeedsReloadReview(item.Shots))
+            .Sum(item => OptionalItemCount(item.AmmoCount));
+
     public static int UnmountedProstheticEnhancements(Character character)
     {
         var enhancementCount = character.Equipment
@@ -314,6 +319,15 @@ public static class CharacterRules
                  !trimmedCost.Contains('*', StringComparison.Ordinal))) ||
             trimmedMass.Length == 0 ||
             CatalogMass(mass) <= 0m;
+    }
+
+    private static bool AmmoPurchaseNeedsReloadReview(string shots)
+    {
+        var trimmedShots = shots.Trim();
+        return trimmedShots.Length == 0 ||
+            trimmedShots == "0" ||
+            trimmedShots.Contains(',', StringComparison.Ordinal) ||
+            trimmedShots.Contains("PPS", StringComparison.OrdinalIgnoreCase);
     }
 
     private static int FindValue(IEnumerable<NamedValue> values, string name) =>
