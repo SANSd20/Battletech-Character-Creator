@@ -197,6 +197,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return $"Inventory is over carrying capacity by {-Summary.RemainingCapacity:0.##} kg.";
             }
 
+            var unpricedPatches = CharacterRules.PatchPurchasesNeedingPrice(Character);
+            if (unpricedPatches > 0)
+            {
+                return $"{unpricedPatches} armor patch purchase(s) need patch pricing.";
+            }
+
             var unmountedEnhancements = CharacterRules.UnmountedProstheticEnhancements(Character);
             if (unmountedEnhancements > 0)
             {
@@ -214,7 +220,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             ? Brushes.DarkGoldenrod
             : Summary.RemainingCBills < 0 || Summary.RemainingCapacity < 0
                 ? Brushes.Firebrick
-                : CharacterRules.UnmountedProstheticEnhancements(Character) > 0 ||
+                : CharacterRules.PatchPurchasesNeedingPrice(Character) > 0 ||
+                  CharacterRules.UnmountedProstheticEnhancements(Character) > 0 ||
                   CharacterRules.UnbackedVehiclePurchases(Character) > 0
                     ? Brushes.DarkGoldenrod
                     : Brushes.DarkGreen;
@@ -593,6 +600,34 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             throw new InvalidOperationException(
                 "Selected equipment era availability did not update when the campaign year changed.");
+        }
+        Character.Equipment.Clear();
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Patch warning armor",
+            Cost = "500",
+            Mass = "2",
+            PatchCount = "2"
+        });
+        Recalculate();
+        if (!InventoryStatus.Contains("armor patch", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Patch pricing warnings were not shown in the editor.");
+        }
+        Character.Equipment.Clear();
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Priced patch armor",
+            Cost = "500/100",
+            Mass = "2",
+            PatchCount = "2"
+        });
+        Recalculate();
+        if (InventoryStatus.Contains("armor patch", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Patch pricing warnings did not clear when a patch price was present.");
         }
         Character.Equipment.Clear();
         Character.Equipment.Add(new EquipmentItem

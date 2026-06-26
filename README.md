@@ -103,7 +103,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Selected equipment and weapon detail panels show campaign-year era
   availability warnings for tracked advanced or later-era items
 - Inventory status warnings for over-budget, overloaded, manually priced wildcard items,
-  and prosthetic enhancements that need a prosthetic or implant host
+  armor patches that need patch pricing, and prosthetic enhancements that need a
+  prosthetic or implant host
 - Inventory status warnings for vehicle purchases that need Vehicle or Custom Vehicle
   trait support
 - Optional Companion catalog toggle with source-tagged imported equipment,
@@ -148,7 +149,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Continue importing and modeling selected optional mechanics from
   *A Time of War Companion*
 - Expand era template coverage after manual preview feedback
-- Expand reload, patch repair rules, ammunition modifier, and deeper vehicle
+- Expand reload, deeper patch repair rules, ammunition modifier, and deeper vehicle
   purchasing details
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery

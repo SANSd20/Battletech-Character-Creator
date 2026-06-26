@@ -91,7 +91,10 @@ public static class CharacterRules
                 CatalogMass(item.Mass) * ItemCount(item.Count) +
                 CatalogMass(item.AmmoMass) * OptionalItemCount(item.AmmoCount));
         var unresolvedInventoryPrices = character.Equipment.Sum(item =>
-                HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0) +
+                (HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0) +
+                (HasUnresolvedPatchCost(item.Cost)
+                    ? OptionalItemCount(item.PatchCount)
+                    : 0)) +
             character.Weapons.Sum(item =>
                 (HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0) +
                 (HasUnresolvedPurchaseCost(item.AmmoCost)
@@ -221,6 +224,10 @@ public static class CharacterRules
     public static bool HasUnresolvedPurchaseCost(string value) =>
         BasePurchaseCost(value) == 0 && value.Contains('*', StringComparison.Ordinal);
 
+    public static bool HasUnresolvedPatchCost(string value) =>
+        SecondaryPurchaseCost(value) == 0 &&
+        CostPart(value, 1).Contains('*', StringComparison.Ordinal);
+
     public static decimal CatalogMass(string value) =>
         decimal.TryParse(value, System.Globalization.NumberStyles.Number,
             System.Globalization.CultureInfo.InvariantCulture, out var parsed)
@@ -232,6 +239,11 @@ public static class CharacterRules
 
     public static int OptionalItemCount(string value) =>
         int.TryParse(value, out var parsed) && parsed > 0 ? parsed : 0;
+
+    public static int PatchPurchasesNeedingPrice(Character character) =>
+        character.Equipment
+            .Where(item => PatchPurchaseNeedsPrice(item.Cost))
+            .Sum(item => OptionalItemCount(item.PatchCount));
 
     public static int UnmountedProstheticEnhancements(Character character)
     {
@@ -279,6 +291,14 @@ public static class CharacterRules
 
     private static bool IsVehiclePurchase(EquipmentItem item) =>
         item.Locations.Equals("Vehicle", StringComparison.OrdinalIgnoreCase);
+
+    private static bool PatchPurchaseNeedsPrice(string value)
+    {
+        var patchCost = CostPart(value, 1).Trim();
+        return patchCost.Length == 0 ||
+            (SecondaryPurchaseCost(value) == 0 &&
+             !patchCost.Contains('*', StringComparison.Ordinal));
+    }
 
     private static int FindValue(IEnumerable<NamedValue> values, string name) =>
         values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;

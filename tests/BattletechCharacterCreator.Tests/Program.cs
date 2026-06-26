@@ -150,6 +150,27 @@ Assert(companionInventorySummary.InventoryMass == 1606.2m,
     "Inventory mass must continue parsing comma and decimal quantities.");
 Assert(companionInventorySummary.UnresolvedInventoryPrices == 6,
     "Inventory summaries must count unresolved wildcard purchase prices by quantity.");
+var patchPriceWarningCharacter = new Character();
+patchPriceWarningCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Patch warning armor", Cost = "500", Mass = "2", PatchCount = "3"
+});
+Assert(CharacterRules.PatchPurchasesNeedingPrice(patchPriceWarningCharacter) == 3,
+    "Patch purchases must warn when no patch price is present.");
+patchPriceWarningCharacter.Equipment.Clear();
+patchPriceWarningCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Priced patch armor", Cost = "500/100", Mass = "2", PatchCount = "3"
+});
+Assert(CharacterRules.PatchPurchasesNeedingPrice(patchPriceWarningCharacter) == 0,
+    "Patch purchase warnings must clear when a patch price is present.");
+patchPriceWarningCharacter.Equipment.Clear();
+patchPriceWarningCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Wildcard patch armor", Cost = "500/*", Mass = "2", PatchCount = "2"
+});
+Assert(CharacterRules.Calculate(patchPriceWarningCharacter).UnresolvedInventoryPrices == 2,
+    "Wildcard patch purchase prices must count as unresolved inventory prices.");
 var prostheticWarningCharacter = new Character();
 prostheticWarningCharacter.Equipment.Add(new EquipmentItem
 {
