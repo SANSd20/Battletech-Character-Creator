@@ -203,6 +203,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return $"{unpricedPatches} armor patch purchase(s) need patch pricing.";
             }
 
+            var ammoNeedingDetails = CharacterRules.AmmoPurchasesNeedingDetails(Character);
+            if (ammoNeedingDetails > 0)
+            {
+                return $"{ammoNeedingDetails} ammo purchase(s) need ammo cost and mass details.";
+            }
+
             var unmountedEnhancements = CharacterRules.UnmountedProstheticEnhancements(Character);
             if (unmountedEnhancements > 0)
             {
@@ -221,6 +227,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             : Summary.RemainingCBills < 0 || Summary.RemainingCapacity < 0
                 ? Brushes.Firebrick
                 : CharacterRules.PatchPurchasesNeedingPrice(Character) > 0 ||
+                  CharacterRules.AmmoPurchasesNeedingDetails(Character) > 0 ||
                   CharacterRules.UnmountedProstheticEnhancements(Character) > 0 ||
                   CharacterRules.UnbackedVehiclePurchases(Character) > 0
                     ? Brushes.DarkGoldenrod
@@ -630,6 +637,39 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 "Patch pricing warnings did not clear when a patch price was present.");
         }
         Character.Equipment.Clear();
+        Character.Weapons.Clear();
+        Character.Weapons.Add(new WeaponItem
+        {
+            Name = "Ammo detail warning weapon",
+            Cost = "100",
+            Mass = "1",
+            AmmoCost = "",
+            AmmoMass = "0.1",
+            AmmoCount = "2"
+        });
+        Recalculate();
+        if (!InventoryStatus.Contains("ammo purchase", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Ammo detail warnings were not shown in the editor.");
+        }
+        Character.Weapons.Clear();
+        Character.Weapons.Add(new WeaponItem
+        {
+            Name = "Priced ammo weapon",
+            Cost = "100",
+            Mass = "1",
+            AmmoCost = "5",
+            AmmoMass = "0.1",
+            AmmoCount = "2"
+        });
+        Recalculate();
+        if (InventoryStatus.Contains("ammo purchase", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Ammo detail warnings did not clear when ammo cost and mass were present.");
+        }
+        Character.Weapons.Clear();
         Character.Equipment.Add(new EquipmentItem
         {
             Name = "Prosthetic Enhancement - Vibroblade",

@@ -171,6 +171,30 @@ patchPriceWarningCharacter.Equipment.Add(new EquipmentItem
 });
 Assert(CharacterRules.Calculate(patchPriceWarningCharacter).UnresolvedInventoryPrices == 2,
     "Wildcard patch purchase prices must count as unresolved inventory prices.");
+var ammoDetailWarningCharacter = new Character();
+ammoDetailWarningCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Missing ammo cost", Cost = "100", Mass = "1",
+    AmmoCost = "", AmmoMass = "0.1", AmmoCount = "3"
+});
+Assert(CharacterRules.AmmoPurchasesNeedingDetails(ammoDetailWarningCharacter) == 3,
+    "Ammo purchases must warn when ammo cost is missing.");
+ammoDetailWarningCharacter.Weapons.Clear();
+ammoDetailWarningCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Missing ammo mass", Cost = "100", Mass = "1",
+    AmmoCost = "5", AmmoMass = "", AmmoCount = "2"
+});
+Assert(CharacterRules.AmmoPurchasesNeedingDetails(ammoDetailWarningCharacter) == 2,
+    "Ammo purchases must warn when ammo mass is missing.");
+ammoDetailWarningCharacter.Weapons.Clear();
+ammoDetailWarningCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Complete ammo", Cost = "100", Mass = "1",
+    AmmoCost = "5", AmmoMass = "0.1", AmmoCount = "2"
+});
+Assert(CharacterRules.AmmoPurchasesNeedingDetails(ammoDetailWarningCharacter) == 0,
+    "Ammo purchase warnings must clear when ammo cost and mass are present.");
 var prostheticWarningCharacter = new Character();
 prostheticWarningCharacter.Equipment.Add(new EquipmentItem
 {

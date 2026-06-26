@@ -245,6 +245,11 @@ public static class CharacterRules
             .Where(item => PatchPurchaseNeedsPrice(item.Cost))
             .Sum(item => OptionalItemCount(item.PatchCount));
 
+    public static int AmmoPurchasesNeedingDetails(Character character) =>
+        character.Weapons
+            .Where(item => AmmoPurchaseNeedsDetails(item.AmmoCost, item.AmmoMass))
+            .Sum(item => OptionalItemCount(item.AmmoCount));
+
     public static int UnmountedProstheticEnhancements(Character character)
     {
         var enhancementCount = character.Equipment
@@ -298,6 +303,17 @@ public static class CharacterRules
         return patchCost.Length == 0 ||
             (SecondaryPurchaseCost(value) == 0 &&
              !patchCost.Contains('*', StringComparison.Ordinal));
+    }
+
+    private static bool AmmoPurchaseNeedsDetails(string cost, string mass)
+    {
+        var trimmedCost = cost.Trim();
+        var trimmedMass = mass.Trim();
+        return (trimmedCost.Length == 0 ||
+                (BasePurchaseCost(cost) == 0 &&
+                 !trimmedCost.Contains('*', StringComparison.Ordinal))) ||
+            trimmedMass.Length == 0 ||
+            CatalogMass(mass) <= 0m;
     }
 
     private static int FindValue(IEnumerable<NamedValue> values, string name) =>
