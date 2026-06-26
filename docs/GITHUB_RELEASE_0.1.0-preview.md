@@ -57,6 +57,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Campaign year infers the matching era from the local Era Digest and Era Report audit
 - Era-aware affiliation availability filters with visible source notes
 - Era-aware Rasalhague sub-affiliation filters with visible source notes
+- Era quick-start templates for common campaign starts in the editor
 - All corrected-printing affiliations and 68 sub-affiliations
 - All 24 corrected-printing Stage 4 base modules, including variants
 - Two ordered Stage 4 careers with repeat and prerequisite handling

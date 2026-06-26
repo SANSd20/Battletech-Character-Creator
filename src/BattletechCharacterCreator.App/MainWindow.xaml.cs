@@ -37,6 +37,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool includeCompanionContent;
     private EquipmentCatalogItem? selectedEquipmentCatalogItem;
     private WeaponCatalogItem? selectedWeaponCatalogItem;
+    private EraCharacterTemplate? selectedEraTemplate;
 
     public ObservableCollection<XpEditorRow> AttributeRows { get; } = [];
     public ObservableCollection<XpEditorRow> SkillRows { get; } = [];
@@ -82,6 +83,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     public ResourceCatalog Catalog { get; private set; }
     public string[] SexOptions { get; } = ["Male", "Female"];
+    public IReadOnlyList<EraCharacterTemplate> EraTemplates =>
+        EraTemplateCatalog.Templates;
     public CharacterSummary Summary
     {
         get => summary;
@@ -163,6 +166,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         EraPresetCatalog.BuildInferredEraLabel(Character.GameYear);
     public string EraAvailabilitySummary =>
         BuildEraAvailabilitySummary();
+    public EraCharacterTemplate? SelectedEraTemplate
+    {
+        get => selectedEraTemplate;
+        set
+        {
+            selectedEraTemplate = value;
+            OnPropertyChanged();
+        }
+    }
     public int CharacterHeight { get => Character.Height; set => Character.Height = value; }
     public int Weight { get => Character.Weight; set => Character.Weight = value; }
     public string Notes { get => Character.Notes; set => Character.Notes = value; }
@@ -401,6 +413,26 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             throw new InvalidOperationException(
                 "The editor campaign year did not infer the Civil War era.");
+        }
+    }
+
+    public void SmokeEraTemplateSelection()
+    {
+        SelectedEraTemplate = EraTemplateCatalog.Templates.Single(template =>
+            template.Name == "Clan Invasion Rasalhague Survivor");
+        ApplyEraTemplate_Click(this, new RoutedEventArgs());
+        if (Character.Name != "Clan Invasion Rasalhague Survivor" ||
+            Character.GameYear != 3052 ||
+            Character.Affiliation != "Free Rasalhague Republic" ||
+            Character.SubAffiliation != "Clan War Expatriate" ||
+            !InferredEraLabel.Contains("Clan Invasion", StringComparison.Ordinal) ||
+            !Character.Skills.Any(skill =>
+                skill.Name == "Survival/City" && skill.Value == 15) ||
+            !Character.Traits.Any(trait =>
+                trait.Name == "Connections" && trait.Value == 25))
+        {
+            throw new InvalidOperationException(
+                "The era quick-start template was not applied in the editor.");
         }
     }
 
@@ -913,6 +945,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
     private void Recalculate_Click(object sender, RoutedEventArgs e) => Recalculate();
+
+    private void ApplyEraTemplate_Click(object sender, RoutedEventArgs e)
+    {
+        if (SelectedEraTemplate is null) return;
+
+        EraTemplateCatalog.Apply(Character, SelectedEraTemplate);
+        OnPropertyChanged(nameof(CharacterName));
+        OnPropertyChanged(nameof(SubAffiliation));
+        OnPropertyChanged(nameof(GameYear));
+        OnPropertyChanged(nameof(InferredEraLabel));
+        OnPropertyChanged(nameof(EraAvailabilitySummary));
+        OnPropertyChanged(nameof(Notes));
+        Recalculate();
+    }
 
     private void Recalculate()
     {

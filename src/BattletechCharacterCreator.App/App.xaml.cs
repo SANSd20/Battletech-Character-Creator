@@ -221,13 +221,26 @@ public partial class App : Application
                 DispatcherPriority.ApplicationIdle,
                 () =>
                 {
-                    wizard.SmokeHomeworldClanCharacter();
-                    var editor = new MainWindow(wizard.CreatedCharacter!);
-                    editor.SmokeCampaignYearEraSelection();
-                    editor.SmokeXpAllocation();
-                    editor.Close();
-                    wizard.Close();
-                    Shutdown(0);
+                    MainWindow? editor = null;
+                    try
+                    {
+                        wizard.SmokeHomeworldClanCharacter();
+                        editor = new MainWindow(wizard.CreatedCharacter!);
+                        editor.SmokeCampaignYearEraSelection();
+                        editor.SmokeXpAllocation();
+                        editor.Close();
+                        wizard.Close();
+                        Shutdown(0);
+                    }
+                    catch (Exception exception)
+                    {
+                        AppErrorReporter.WriteReport(
+                            exception,
+                            "Editor allocation smoke");
+                        editor?.Close();
+                        wizard.Close();
+                        Shutdown(1);
+                    }
                 });
             wizard.Show();
             return;

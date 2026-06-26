@@ -90,6 +90,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   Report source audit
 - Era-aware affiliation and sub-affiliation availability filters with visible
   era notes for Stage 0
+- Era quick-start templates for common campaign eras in the editor
 - All affiliations and 68 corrected sub-affiliations
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
 - Character editor with guided Attribute, Trait, and Skill XP controls
@@ -143,8 +144,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Run the manual preview test plan on the installed app
 - Continue importing and modeling selected optional mechanics from
   *A Time of War Companion*
-- Add era-aware template behavior from the local Era Digest and Era Report
-  source audit
+- Expand era template coverage after manual preview feedback
 - Expand reload, patch repair rules, ammunition modifier, vehicle, and prosthetic enhancement
   purchasing details
 - Continue interface polish and usability testing

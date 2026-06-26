@@ -164,6 +164,21 @@
                                    TextWrapping="Wrap"
                                    Foreground="#5B5B56"
                                    Margin="0,8,0,0"/>
+                        <TextBlock Text="Quick-start template" Style="{StaticResource EditorLabel}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox ItemsSource="{Binding EraTemplates}"
+                                      SelectedItem="{Binding SelectedEraTemplate}"
+                                      DisplayMemberPath="DisplayName"/>
+                            <Button Grid.Column="2"
+                                    Content="Apply"
+                                    Padding="16,4"
+                                    Click="ApplyEraTemplate_Click"/>
+                        </Grid>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>

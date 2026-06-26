@@ -79,6 +79,7 @@ Assert(loaded.ClanCaste == character.ClanCaste &&
 CheckResourceCatalog();
 CheckEraInference();
 CheckEraAvailability();
+CheckEraTemplates();
 
 Assert(CharacterRules.AttributeValue(99) == 1, "Sub-100 attributes have value 1.");
 Assert(CharacterRules.AttributeValue(400) == 4, "Attribute XP converts to its value.");
@@ -415,6 +416,30 @@ static void CheckEraAvailability()
         !invasionSubAffiliations.Any(module => module.Name == "Ghost Bear Dominion") &&
         civilWarSubAffiliations.Any(module => module.Name == "Ghost Bear Dominion"),
         "Rasalhague sub-affiliation availability must follow the selected era.");
+}
+
+static void CheckEraTemplates()
+{
+    Assert(EraTemplateCatalog.Templates.Count == 4 &&
+        EraTemplateCatalog.Templates.Select(template => template.Name).SequenceEqual(
+            ["Star League Technician", "Clan Invasion Rasalhague Survivor",
+             "Civil War Mercenary", "Late Dark Age Scout"]),
+        "Era quick-start templates must remain stable and visible.");
+
+    var character = new Character();
+    var template = EraTemplateCatalog.Templates.Single(item =>
+        item.Name == "Clan Invasion Rasalhague Survivor");
+    EraTemplateCatalog.Apply(character, template);
+    Assert(character.Name == template.Name &&
+        character.GameYear == 3052 &&
+        character.Affiliation == "Free Rasalhague Republic" &&
+        character.SubAffiliation == "Clan War Expatriate" &&
+        character.Notes.Contains("Clan Invasion", StringComparison.Ordinal) &&
+        character.Skills.Any(skill =>
+            skill.Name == "Survival/City" && skill.Value == 15) &&
+        character.Traits.Any(trait =>
+            trait.Name == "Connections" && trait.Value == 25),
+        "Era quick-start templates must apply campaign year, affiliation, notes, skills, and traits.");
 }
 
 static void CheckSample(

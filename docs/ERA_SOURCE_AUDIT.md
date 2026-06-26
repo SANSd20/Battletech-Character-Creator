@@ -43,4 +43,6 @@ override the core character-creation rules in the corrected third printing.
 - Era-aware equipment availability and warnings. Done: selected equipment and
   weapon detail panels show campaign-year warnings for tracked advanced or
   later-era items without hard-blocking purchases.
-- Character templates or quick-start examples for specific eras.
+- Character templates or quick-start examples for specific eras. Done:
+  first-pass editor templates cover Star League, Clan Invasion, Civil War, and
+  Late Dark Age campaign starts.
