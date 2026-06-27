@@ -24,23 +24,27 @@ $sheetExportPath = Join-Path $installTarget "installer-smoke-sheet-export.pdf"
 $sheetExportErrorPath = $sheetExportPath + ".error.txt"
 $uninstaller = Join-Path $installTarget "uninstall.exe"
 
-if (!(Test-Path -LiteralPath $installer)) {
-    throw "Installer not found: $installer"
-}
-
 if ($DryRun) {
     Write-Host "Installer: $installer"
+    if (!(Test-Path -LiteralPath $installer)) {
+        Write-Host "Installer is not present; dry run will only show the planned checks."
+    }
     Write-Host "Install target: $installTarget"
     Write-Host "Would run: $installer /S /D=$installTarget"
     Write-Host "Would verify: $installedExe"
     Write-Host "Would verify: $resourceFile"
     Write-Host "Would verify: $sheetFile"
+    Write-Host "Would smoke: $installedExe --smoke-start"
     Write-Host "Would smoke: $installedExe --smoke-error-report=$smokeReport"
     Write-Host "Would verify smoke report diagnostic metadata"
     Write-Host "Would smoke: $installedExe --smoke-sheet-export=$sheetExportPath"
     Write-Host "Would verify sheet export output"
     Write-Host "Would uninstall: $uninstaller /S"
     exit 0
+}
+
+if (!(Test-Path -LiteralPath $installer)) {
+    throw "Installer not found: $installer"
 }
 
 if (Test-Path -LiteralPath $installTarget) {
@@ -60,6 +64,18 @@ foreach ($path in @($installedExe, $resourceFile, $sheetFile, $uninstaller)) {
     if (!(Test-Path -LiteralPath $path)) {
         throw "Installed file missing: $path"
     }
+}
+
+$startSmokeProcess = Start-Process -FilePath $installedExe `
+    -ArgumentList "--smoke-start" `
+    -WindowStyle Hidden `
+    -PassThru
+if (!$startSmokeProcess.WaitForExit(30000)) {
+    $startSmokeProcess.Kill()
+    throw "Installed app start-window smoke test timed out."
+}
+if ($startSmokeProcess.ExitCode -ne 0) {
+    throw "Installed app start-window smoke test exited with code $($startSmokeProcess.ExitCode)."
 }
 
 $smokeProcess = Start-Process -FilePath $installedExe `

@@ -135,7 +135,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Locally compile-verified per-user NSIS installer script for the .NET publish
   output
 - Installer smoke-test script for install, launch diagnostics, and uninstall
-  verification, including installed-app sheet export
+  verification, including installed-app start-window validation and sheet export
 - Full installer install, launch-smoke, and uninstall verification
 - Automated release-check script covering tests, start window, app smokes,
   sheet export output, publish, and installer dry-run

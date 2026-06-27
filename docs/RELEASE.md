@@ -43,7 +43,9 @@ To smoke-test the built installer on a normal Windows session:
 ```
 
 In restricted environments, use dry-run mode to validate paths and commands
-without executing the installer:
+without executing the installer. Dry-run mode can be used before the installer
+has been rebuilt; it reports the planned checks even when the installer file is
+not present yet:
 
 ```powershell
 .\scripts\Test-Installer.ps1 -DryRun
@@ -69,8 +71,9 @@ smoke:
 
 Status note: the full installer smoke test passed on June 18, 2026. Repeat it
 before each packaged release after rebuilding the installer. The smoke test
-also checks that the installed app can write diagnostic metadata to its launch
-report and export a nonempty character-sheet PDF.
+also checks that the installed app can validate the start window assets, write
+diagnostic metadata to its launch report, and export a nonempty character-sheet
+PDF.
 
 After automated checks pass, run the installed-app manual preview checklist:
 

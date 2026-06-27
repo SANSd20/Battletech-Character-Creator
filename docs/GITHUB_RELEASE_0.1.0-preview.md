@@ -90,6 +90,8 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Release checks verify Windows assembly/file versions match the release version
 - Start-window smoke runs headlessly before WPF startup so release automation
   validates launch choices without hanging on window construction
+- Installer smoke validates the installed start-window choices and required
+  launch-screen assets
 - Installer smoke validates diagnostic metadata from the installed app
 - Installer smoke validates character-sheet PDF export from the installed app
 - Per-user Windows installer
