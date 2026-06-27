@@ -353,6 +353,7 @@ public static class LifePathEngine
     {
         if (AttributeNames.Contains(name)) return EffectTarget.Attribute;
         if (TraitNames.Contains(name) ||
+            name.StartsWith("Compulsion/", StringComparison.Ordinal) ||
             name.StartsWith("Exceptional Attribute/", StringComparison.Ordinal) ||
             name.StartsWith("Natural Aptitude/", StringComparison.Ordinal))
         {

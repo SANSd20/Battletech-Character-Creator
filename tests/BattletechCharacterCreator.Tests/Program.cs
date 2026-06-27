@@ -817,6 +817,25 @@ static void CheckLateChildhoods()
         "Late-childhood affiliation streetwise must use the selected affiliation.");
     Assert(character.Skills.Single(item => item.Name == "Language/English").Value == 15,
         "Late-childhood language modifiers must accumulate with the base language.");
+    var flexibleChoice = warfare.Choices.Single(choice => choice.Id == "flex");
+    Assert(flexibleChoice.Options.Contains("Compulsion/Paranoid"),
+        "Stage 1 flexible XP must offer cataloged Compulsion traits.");
+    Assert(LifePathEngine.ClassifyFlexibleTarget("Compulsion/Paranoid") == EffectTarget.Trait,
+        "Stage 1 flexible XP must classify Compulsion targets as traits.");
+    var compulsionCharacter = LifePathEngine.CreateBase("Compulsion", "Language/English");
+    LifePathEngine.Apply(compulsionCharacter, new ModuleSelection(
+        warfare,
+        new Dictionary<string, IReadOnlyList<string>>
+        {
+            ["survival"] = ["Survival/Arctic"],
+            ["flex"] = []
+        },
+        new Dictionary<string, IReadOnlyList<ChoiceAllocation>>
+        {
+            ["flex"] = [new ChoiceAllocation("Compulsion/Paranoid", 130)]
+        }));
+    Assert(compulsionCharacter.Traits.Single(item => item.Name == "Compulsion/Paranoid").Value == 110,
+        "Stage 1 flexible XP must apply Compulsion allocations to trait XP.");
 
     var trueborn = LifePathCatalog.LateChildhoods
         .Single(module => module.Id == "late-trueborn-sibko");

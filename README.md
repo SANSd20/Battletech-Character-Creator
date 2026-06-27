@@ -93,6 +93,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Era quick-start templates for common campaign eras in the editor
 - All affiliations and 68 corrected sub-affiliations
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
+- Stage 1 flexible XP target lists include cataloged Compulsion traits
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
 - Character editor with guided Attribute, Trait, and Skill XP controls

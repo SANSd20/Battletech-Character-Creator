@@ -94,6 +94,44 @@ public static class LifePathCatalog
         ["Compulsion/Alcohol Addiction", "Compulsion/Drug Addiction",
             "Compulsion/Smoking Addiction", "Compulsion/Gambling"];
 
+    private static readonly string[] CompulsionTraits =
+    [
+        "Compulsion/Adder Arrogance", "Compulsion/Alcohol Addiction",
+        "Compulsion/Arrogance", "Compulsion/Atrean Opponent",
+        "Compulsion/Berserker", "Compulsion/Blood Spirit Fanaticism",
+        "Compulsion/Burrock Forever!", "Compulsion/Castilian Honor Code",
+        "Compulsion/Catatonia", "Compulsion/Chemical Addiction",
+        "Compulsion/Clan Honor", "Compulsion/Confusion",
+        "Compulsion/Distrust FedSuns", "Compulsion/Distrust Lyrans",
+        "Compulsion/Distrust of Inner Sphere",
+        "Compulsion/Distrust of Non-Terrans", "Compulsion/Drug Addiction",
+        "Compulsion/Falcon Pride", "Compulsion/Fire Mandrill Fanaticism",
+        "Compulsion/Flashbacks", "Compulsion/Gambling", "Compulsion/Greedy",
+        "Compulsion/Hate Ghost Bears", "Compulsion/Hate Hell's Horses",
+        "Compulsion/Hate Invading Clans", "Compulsion/Hate Jade Falcons",
+        "Compulsion/Hate Snow Ravens", "Compulsion/Hate Star Adder",
+        "Compulsion/Hate Steel Vipers", "Compulsion/Hatred for Authority",
+        "Compulsion/Hatred of Capellan Confederation",
+        "Compulsion/Hatred of Clans", "Compulsion/Hatred of ComStar",
+        "Compulsion/Hatred of Draconis Combine",
+        "Compulsion/Hatred of Federated Suns",
+        "Compulsion/Hatred of House Liao", "Compulsion/Hatred of House Marik",
+        "Compulsion/Hatred of Umayyads", "Compulsion/Hatred of Word of Blake",
+        "Compulsion/Hysteria", "Compulsion/Kindraa Fanaticism",
+        "Compulsion/Loyalty to Crime Boss",
+        "Compulsion/Loyalty to Draconis Combine",
+        "Compulsion/Loyalty to House Kurita",
+        "Compulsion/Necrosia Addiction", "Compulsion/Nostalgic",
+        "Compulsion/Paranoia", "Compulsion/Paranoid",
+        "Compulsion/Paranoid of Combine Government",
+        "Compulsion/Rasalhague Pride", "Compulsion/Raven Pride",
+        "Compulsion/Regression", "Compulsion/Religious Faith",
+        "Compulsion/Smoking Addiction", "Compulsion/Split Personality",
+        "Compulsion/Stubborn", "Compulsion/Traumatic Memories",
+        "Compulsion/Wolf Pride", "Compulsion/Xenophobia",
+        "Compulsion/Xenophobic"
+    ];
+
     private static readonly string[] ClanProtocols =
         ["Protocol/Blood Spirit", "Protocol/Cloud Cobra", "Protocol/Coyote",
             "Protocol/Diamond Shark", "Protocol/Fire Mandrill",
@@ -171,7 +209,8 @@ public static class LifePathCatalog
         "Alternate ID", "Ambidextrous", "Animal Empathy", "Attractive", "Combat Sense",
         "Connections", "Equipped", "Exceptional Attribute/STR", "Extra Income", "Fast Learner",
         "Fit", "Good Hearing", "Good Vision", "Natural Aptitude/Perception", "Pain Resistance",
-        "Patient", "Property", "Reputation", "Sixth Sense", "Thick-Skinned", "Toughness", "Wealth"
+        "Patient", "Property", "Reputation", "Sixth Sense", "Thick-Skinned", "Toughness", "Wealth",
+        ..CompulsionTraits
     ];
 
     private static readonly string[] FlexibleSkills =
