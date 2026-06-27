@@ -138,7 +138,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   verification, including installed-app start-window validation and sheet export
 - Full installer install, launch-smoke, and uninstall verification
 - Automated release-check script covering tests, start window, app smokes,
-  sheet export output, publish, and installer dry-run
+  sheet export output, publish, and self-checking installer dry-run coverage
 - Preview release packaging script with installer checksum, stale-installer
   guard, and manifest output
 - Preview release notes included in packaged release artifacts

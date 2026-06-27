@@ -150,10 +150,27 @@ if (!$SkipInstallerBuild) {
     }
 
     Invoke-Step "Installer smoke dry-run" {
-        powershell -NoProfile -ExecutionPolicy Bypass `
+        $installerDryRunOutput = powershell -NoProfile -ExecutionPolicy Bypass `
             -File scripts\Test-Installer.ps1 -DryRun `
             -InstallerPath "niss\atow-character-creator-$Version-setup.exe" `
             -ExpectedVersion $Version
+        if ($LASTEXITCODE -ne 0) {
+            throw "Installer smoke dry-run failed with exit code $LASTEXITCODE."
+        }
+        $installerDryRunOutput | Write-Host
+        $requiredDryRunText = @(
+            "--smoke-start",
+            "--smoke-error-report=",
+            "--smoke-sheet-export=",
+            "Would verify smoke report diagnostic metadata",
+            "Would uninstall:"
+        )
+        $installerDryRunText = $installerDryRunOutput -join "`n"
+        foreach ($text in $requiredDryRunText) {
+            if (!$installerDryRunText.Contains($text)) {
+                throw "Installer smoke dry-run did not include planned check: $text"
+            }
+        }
     }
 }
 

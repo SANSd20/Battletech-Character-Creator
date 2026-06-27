@@ -88,6 +88,8 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Release checks validate diagnostic report versions against the requested version
 - Release checks verify the app project version matches the requested version
 - Release checks verify Windows assembly/file versions match the release version
+- Release checks verify the installer dry-run still covers installed start,
+  diagnostic, sheet export, and uninstall checks
 - Start-window smoke runs headlessly before WPF startup so release automation
   validates launch choices without hanging on window construction
 - Installer smoke validates the installed start-window choices and required
