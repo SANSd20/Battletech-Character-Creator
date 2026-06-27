@@ -61,6 +61,8 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - All corrected-printing affiliations and 68 sub-affiliations
 - All 24 corrected-printing Stage 4 base modules, including variants
 - Two ordered Stage 4 careers with repeat and prerequisite handling
+- Wizard character totals remain visible while flexible XP pools still have
+  unallocated or overallocated XP
 - Character editor with XP controls for attributes, skills, and traits
 - Legacy `.btcc` save/load compatibility
 - Searchable equipment and weapon catalogs with C-Bill and mass summaries

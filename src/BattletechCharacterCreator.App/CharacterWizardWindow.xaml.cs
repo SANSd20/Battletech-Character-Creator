@@ -1621,12 +1621,18 @@ public partial class CharacterWizardWindow : Window
         }
         catch (InvalidOperationException)
         {
-            PreviewAttributes.ItemsSource = null;
-            PreviewSkills.ItemsSource = null;
-            PreviewTraits.ItemsSource = null;
-            Stage0Attributes.ItemsSource = null;
-            Stage0Skills.ItemsSource = null;
-            Stage0Traits.ItemsSource = null;
+            if (TotalsHost.Visibility != Visibility.Visible)
+            {
+                PreviewAttributes.ItemsSource = null;
+                PreviewSkills.ItemsSource = null;
+                PreviewTraits.ItemsSource = null;
+            }
+            if (currentStep == 1)
+            {
+                Stage0Attributes.ItemsSource = null;
+                Stage0Skills.ItemsSource = null;
+                Stage0Traits.ItemsSource = null;
+            }
             ReviewAttributes.ItemsSource = null;
             ReviewSkills.ItemsSource = null;
             ReviewTraits.ItemsSource = null;
@@ -1634,7 +1640,10 @@ public partial class CharacterWizardWindow : Window
             ReviewCharacterSummary.Text = "";
             ReviewLifePath.Text = "";
             ReviewRuleStatus.Text = "Complete the earlier stages to review this character.";
-            RunningFreeXp.Text = "";
+            if (TotalsHost.Visibility != Visibility.Visible)
+            {
+                RunningFreeXp.Text = "";
+            }
         }
     }
 
