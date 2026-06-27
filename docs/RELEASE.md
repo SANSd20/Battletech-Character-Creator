@@ -64,7 +64,8 @@ release version, that smoke-test diagnostic reports include that version, and
 that the installer dry-run still covers installed start-window, diagnostic,
 sheet export, and uninstall checks. To avoid stale build-output file locks, it
 also closes `BattletechCharacterCreator.App` processes launched from this
-repository before build and publish steps.
+repository around app smoke, build, and publish steps. App smoke steps use a
+single pre-smoke app build and then run without rebuilding between launches.
 
 Then, outside restricted sandboxes, run the full installer install/uninstall
 smoke:

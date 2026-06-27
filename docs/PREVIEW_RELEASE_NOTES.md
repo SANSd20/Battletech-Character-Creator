@@ -45,8 +45,10 @@ release.
 - Release checks verify Windows assembly/file versions match the release version
 - Release checks verify the installer dry-run still covers installed start,
   diagnostic, sheet export, and uninstall checks
-- Release checks close repo-launched app instances before build and publish
-  steps to prevent stale file locks
+- Release checks close repo-launched app instances around app smoke, build, and
+  publish steps to prevent stale file locks
+- Release checks build once before app smoke steps and avoid rebuilding between
+  smoke launches
 - Start-window smoke runs headlessly before WPF startup so release automation
   validates launch choices without hanging on window construction
 - Installer smoke validates the installed start-window choices and required

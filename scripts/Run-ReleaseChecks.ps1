@@ -69,6 +69,21 @@ function Stop-RepoAppProcesses([string]$RepoRoot, [string]$Reason) {
     }
 }
 
+function Invoke-AppSmoke([string]$Name, [string[]]$Arguments) {
+    Invoke-Step $Name {
+        try {
+            Stop-RepoAppProcesses $repoRoot $Name
+            dotnet run --no-build --project src\BattletechCharacterCreator.App `
+                /p:UseSharedCompilation=false -- @Arguments
+            if ($LASTEXITCODE -ne 0) {
+                throw "$Name failed with exit code $LASTEXITCODE."
+            }
+        } finally {
+            Stop-RepoAppProcesses $repoRoot $Name
+        }
+    }
+}
+
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $repoRoot
 Stop-RepoAppProcesses $repoRoot "release checks"
@@ -109,39 +124,35 @@ Invoke-Step "Migration tests" {
         /p:UseSharedCompilation=false
 }
 
-Invoke-Step "Start window smoke" {
-    dotnet run --project src\BattletechCharacterCreator.App `
-        /p:UseSharedCompilation=false -- --smoke-start
+Invoke-Step "App smoke build" {
+    Stop-RepoAppProcesses $repoRoot "app smoke build"
+    dotnet build src\BattletechCharacterCreator.App --no-restore `
+        /p:UseSharedCompilation=false
 }
 
-Invoke-Step "Wizard smoke" {
-    dotnet run --project src\BattletechCharacterCreator.App `
-        /p:UseSharedCompilation=false -- --smoke-wizard
-}
+Invoke-AppSmoke "Start window smoke" @("--smoke-start")
 
-Invoke-Step "Clan round-trip smoke" {
-    dotnet run --project src\BattletechCharacterCreator.App `
-        /p:UseSharedCompilation=false -- --smoke-clan-roundtrip
-}
+Invoke-AppSmoke "Wizard smoke" @("--smoke-wizard")
 
-Invoke-Step "Representative life paths smoke" {
-    dotnet run --project src\BattletechCharacterCreator.App `
-        /p:UseSharedCompilation=false -- --smoke-complete-life-paths
-}
+Invoke-AppSmoke "Clan round-trip smoke" @("--smoke-clan-roundtrip")
 
-Invoke-Step "Editor allocation smoke" {
-    dotnet run --project src\BattletechCharacterCreator.App `
-        /p:UseSharedCompilation=false -- --smoke-editor-allocation
-}
+Invoke-AppSmoke "Representative life paths smoke" @("--smoke-complete-life-paths")
 
-Invoke-Step "Inventory smoke" {
-    dotnet run --project src\BattletechCharacterCreator.App `
-        /p:UseSharedCompilation=false -- --smoke-inventory
-}
+Invoke-AppSmoke "Editor allocation smoke" @("--smoke-editor-allocation")
+
+Invoke-AppSmoke "Inventory smoke" @("--smoke-inventory")
 
 Invoke-Step "Sheet export smoke" {
-    dotnet run --project src\BattletechCharacterCreator.App `
-        /p:UseSharedCompilation=false -- --smoke-sheet-export=$sheetExportPath
+    try {
+        Stop-RepoAppProcesses $repoRoot "sheet export smoke"
+        dotnet run --no-build --project src\BattletechCharacterCreator.App `
+            /p:UseSharedCompilation=false -- --smoke-sheet-export=$sheetExportPath
+        if ($LASTEXITCODE -ne 0) {
+            throw "Sheet export smoke failed with exit code $LASTEXITCODE."
+        }
+    } finally {
+        Stop-RepoAppProcesses $repoRoot "sheet export smoke"
+    }
     if (Test-Path -LiteralPath $sheetExportErrorPath) {
         $exportError = Get-Content -LiteralPath $sheetExportErrorPath -Raw
         throw "Sheet export smoke wrote an error report: $exportError"
@@ -155,14 +166,30 @@ Invoke-Step "Sheet export smoke" {
 }
 
 Invoke-Step "Error report smoke" {
-    dotnet run --project src\BattletechCharacterCreator.App `
-        /p:UseSharedCompilation=false -- --smoke-error-report=$errorReportPath
+    try {
+        Stop-RepoAppProcesses $repoRoot "error report smoke"
+        dotnet run --no-build --project src\BattletechCharacterCreator.App `
+            /p:UseSharedCompilation=false -- --smoke-error-report=$errorReportPath
+        if ($LASTEXITCODE -ne 0) {
+            throw "Error report smoke failed with exit code $LASTEXITCODE."
+        }
+    } finally {
+        Stop-RepoAppProcesses $repoRoot "error report smoke"
+    }
     Assert-DiagnosticReport $errorReportPath "Error report smoke"
 }
 
 Invoke-Step "Operation report smoke" {
-    dotnet run --project src\BattletechCharacterCreator.App `
-        /p:UseSharedCompilation=false -- --smoke-operation-error-report=$operationReportPath
+    try {
+        Stop-RepoAppProcesses $repoRoot "operation report smoke"
+        dotnet run --no-build --project src\BattletechCharacterCreator.App `
+            /p:UseSharedCompilation=false -- --smoke-operation-error-report=$operationReportPath
+        if ($LASTEXITCODE -ne 0) {
+            throw "Operation report smoke failed with exit code $LASTEXITCODE."
+        }
+    } finally {
+        Stop-RepoAppProcesses $repoRoot "operation report smoke"
+    }
     Assert-DiagnosticReport $operationReportPath "Operation report smoke"
 }
 
