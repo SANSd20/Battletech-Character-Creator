@@ -358,20 +358,6 @@ public partial class App : Application
             return;
         }
 
-        if (e.Args.Contains("--smoke-start", StringComparer.Ordinal))
-        {
-            var start = new StartWindow();
-            start.Loaded += (_, _) => start.Dispatcher.BeginInvoke(
-                DispatcherPriority.ApplicationIdle,
-                () =>
-                {
-                    start.Close();
-                    ShutdownSmoke(0);
-                });
-            start.Show();
-            return;
-        }
-
         var captureArgument = e.Args.FirstOrDefault(
             argument => argument.StartsWith("--capture-start=", StringComparison.Ordinal));
         if (captureArgument is not null)

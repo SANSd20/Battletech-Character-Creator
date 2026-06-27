@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <StartupObject>BattletechCharacterCreator.App.Program</StartupObject>
     <ApplicationIcon>..\..\ico1.ico</ApplicationIcon>
     <AssemblyTitle>A Time of War Character Creator</AssemblyTitle>
     <AssemblyVersion>0.1.0.0</AssemblyVersion>

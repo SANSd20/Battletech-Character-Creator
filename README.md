@@ -127,6 +127,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   version
 - Release checks verify Windows assembly/file versions match the release
   version number
+- Start-window smoke runs headlessly before WPF startup so automation validates
+  the launch choices without hanging on window construction
 - Inventory smoke runs headlessly against catalog and inventory-rule checks so
   automation does not hang on editor window construction
 - Windows x64 folder publish profile documented in `docs/RELEASE.md`
