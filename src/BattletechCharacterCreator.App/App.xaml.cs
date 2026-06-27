@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using BattletechCharacterCreator.Core.Models;
+using BattletechCharacterCreator.Core.Resources;
 using BattletechCharacterCreator.Core.Rules;
 
 namespace BattletechCharacterCreator.App;
@@ -56,7 +58,7 @@ public partial class App : Application
                 new InvalidOperationException("Smoke error report"),
                 "Smoke test",
                 outputPath);
-            Shutdown(0);
+            ShutdownSmoke(0);
             return;
         }
 
@@ -70,7 +72,7 @@ public partial class App : Application
                     "--smoke-operation-error-report=".Length..]);
             BattletechCharacterCreator.App.MainWindow
                 .SmokeOperationErrorReport(outputPath);
-            Shutdown(0);
+            ShutdownSmoke(0);
             return;
         }
 
@@ -87,13 +89,13 @@ public partial class App : Application
                         wizard.SmokeCampaignYearEraSelection();
                         wizard.SmokeCreateCharacter();
                         wizard.Close();
-                        Shutdown(0);
+                        ShutdownSmoke(0);
                     }
                     catch (Exception exception)
                     {
                         AppErrorReporter.WriteReport(exception, "Wizard smoke");
                         wizard.Close();
-                        Shutdown(1);
+                        ShutdownSmoke(1);
                     }
                 });
             wizard.Show();
@@ -109,7 +111,7 @@ public partial class App : Application
                 {
                     wizard.SmokeInvadingClanCharacter();
                     wizard.Close();
-                    Shutdown(0);
+                    ShutdownSmoke(0);
                 });
             wizard.Show();
             return;
@@ -124,7 +126,7 @@ public partial class App : Application
                 {
                     wizard.SmokeHomeworldClanCharacter();
                     wizard.Close();
-                    Shutdown(0);
+                    ShutdownSmoke(0);
                 });
             wizard.Show();
             return;
@@ -146,7 +148,7 @@ public partial class App : Application
                         editor.SmokeSaveAndReload(path);
                         editor.Close();
                         wizard.Close();
-                        Shutdown(0);
+                        ShutdownSmoke(0);
                     }
                     finally
                     {
@@ -194,13 +196,13 @@ public partial class App : Application
                             }
                         }
                         wizard.Close();
-                        Shutdown(0);
+                        ShutdownSmoke(0);
                     }
                     catch (Exception ex)
                     {
                         File.WriteAllText(errorPath, ex.ToString());
                         wizard.Close();
-                        Shutdown(1);
+                        ShutdownSmoke(1);
                     }
                     finally
                     {
@@ -230,7 +232,7 @@ public partial class App : Application
                         editor.SmokeXpAllocation();
                         editor.Close();
                         wizard.Close();
-                        Shutdown(0);
+                        ShutdownSmoke(0);
                     }
                     catch (Exception exception)
                     {
@@ -239,7 +241,7 @@ public partial class App : Application
                             "Editor allocation smoke");
                         editor?.Close();
                         wizard.Close();
-                        Shutdown(1);
+                        ShutdownSmoke(1);
                     }
                 });
             wizard.Show();
@@ -248,25 +250,22 @@ public partial class App : Application
 
         if (e.Args.Contains("--smoke-inventory", StringComparer.Ordinal))
         {
-            var editor = new MainWindow(
-                new BattletechCharacterCreator.Core.Models.Character());
-            editor.Loaded += (_, _) => editor.Dispatcher.BeginInvoke(
-                DispatcherPriority.ApplicationIdle,
-                () =>
-                {
-                    try
-                    {
-                        editor.SmokeInventoryCatalog();
-                        editor.Close();
-                        Shutdown(0);
-                    }
-                    catch
-                    {
-                        editor.Close();
-                        Shutdown(1);
-                    }
-                });
-            editor.Show();
+            try
+            {
+                SmokeInventoryCatalogHeadless();
+                ShutdownSmoke(0);
+            }
+            catch (Exception exception)
+            {
+                var reportPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "inventory-smoke-error-report.txt");
+                AppErrorReporter.WriteReport(
+                    exception,
+                    "Inventory smoke",
+                    reportPath);
+                ShutdownSmoke(1);
+            }
             return;
         }
 
@@ -289,13 +288,13 @@ public partial class App : Application
                         editor.SmokeExportCharacterSheet(outputPath);
                         editor.Close();
                         wizard.Close();
-                        Shutdown(0);
+                        ShutdownSmoke(0);
                     }
                     catch (Exception ex)
                     {
                         File.WriteAllText(outputPath + ".error.txt", ex.ToString());
                         wizard.Close();
-                        Shutdown(1);
+                        ShutdownSmoke(1);
                     }
                 });
             wizard.Show();
@@ -343,7 +342,7 @@ public partial class App : Application
                                         editor.Close();
                                         wizard.Close();
                                         File.Delete(characterPath);
-                                        Shutdown(0);
+                                        ShutdownSmoke(0);
                                     });
                             });
                         editor.Show();
@@ -367,7 +366,7 @@ public partial class App : Application
                 () =>
                 {
                     start.Close();
-                    Shutdown(0);
+                    ShutdownSmoke(0);
                 });
             start.Show();
             return;
@@ -385,7 +384,7 @@ public partial class App : Application
                 {
                     CaptureWindow(start, outputPath);
                     start.Close();
-                    Shutdown(0);
+                    ShutdownSmoke(0);
                 });
             start.Show();
             return;
@@ -476,13 +475,241 @@ public partial class App : Application
                     wizard.ShowStepForCapture(wizardStep);
                     CaptureWindow(wizard, outputPath);
                     wizard.Close();
-                    Shutdown(0);
+                    ShutdownSmoke(0);
                 });
             wizard.Show();
             return;
         }
 
         new StartWindow().Show();
+    }
+
+    private void ShutdownSmoke(int exitCode)
+    {
+        Environment.ExitCode = exitCode;
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(1000).ConfigureAwait(false);
+            Environment.Exit(exitCode);
+        });
+
+        foreach (var window in Windows.Cast<Window>().ToArray())
+        {
+            window.Close();
+        }
+        Current.Shutdown(exitCode);
+    }
+
+    private static void SmokeInventoryCatalogHeadless()
+    {
+        var resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
+        var catalog = ResourceCatalog.Load(resourcePath);
+        if (catalog.Options.IncludeCompanion)
+        {
+            throw new InvalidOperationException(
+                "Companion catalog content must be disabled by default.");
+        }
+
+        var flak = catalog.Equipment.Single(item => item.Name == "Flak/Jacket");
+        var katana = catalog.Weapons.Single(item => item.Name == "Katana");
+        var character = new Character();
+        character.Equipment.Add(new EquipmentItem
+        {
+            Name = flak.Name,
+            Cost = flak.Cost,
+            Mass = flak.Mass,
+            Locations = flak.Locations,
+            Armor = flak.Armor,
+            Notes = flak.Notes,
+            Count = "2"
+        });
+        character.Weapons.Add(new WeaponItem
+        {
+            Skill = katana.Skill,
+            Name = katana.Name,
+            Damage = katana.Damage,
+            Range = katana.Range,
+            Cost = katana.Cost,
+            Mass = katana.Mass,
+            Shots = katana.Shots,
+            AmmoCost = katana.AmmoCost,
+            AmmoMass = katana.AmmoMass,
+            Notes = katana.Notes,
+            Count = "3"
+        });
+        var summary = CharacterRules.Calculate(character);
+        if (character.Equipment.Single().Armor != "1/5/1/3" ||
+            character.Weapons.Single().Skill != "Melee Weapons" ||
+            summary.InventoryMass <= 0)
+        {
+            throw new InvalidOperationException(
+                "Catalog equipment and weapon fields were not copied correctly.");
+        }
+
+        character.Equipment.Clear();
+        character.Weapons.Clear();
+        character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Heavy smoke item",
+            Cost = "0",
+            Mass = "999",
+            Count = "1"
+        });
+        if (CharacterRules.Calculate(character).RemainingCapacity >= 0)
+        {
+            throw new InvalidOperationException(
+                "Inventory carrying capacity warning was not detectable.");
+        }
+
+        var companionCatalog = ResourceCatalog.Load(
+            resourcePath,
+            new ResourceCatalogOptions(IncludeCompanion: true));
+        if (!companionCatalog.Options.IncludeCompanion ||
+            companionCatalog.Equipment.All(item =>
+                item.Name != "Vintage Bulletproof Vest") ||
+            companionCatalog.Weapons.All(item => item.Name != "Shock Staff") ||
+            catalog.Equipment.Any(item => item.Source == RulebookSource.Companion) ||
+            catalog.Weapons.Any(item => item.Source == RulebookSource.Companion))
+        {
+            throw new InvalidOperationException(
+                "Companion catalog opt-in filtering did not work.");
+        }
+
+        character = new Character();
+        character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Wildcard smoke item",
+            Cost = "*",
+            Mass = "0",
+            Count = "2"
+        });
+        if (CharacterRules.Calculate(character).UnresolvedInventoryPrices != 2)
+        {
+            throw new InvalidOperationException(
+                "Wildcard inventory pricing was not counted.");
+        }
+
+        character.Equipment.Clear();
+        character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Patch warning armor",
+            Cost = "500",
+            Mass = "2",
+            PatchCount = "2"
+        });
+        if (CharacterRules.PatchPurchasesNeedingPrice(character) != 2)
+        {
+            throw new InvalidOperationException(
+                "Patch pricing warnings were not detected.");
+        }
+        character.Equipment.Clear();
+        character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Priced patch armor",
+            Cost = "500/100",
+            Mass = "2",
+            PatchCount = "2"
+        });
+        if (CharacterRules.PatchPurchasesNeedingPrice(character) != 0)
+        {
+            throw new InvalidOperationException(
+                "Patch pricing warnings did not clear with a patch price.");
+        }
+
+        character.Weapons.Add(new WeaponItem
+        {
+            Name = "Ammo detail warning weapon",
+            Cost = "100",
+            Mass = "1",
+            AmmoCost = "",
+            AmmoMass = "0.1",
+            AmmoCount = "2"
+        });
+        if (CharacterRules.AmmoPurchasesNeedingDetails(character) != 2)
+        {
+            throw new InvalidOperationException(
+                "Ammo detail warnings were not detected.");
+        }
+        character.Weapons.Clear();
+        character.Weapons.Add(new WeaponItem
+        {
+            Name = "Power-pack weapon",
+            Cost = "100",
+            Mass = "1",
+            Shots = "5 PPS",
+            AmmoCost = "5",
+            AmmoMass = "0.1",
+            AmmoCount = "2"
+        });
+        if (CharacterRules.AmmoPurchasesNeedingReloadReview(character) != 2)
+        {
+            throw new InvalidOperationException(
+                "Ammo reload review warnings were not detected.");
+        }
+        character.Weapons.Clear();
+        character.Weapons.Add(new WeaponItem
+        {
+            Name = "Numeric ammo weapon",
+            Cost = "100",
+            Mass = "1",
+            Shots = "10",
+            AmmoCost = "5",
+            AmmoMass = "0.1",
+            AmmoCount = "2"
+        });
+        if (CharacterRules.AmmoPurchasesNeedingDetails(character) != 0 ||
+            CharacterRules.AmmoPurchasesNeedingReloadReview(character) != 0)
+        {
+            throw new InvalidOperationException(
+                "Ammo warnings did not clear with complete ammo details.");
+        }
+
+        character.Equipment.Clear();
+        character.Weapons.Clear();
+        character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Prosthetic Enhancement - Vibroblade",
+            Cost = "1000",
+            Mass = "0",
+            Locations = "Prosthetic"
+        });
+        if (CharacterRules.UnmountedProstheticEnhancements(character) != 1)
+        {
+            throw new InvalidOperationException(
+                "Unmounted prosthetic enhancement warnings were not detected.");
+        }
+        character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Gill Implant",
+            Cost = "8000",
+            Mass = "0",
+            Locations = "Implant"
+        });
+        if (CharacterRules.UnmountedProstheticEnhancements(character) != 0)
+        {
+            throw new InvalidOperationException(
+                "Prosthetic enhancement warnings did not clear with an implant host.");
+        }
+
+        character.Equipment.Clear();
+        character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Hoodling Sensor HoverJeep",
+            Cost = "92000",
+            Mass = "0",
+            Locations = "Vehicle"
+        });
+        if (CharacterRules.UnbackedVehiclePurchases(character) != 1)
+        {
+            throw new InvalidOperationException(
+                "Vehicle trait support warnings were not detected.");
+        }
+        character.Traits.Add(new NamedValue("Vehicle", 100));
+        if (CharacterRules.UnbackedVehiclePurchases(character) != 0)
+        {
+            throw new InvalidOperationException(
+                "Vehicle trait support warnings did not clear with the Vehicle trait.");
+        }
     }
 
     private static void CaptureWindow(Window window, string outputPath)

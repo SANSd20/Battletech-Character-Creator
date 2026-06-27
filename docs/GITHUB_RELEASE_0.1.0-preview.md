@@ -73,6 +73,8 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Inventory status warnings for ammo purchases that need reload or power-pack review
 - Inventory status warnings for vehicle purchases that need Vehicle or Custom Vehicle
   trait support
+- Headless inventory smoke checks catalog and inventory-rule behavior without
+  constructing the editor window
 - Opt-in *A Time of War Companion* equipment and weapon catalog content
 - Opt-in *A Time of War Companion* expanded trait reference entries
 - Skill and Trait editor reference panels with source labels and rule notes

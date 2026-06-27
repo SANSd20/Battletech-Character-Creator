@@ -127,6 +127,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   version
 - Release checks verify Windows assembly/file versions match the release
   version number
+- Inventory smoke runs headlessly against catalog and inventory-rule checks so
+  automation does not hang on editor window construction
 - Windows x64 folder publish profile documented in `docs/RELEASE.md`
 - Locally compile-verified per-user NSIS installer script for the .NET publish
   output
