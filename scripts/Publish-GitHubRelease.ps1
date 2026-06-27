@@ -144,6 +144,22 @@ if ($authExitCode -ne 0) {
 $previousErrorActionPreference = $ErrorActionPreference
 $ErrorActionPreference = "Continue"
 try {
+    $existingReleaseOutput = & gh release view $TagName --repo $Repository --json url 2>&1
+    $existingReleaseExitCode = $LASTEXITCODE
+}
+finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+}
+if ($existingReleaseExitCode -eq 0) {
+    if ($existingReleaseOutput) {
+        $existingReleaseOutput | ForEach-Object { Write-Host $_ }
+    }
+    throw "GitHub release $TagName already exists in $Repository. Delete it, choose a new -Version/-TagName, or upload missing assets manually."
+}
+
+$previousErrorActionPreference = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+try {
     $releaseOutput = & gh @arguments 2>&1
     $releaseExitCode = $LASTEXITCODE
 }
@@ -154,5 +170,9 @@ if ($releaseOutput) {
     $releaseOutput | ForEach-Object { Write-Host $_ }
 }
 if ($releaseExitCode -ne 0) {
-    throw "GitHub release creation failed with exit code $releaseExitCode. See the GitHub CLI output above."
+    $releaseOutputText = ($releaseOutput | Out-String).Trim()
+    if ([string]::IsNullOrWhiteSpace($releaseOutputText)) {
+        $releaseOutputText = "No output was returned by GitHub CLI."
+    }
+    throw "GitHub release creation failed with exit code $releaseExitCode. GitHub CLI output: $releaseOutputText"
 }
