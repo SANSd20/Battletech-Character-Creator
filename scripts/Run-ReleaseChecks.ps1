@@ -37,8 +37,41 @@ function Assert-DiagnosticReport([string]$Path, [string]$Name) {
     }
 }
 
+function Stop-RepoAppProcesses([string]$RepoRoot, [string]$Reason) {
+    $repoPrefix = [System.IO.Path]::GetFullPath($RepoRoot)
+    $processes = Get-Process BattletechCharacterCreator.App -ErrorAction SilentlyContinue |
+        Where-Object {
+            try {
+                $_.Path -and
+                    [System.IO.Path]::GetFullPath($_.Path).StartsWith(
+                        $repoPrefix,
+                        [System.StringComparison]::OrdinalIgnoreCase)
+            } catch {
+                $false
+            }
+        }
+
+    if ($null -eq $processes) {
+        return
+    }
+
+    Write-Host "Closing repo app process(es) before $Reason..."
+    foreach ($process in $processes) {
+        $process.CloseMainWindow() | Out-Null
+    }
+    Start-Sleep -Seconds 2
+
+    foreach ($process in $processes) {
+        $running = Get-Process -Id $process.Id -ErrorAction SilentlyContinue
+        if ($null -ne $running) {
+            Stop-Process -Id $process.Id -Force
+        }
+    }
+}
+
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $repoRoot
+Stop-RepoAppProcesses $repoRoot "release checks"
 
 $appProjectPath = Join-Path $repoRoot "src\BattletechCharacterCreator.App\BattletechCharacterCreator.App.csproj"
 [xml]$appProject = Get-Content -LiteralPath $appProjectPath
@@ -134,10 +167,12 @@ Invoke-Step "Operation report smoke" {
 }
 
 Invoke-Step "Solution build" {
+    Stop-RepoAppProcesses $repoRoot "solution build"
     dotnet build BattletechCharacterCreator.sln /p:UseSharedCompilation=false
 }
 
 Invoke-Step "Folder publish" {
+    Stop-RepoAppProcesses $repoRoot "folder publish"
     dotnet publish src\BattletechCharacterCreator.App `
         /p:PublishProfile=win-x64-folder `
         /p:UseSharedCompilation=false

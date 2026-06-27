@@ -62,7 +62,9 @@ nonempty PDF and does not write an export error report. It also validates that
 the app project informational, assembly, and file versions match the requested
 release version, that smoke-test diagnostic reports include that version, and
 that the installer dry-run still covers installed start-window, diagnostic,
-sheet export, and uninstall checks.
+sheet export, and uninstall checks. To avoid stale build-output file locks, it
+also closes `BattletechCharacterCreator.App` processes launched from this
+repository before build and publish steps.
 
 Then, outside restricted sandboxes, run the full installer install/uninstall
 smoke:
