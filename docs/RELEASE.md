@@ -133,10 +133,18 @@ To publish the preview with GitHub CLI after signing in with `gh auth login`:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Publish-GitHubRelease.ps1
 ```
 
+If the prerelease already exists and you want to refresh its notes and attached
+assets from the current package, rerun with:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Publish-GitHubRelease.ps1 -UpdateExisting
+```
+
 The publish helper checks that the installer, checksum, release notes, GitHub
 release draft, and manifest are present. It also verifies that the checksum
 matches the installer, that the preview notes and GitHub release draft include
 the requested version, that the draft includes the current installer hash, and
 that the manifest was generated from the current clean commit and requested
 version with matching installer hash, size, and build timestamp before creating
-the prerelease.
+the prerelease. If `-UpdateExisting` is used, the helper updates the existing
+prerelease notes and uploads the current assets with `--clobber`.

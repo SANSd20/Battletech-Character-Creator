@@ -4,6 +4,7 @@ param(
     [string]$TagName = "",
     [string]$Title = "",
     [switch]$DryRun,
+    [switch]$UpdateExisting,
     [switch]$AllowDirtyManifest
 )
 
@@ -109,6 +110,29 @@ $arguments = @(
     "--prerelease"
 ) + $assetPaths
 
+$editArguments = @(
+    "release",
+    "edit",
+    $TagName,
+    "--repo",
+    $Repository,
+    "--title",
+    $Title,
+    "--notes-file",
+    $notesPath,
+    "--prerelease"
+)
+
+$uploadArguments = @(
+    "release",
+    "upload",
+    $TagName
+) + $assetPaths + @(
+    "--repo",
+    $Repository,
+    "--clobber"
+)
+
 Write-Host "Release package validated:"
 Write-Host $releaseDir
 Write-Host "Tag: $TagName"
@@ -116,7 +140,13 @@ Write-Host "Repository: $Repository"
 
 if ($DryRun) {
     Write-Host "Dry run only. GitHub release command:"
-    Write-Host "gh $($arguments -join ' ')"
+    if ($UpdateExisting) {
+        Write-Host "gh $($editArguments -join ' ')"
+        Write-Host "gh $($uploadArguments -join ' ')"
+    }
+    else {
+        Write-Host "gh $($arguments -join ' ')"
+    }
     exit 0
 }
 
@@ -154,7 +184,56 @@ if ($existingReleaseExitCode -eq 0) {
     if ($existingReleaseOutput) {
         $existingReleaseOutput | ForEach-Object { Write-Host $_ }
     }
-    throw "GitHub release $TagName already exists in $Repository. Delete it, choose a new -Version/-TagName, or upload missing assets manually."
+    if (!$UpdateExisting) {
+        throw "GitHub release $TagName already exists in $Repository. Rerun with -UpdateExisting to refresh notes and assets, delete it, or choose a new -Version/-TagName."
+    }
+}
+elseif ($UpdateExisting) {
+    Write-Host "GitHub release $TagName does not exist yet. Creating it instead of updating."
+}
+
+if ($existingReleaseExitCode -eq 0 -and $UpdateExisting) {
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        $editOutput = & gh @editArguments 2>&1
+        $editExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    if ($editOutput) {
+        $editOutput | ForEach-Object { Write-Host $_ }
+    }
+    if ($editExitCode -ne 0) {
+        $editOutputText = ($editOutput | Out-String).Trim()
+        if ([string]::IsNullOrWhiteSpace($editOutputText)) {
+            $editOutputText = "No output was returned by GitHub CLI."
+        }
+        throw "GitHub release update failed with exit code $editExitCode. GitHub CLI output: $editOutputText"
+    }
+
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        $uploadOutput = & gh @uploadArguments 2>&1
+        $uploadExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    if ($uploadOutput) {
+        $uploadOutput | ForEach-Object { Write-Host $_ }
+    }
+    if ($uploadExitCode -ne 0) {
+        $uploadOutputText = ($uploadOutput | Out-String).Trim()
+        if ([string]::IsNullOrWhiteSpace($uploadOutputText)) {
+            $uploadOutputText = "No output was returned by GitHub CLI."
+        }
+        throw "GitHub release asset upload failed with exit code $uploadExitCode. GitHub CLI output: $uploadOutputText"
+    }
+
+    exit 0
 }
 
 $previousErrorActionPreference = $ErrorActionPreference

@@ -157,6 +157,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - GitHub-ready preview release draft included in packaged release artifacts
 - GitHub release publish helper with package, checksum, manifest, and installer
   metadata/version/notes validation
+- GitHub release publish helper can refresh an existing prerelease's notes and
+  assets with an explicit update flag
 - Manual preview test plan in `docs/MANUAL_TEST_PLAN.md` and generated manual
   test run logs under `artifacts/manual-tests`
 - Automated tests covering major Inner Sphere, Periphery, ComStar, and Clan paths
