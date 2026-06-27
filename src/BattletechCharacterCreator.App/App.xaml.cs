@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using BattletechCharacterCreator.Core.LifePath;
 using BattletechCharacterCreator.Core.Models;
 using BattletechCharacterCreator.Core.Resources;
 using BattletechCharacterCreator.Core.Rules;
@@ -78,27 +79,16 @@ public partial class App : Application
 
         if (e.Args.Contains("--smoke-wizard", StringComparer.Ordinal))
         {
-            var wizard = new CharacterWizardWindow();
-            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
-                DispatcherPriority.ApplicationIdle,
-                () =>
-                {
-                    try
-                    {
-                        wizard.SmokeAllSelections();
-                        wizard.SmokeCampaignYearEraSelection();
-                        wizard.SmokeCreateCharacter();
-                        wizard.Close();
-                        ShutdownSmoke(0);
-                    }
-                    catch (Exception exception)
-                    {
-                        AppErrorReporter.WriteReport(exception, "Wizard smoke");
-                        wizard.Close();
-                        ShutdownSmoke(1);
-                    }
-                });
-            wizard.Show();
+            try
+            {
+                SmokeWizardHeadless();
+                ShutdownSmoke(0);
+            }
+            catch (Exception exception)
+            {
+                AppErrorReporter.WriteReport(exception, "Wizard smoke");
+                ShutdownSmoke(1);
+            }
             return;
         }
 
@@ -696,6 +686,95 @@ public partial class App : Application
             throw new InvalidOperationException(
                 "Vehicle trait support warnings did not clear with the Vehicle trait.");
         }
+    }
+
+    private static void SmokeWizardHeadless()
+    {
+        if (EraAvailabilityCatalog.EarliestAffiliationYear("invading-clan") is not { } clanYear ||
+            clanYear > 3052)
+        {
+            throw new InvalidOperationException(
+                "Wizard smoke could not verify Clan Invasion affiliation availability.");
+        }
+        var rasalhague = LifePathCatalog.Affiliations
+            .First(module => module.Id == "rasalhague");
+        var rasalhagueIn3052 = EraAvailabilityCatalog.FilterSubAffiliations(
+            rasalhague.Id, rasalhague.SubAffiliations ?? [], 3052);
+        var rasalhagueIn3062 = EraAvailabilityCatalog.FilterSubAffiliations(
+            rasalhague.Id, rasalhague.SubAffiliations ?? [], 3062);
+        if (rasalhagueIn3052.Any(module =>
+                module.Name == "Ghost Bear Dominion") ||
+            !rasalhagueIn3062.Any(module =>
+                module.Name == "Ghost Bear Dominion"))
+        {
+            throw new InvalidOperationException(
+                "Wizard smoke could not verify era-aware Rasalhague sub-affiliation availability.");
+        }
+
+        const string language = "Language/English";
+        var affiliation = LifePathCatalog.Affiliations
+            .First(module => module.Id == "lyran");
+        var childhood = LifePathCatalog.Childhoods
+            .First(module => module.Id == "street");
+        var lateChildhood = LifePathCatalog.LateChildhoods
+            .First(module => module.Id == "late-street");
+        var career = LifePathCatalog.RealLifeModules
+            .First(module => module.Id == "real-agitator");
+
+        var character = LifePathEngine.CreateBase("Wizard Smoke", language);
+        character.Affiliation = affiliation.Name;
+        character.EarlyChildhood = childhood.Name;
+        character.LateChildhood = lateChildhood.Name;
+        character.RealLife = career.Name;
+        character.BirthYear = 3026;
+        character.GameYear = 3052;
+
+        var modules = new[] { affiliation, childhood, lateChildhood, career };
+        LifePathEngine.Apply(character, CreateDefaultSelection(affiliation));
+        LifePathEngine.Apply(character, CreateDefaultSelection(childhood));
+        LifePathEngine.Apply(character, CreateDefaultSelection(lateChildhood));
+        LifePathEngine.ApplyStage4(character, CreateDefaultSelection(career));
+        LifePathEngine.ApplyAffiliationContext(
+            character, affiliation, childhood, language);
+        LifePathEngine.ApplyAffiliationContext(
+            character, affiliation, lateChildhood, language);
+        LifePathEngine.ApplyAffiliationContext(
+            character, affiliation, career, language);
+        LifePathEngine.ApplyModuleAccounting(character, modules);
+
+        if (character.Age != 26 ||
+            character.Affiliation != "Lyran Alliance" ||
+            character.RealLifeHistory.LastOrDefault() != "Agitator")
+        {
+            throw new InvalidOperationException(
+                "Wizard smoke representative character did not preserve its basic life path.");
+        }
+        if (!character.Skills.Any(item =>
+                item.Name == "Protocol/Lyran" && item.Value != 0) ||
+            !character.Skills.Any(item =>
+                item.Name == "Leadership" && item.Value != 0))
+        {
+            throw new InvalidOperationException(
+                "Wizard smoke representative character did not apply expected effects.");
+        }
+        if (PrerequisiteRules.Evaluate(character)
+            .Any(issue => issue.Category == "Affiliation"))
+        {
+            throw new InvalidOperationException(
+                "Wizard smoke representative character has an affiliation conflict.");
+        }
+    }
+
+    private static ModuleSelection CreateDefaultSelection(LifePathModule module)
+    {
+        var choices = module.Choices.ToDictionary(
+            choice => choice.Id,
+            choice =>
+                (IReadOnlyList<string>)choice.Options
+                    .DefaultIfEmpty("Perception")
+                    .Take(choice.Count)
+                    .ToArray());
+        return new ModuleSelection(module, choices);
     }
 
     private static void CaptureWindow(Window window, string outputPath)

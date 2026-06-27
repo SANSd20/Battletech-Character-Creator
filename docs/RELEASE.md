@@ -66,6 +66,9 @@ sheet export, and uninstall checks. To avoid stale build-output file locks, it
 also closes `BattletechCharacterCreator.App` processes launched from this
 repository around app smoke, build, and publish steps. App smoke steps use a
 single pre-smoke app build and then run without rebuilding between launches.
+The wizard smoke is headless and intentionally focused on era-aware behavior and a
+representative character path; broader path coverage is handled by the
+representative life paths smoke.
 
 Then, outside restricted sandboxes, run the full installer install/uninstall
 smoke:

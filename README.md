@@ -143,6 +143,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   publish steps to prevent stale file locks
 - Release checks build the app once before app smoke steps and run those smokes
   without rebuilding between launches
+- Wizard smoke headlessly validates era-aware wizard behavior and a representative
+  character path without the slower exhaustive UI selection sweep
 - Preview release packaging script with installer checksum, stale-installer
   guard, and manifest output
 - Preview release notes included in packaged release artifacts

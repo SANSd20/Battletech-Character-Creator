@@ -49,6 +49,8 @@ release.
   publish steps to prevent stale file locks
 - Release checks build once before app smoke steps and avoid rebuilding between
   smoke launches
+- Wizard smoke headlessly validates era-aware wizard behavior and a representative
+  character path without the slower exhaustive UI selection sweep
 - Start-window smoke runs headlessly before WPF startup so release automation
   validates launch choices without hanging on window construction
 - Installer smoke validates the installed start-window choices and required
