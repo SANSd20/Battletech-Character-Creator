@@ -83,6 +83,15 @@ After automated checks pass, run the installed-app manual preview checklist:
 docs\MANUAL_TEST_PLAN.md
 ```
 
+To create a dated manual test run log from that checklist:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\New-ManualTestRun.ps1
+```
+
+The run log is written under `artifacts\manual-tests` with the current commit,
+version, tester, installer path, and checklist copied in for notes and results.
+
 Package the preview release with:
 
 ```powershell

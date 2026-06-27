@@ -57,7 +57,7 @@ release.
 - GitHub release validation cross-checks the packaged release version
 - GitHub release validation checks the draft notes match the requested version
 - GitHub release validation checks preview notes match the requested version
-- Manual preview test plan for installed-app testing
+- Manual preview test plan and generated run logs for installed-app testing
 
 ## Verification
 
