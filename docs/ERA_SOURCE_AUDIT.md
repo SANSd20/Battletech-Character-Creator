@@ -5,6 +5,10 @@ repository. They can inform future era-aware defaults, affiliation availability,
 campaign context, equipment availability, and template work, but they do not
 override the core character-creation rules in the corrected third printing.
 
+Era boundary definitions are imported from the committed `Eras.xlsx` workbook.
+The PDF sources below remain supporting references for context and specific
+availability notes.
+
 ## Local Sources
 
 | Local file | PDF title | Pages | Initial use |
@@ -32,7 +36,7 @@ override the core character-creation rules in the corrected third printing.
 ## Candidate Features
 
 - Campaign-year era inference. Done: the wizard and editor infer the displayed
-  era from the campaign year using the local Era Digest and Era Report sources.
+  era from the campaign year using the `Eras.xlsx` chronology.
 - Era-aware affiliation availability filters. Done: first-pass year filters hide
   clearly later-era affiliations and order choices, with visible source notes.
 - Era-aware sub-affiliation availability filters. Done: first-pass filters hide

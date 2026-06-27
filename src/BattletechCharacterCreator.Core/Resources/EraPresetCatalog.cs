@@ -2,6 +2,7 @@ namespace BattletechCharacterCreator.Core.Resources;
 
 public sealed record EraPreset(
     string Name,
+    string BroadEra,
     int StartYear,
     int? EndYear,
     string Source)
@@ -16,20 +17,28 @@ public static class EraPresetCatalog
 {
     public static IReadOnlyList<EraPreset> Presets { get; } =
     [
-        new("Age of War", 2398, 2571,
-            "BattleTech: Era Digest: Age of War"),
-        new("Star League", 2750, null,
-            "BattleTech: Era Report: 2750"),
-        new("Golden Century", 2830, 2930,
-            "BattleTech: Era Digest: Golden Century"),
-        new("Clan Invasion", 3052, null,
-            "BattleTech: Era Report: 3052"),
-        new("Civil War", 3062, null,
-            "BATTLETECH ERA REPORT 3062"),
-        new("Dark Age", 3128, 3134,
-            "Battletech: Era Digest: Dark Age"),
-        new("Late Dark Age", 3145, null,
-            "BattleTech: Era Report 3145")
+        new("Age of War", "Star League", 2005, 2570,
+            "Eras.xlsx"),
+        new("Star League", "Star League", 2571, 2780,
+            "Eras.xlsx"),
+        new("Early Succession War", "Succession Wars", 2781, 2900,
+            "Eras.xlsx"),
+        new("Late Succession War - LosTech", "Succession Wars", 2901, 3019,
+            "Eras.xlsx"),
+        new("Late Succession War - Renaissance", "Succession Wars", 3020, 3049,
+            "Eras.xlsx"),
+        new("Clan Invasion", "Clan Invasion", 3050, 3061,
+            "Eras.xlsx"),
+        new("Civil War", "Civil War", 3062, 3067,
+            "Eras.xlsx"),
+        new("Jihad", "Jihad", 3068, 3080,
+            "Eras.xlsx"),
+        new("Republic Age", "Dark Age", 3081, 3130,
+            "Eras.xlsx"),
+        new("Dark Age", "Dark Age", 3131, 3150,
+            "Eras.xlsx"),
+        new("IlClan", "ilClan", 3151, null,
+            "Eras.xlsx")
     ];
 
     public static EraPreset? InferEra(int year) =>

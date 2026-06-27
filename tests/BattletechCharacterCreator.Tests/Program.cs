@@ -446,19 +446,24 @@ static void CheckResourceCatalog()
 
 static void CheckEraInference()
 {
-    Assert(EraPresetCatalog.Presets.Count == 7,
-        "Every local Era Digest and Era Report source must map to an era.");
+    Assert(EraPresetCatalog.Presets.Count == 11,
+        "Every row from Eras.xlsx must map to an era.");
     Assert(EraPresetCatalog.Presets.Select(preset => preset.Name).SequenceEqual(
-            ["Age of War", "Star League", "Golden Century", "Clan Invasion",
-             "Civil War", "Dark Age", "Late Dark Age"]),
-        "Era inference sources must remain in chronological order.");
+            ["Age of War", "Star League", "Early Succession War",
+             "Late Succession War - LosTech", "Late Succession War - Renaissance",
+             "Clan Invasion", "Civil War", "Jihad", "Republic Age", "Dark Age",
+             "IlClan"]),
+        "Imported era chronology rows must remain in sheet order.");
     Assert(EraPresetCatalog.Presets.Single(preset =>
-            preset.Name == "Age of War").DisplayName == "Age of War (2398-2571)" &&
-        EraPresetCatalog.InferEra(3052)?.Name == "Clan Invasion" &&
+            preset.Name == "Age of War").DisplayName == "Age of War (2005-2570)" &&
+        EraPresetCatalog.InferEra(3028)?.Name == "Late Succession War - Renaissance" &&
+        EraPresetCatalog.InferEra(3050)?.Name == "Clan Invasion" &&
         EraPresetCatalog.BuildInferredEraLabel(3062).Contains("Civil War", StringComparison.Ordinal) &&
         EraPresetCatalog.Presets.Single(preset =>
-            preset.Name == "Late Dark Age").Source == "BattleTech: Era Report 3145",
-        "Campaign years must infer source titles, ranges, and labels.");
+            preset.Name == "Republic Age").BroadEra == "Dark Age" &&
+        EraPresetCatalog.InferEra(3151)?.Name == "IlClan" &&
+        EraPresetCatalog.Presets.All(preset => preset.Source == "Eras.xlsx"),
+        "Campaign years must infer imported sheet ranges, broad eras, and labels.");
 }
 
 static void CheckEraAvailability()

@@ -34,10 +34,11 @@ trait reference entries are also available behind the Companion toggle.
 Rules are verified against *A Time of War: The BattleTech RPG, Corrected Third
 Printing*. See `docs/RULES_SOURCE.md` for the authoritative page map and
 migration policy. Optional material from *A Time of War Companion* is tracked in
-`docs/COMPANION_AUDIT.md`. Local Era Digest and Era Report references are
-tracked in `docs/ERA_SOURCE_AUDIT.md` for future era-aware defaults and
-campaign context. The original Qt application is an implementation reference,
-not the final authority when it conflicts with the corrected rulebook.
+`docs/COMPANION_AUDIT.md`. Era boundaries are imported from `Eras.xlsx`; local
+Era Digest and Era Report references are tracked in `docs/ERA_SOURCE_AUDIT.md`
+for era-aware defaults and campaign context. The original Qt application is an
+implementation reference, not the final authority when it conflicts with the
+corrected rulebook.
 
 Build the new application with:
 
@@ -86,8 +87,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Character wizard from basic information through Stage 4
 - Basic information uses year of birth and game year, with age calculated for
   summaries and exports
-- Campaign year infers the matching era from the local Era Digest and Era
-  Report source audit
+- Campaign year infers the matching era from the imported `Eras.xlsx`
+  chronology
 - Era-aware affiliation and sub-affiliation availability filters with visible
   era notes for Stage 0
 - Era quick-start templates for common campaign eras in the editor

@@ -9,7 +9,7 @@ release.
 - Life Module character wizard from basic information through Stage 4
 - First-launch choice window for opening the Character Wizard or Character Editor
 - Basic information uses year of birth and game year, with calculated age
-- Campaign year infers the matching era from the local Era Digest and Era Report audit
+- Campaign year infers the matching era from the imported `Eras.xlsx` chronology
 - Era-aware affiliation availability filters with visible source notes
 - Era-aware Rasalhague sub-affiliation filters with visible source notes
 - Era quick-start templates for common campaign starts in the editor
