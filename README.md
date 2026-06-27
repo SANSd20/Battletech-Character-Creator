@@ -129,6 +129,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   version number
 - Start-window smoke runs headlessly before WPF startup so automation validates
   the launch choices without hanging on window construction
+- Start-window smoke accepts installed WPF builds where the launch-screen XAML,
+  image, and font are compiled resources instead of loose files
 - Inventory smoke runs headlessly against catalog and inventory-rule checks so
   automation does not hang on editor window construction
 - Windows x64 folder publish profile documented in `docs/RELEASE.md`

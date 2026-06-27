@@ -1,4 +1,5 @@
 using System.IO;
+using System.Resources;
 using System.Windows;
 
 namespace BattletechCharacterCreator.App;
@@ -37,6 +38,7 @@ public static class Program
 
     private static void SmokeStartWindowHeadless()
     {
+        var compiledResources = CompiledResourceNames();
         var xamlPath = Path.Combine(AppContext.BaseDirectory, "StartWindow.xaml");
         if (!File.Exists(xamlPath))
         {
@@ -46,22 +48,29 @@ public static class Program
         }
         if (!File.Exists(xamlPath))
         {
-            throw new FileNotFoundException(
-                "Start window XAML could not be found.",
-                xamlPath);
+            if (!compiledResources.Contains(
+                    "startwindow.baml",
+                    StringComparer.OrdinalIgnoreCase))
+            {
+                throw new FileNotFoundException(
+                    "Start window XAML/BAML could not be found.",
+                    xamlPath);
+            }
         }
-
-        var xaml = File.ReadAllText(xamlPath);
-        if (!xaml.Contains("A TIME OF WAR", StringComparison.Ordinal) ||
-            !xaml.Contains("Character Wizard", StringComparison.Ordinal) ||
-            !xaml.Contains("Character Editor", StringComparison.Ordinal) ||
-            !xaml.Contains("Wizard_Click", StringComparison.Ordinal) ||
-            !xaml.Contains("Editor_Click", StringComparison.Ordinal) ||
-            !xaml.Contains("Assets/Images/pilot6.jpg", StringComparison.Ordinal) ||
-            !xaml.Contains("Assets/Fonts/#Montserrat", StringComparison.Ordinal))
+        else
         {
-            throw new InvalidOperationException(
-                "Start window XAML is missing expected title, choices, handlers, or assets.");
+            var xaml = File.ReadAllText(xamlPath);
+            if (!xaml.Contains("A TIME OF WAR", StringComparison.Ordinal) ||
+                !xaml.Contains("Character Wizard", StringComparison.Ordinal) ||
+                !xaml.Contains("Character Editor", StringComparison.Ordinal) ||
+                !xaml.Contains("Wizard_Click", StringComparison.Ordinal) ||
+                !xaml.Contains("Editor_Click", StringComparison.Ordinal) ||
+                !xaml.Contains("Assets/Images/pilot6.jpg", StringComparison.Ordinal) ||
+                !xaml.Contains("Assets/Fonts/#Montserrat", StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    "Start window XAML is missing expected title, choices, handlers, or assets.");
+            }
         }
 
         var assetRoot = AppContext.BaseDirectory;
@@ -77,17 +86,48 @@ public static class Program
         {
             fontPath = Path.Combine(projectRoot, "Assets", "Fonts", "Montserrat-Black.ttf");
         }
-        if (!File.Exists(pilotPath))
+        if (!File.Exists(pilotPath) &&
+            !compiledResources.Contains(
+                "assets/images/pilot6.jpg",
+                StringComparer.OrdinalIgnoreCase))
         {
             throw new FileNotFoundException(
                 "Start window pilot image asset could not be found.",
                 pilotPath);
         }
-        if (!File.Exists(fontPath))
+        if (!File.Exists(fontPath) &&
+            !compiledResources.Contains(
+                "assets/fonts/montserrat-black.ttf",
+                StringComparer.OrdinalIgnoreCase))
         {
             throw new FileNotFoundException(
                 "Start window Montserrat font asset could not be found.",
                 fontPath);
         }
+    }
+
+    private static IReadOnlyList<string> CompiledResourceNames()
+    {
+        var assembly = typeof(Program).Assembly;
+        var resourceName = assembly.GetManifestResourceNames()
+            .FirstOrDefault(name =>
+                name.EndsWith(".g.resources", StringComparison.Ordinal));
+        if (resourceName is null)
+        {
+            return [];
+        }
+
+        using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream is null)
+        {
+            return [];
+        }
+
+        using var reader = new ResourceReader(stream);
+        return reader
+            .Cast<System.Collections.DictionaryEntry>()
+            .Select(entry => entry.Key.ToString() ?? "")
+            .Where(name => name.Length > 0)
+            .ToArray();
     }
 }

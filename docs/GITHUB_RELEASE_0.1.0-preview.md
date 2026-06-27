@@ -98,6 +98,8 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
   character path without the slower exhaustive UI selection sweep
 - Start-window smoke runs headlessly before WPF startup so release automation
   validates launch choices without hanging on window construction
+- Start-window smoke validates compiled WPF start-screen resources in installed
+  builds
 - Installer smoke validates the installed start-window choices and required
   launch-screen assets
 - Installer smoke validates diagnostic metadata from the installed app
