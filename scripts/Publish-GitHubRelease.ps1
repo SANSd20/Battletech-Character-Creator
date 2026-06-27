@@ -125,7 +125,34 @@ if ($null -eq $ghCommand) {
     throw "GitHub CLI was not found. Install gh or publish the release manually from the files in $releaseDir."
 }
 
-& gh @arguments
-if ($LASTEXITCODE -ne 0) {
-    throw "GitHub release creation failed with exit code $LASTEXITCODE."
+$previousErrorActionPreference = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+try {
+    $authOutput = & gh auth status --hostname github.com 2>&1
+    $authExitCode = $LASTEXITCODE
+}
+finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+}
+if ($authOutput) {
+    $authOutput | ForEach-Object { Write-Host $_ }
+}
+if ($authExitCode -ne 0) {
+    throw "GitHub CLI is not authenticated for github.com. Run 'gh auth login -h github.com', then retry this script."
+}
+
+$previousErrorActionPreference = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+try {
+    $releaseOutput = & gh @arguments 2>&1
+    $releaseExitCode = $LASTEXITCODE
+}
+finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+}
+if ($releaseOutput) {
+    $releaseOutput | ForEach-Object { Write-Host $_ }
+}
+if ($releaseExitCode -ne 0) {
+    throw "GitHub release creation failed with exit code $releaseExitCode. See the GitHub CLI output above."
 }
