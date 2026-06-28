@@ -280,6 +280,40 @@ public partial class CharacterWizardWindow : Window
         }
     }
 
+    public void SmokeStageLimitedPreview()
+    {
+        GameYearInput.Text = "3052";
+        RefreshEraAvailability();
+        SelectAffiliationForCapture("fed-suns");
+        SubAffiliationPicker.SelectedItem = SubAffiliationPicker.Items
+            .Cast<LifePathModule>()
+            .First(module => module.Name == "Capellan March");
+        BuildChoiceControls();
+        ShowStep(1);
+        var stage0Attributes = Stage0Attributes.ItemsSource
+            .Cast<NamedValue>()
+            .ToDictionary(item => item.Name, item => item.Value);
+        if (stage0Attributes["STR"] != 100 ||
+            stage0Attributes["WIL"] != 140 ||
+            stage0Attributes["BOD"] != 100)
+        {
+            throw new InvalidOperationException(
+                "Stage 0 preview must only include base, affiliation, and sub-affiliation attributes.");
+        }
+
+        ShowStep(2);
+        var stage1Attributes = PreviewAttributes.ItemsSource
+            .Cast<NamedValue>()
+            .ToDictionary(item => item.Name, item => item.Value);
+        if (stage1Attributes["STR"] != 200 ||
+            stage1Attributes["BOD"] != 200 ||
+            stage1Attributes["WIL"] != 140)
+        {
+            throw new InvalidOperationException(
+                "Stage 1 preview must add early-childhood attributes after Stage 0.");
+        }
+    }
+
     public void SelectLateChildhoodForCapture(string lateChildhoodId)
     {
         LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
@@ -1601,7 +1635,7 @@ public partial class CharacterWizardWindow : Window
         UpdateFlexibleChoiceDisplays();
         try
         {
-            var character = BuildCharacter();
+            var character = BuildCharacter(currentStep);
             var summary = CharacterRules.Calculate(character);
             PreviewAttributes.ItemsSource = character.Attributes;
             PreviewSkills.ItemsSource = character.Skills.OrderBy(item => item.Name);
@@ -1613,7 +1647,8 @@ public partial class CharacterWizardWindow : Window
             ReviewSkills.ItemsSource = character.Skills.OrderBy(item => item.Name);
             ReviewTraits.ItemsSource = character.Traits.OrderBy(item => item.Name);
             ModuleCost.Text =
-                LifePathEngine.CalculateModuleCost(character, SelectedModules()).ToString();
+                LifePathEngine.CalculateModuleCost(
+                    character, SelectedModules(currentStep)).ToString();
             SpentXp.Text = summary.SpentXp.ToString();
             FreeXp.Text = summary.FreeXp.ToString();
             RunningFreeXp.Text = summary.FreeXp.ToString();
@@ -1694,20 +1729,28 @@ public partial class CharacterWizardWindow : Window
     private static string ValueOrDash(string value) =>
         string.IsNullOrWhiteSpace(value) ? "-" : value;
 
-    private Character BuildCharacter()
+    private Character BuildCharacter() => BuildCharacter(pages.Length - 1);
+
+    private Character BuildCharacter(int throughStep)
     {
         var affiliation = SelectedAffiliation ??
             throw new InvalidOperationException("Choose an affiliation.");
-        var childhood = SelectedChildhood ??
-            throw new InvalidOperationException("Choose an early childhood.");
-        var lateChildhood = SelectedLateChildhood ??
-            throw new InvalidOperationException("Choose a late childhood.");
-        var school = SelectedSchool;
+        var childhood = throughStep >= 2
+            ? SelectedChildhood ??
+              throw new InvalidOperationException("Choose an early childhood.")
+            : null;
+        var lateChildhood = throughStep >= 3
+            ? SelectedLateChildhood ??
+              throw new InvalidOperationException("Choose a late childhood.")
+            : null;
+        var school = throughStep >= 4 ? SelectedSchool : null;
         if (school is not null && SelectedBasicField is null)
         {
             throw new InvalidOperationException("Choose one Basic Field for the selected school.");
         }
-        if (SelectedSpecialistField is not null && SelectedAdvancedField is null)
+        if (throughStep >= 4 &&
+            SelectedSpecialistField is not null &&
+            SelectedAdvancedField is null)
         {
             throw new InvalidOperationException(
                 "Choose an Advanced Field before adding a third field.");
@@ -1738,19 +1781,25 @@ public partial class CharacterWizardWindow : Window
             ? ""
             : SelectedSubAffiliation?.Name ?? "";
         character.ClanCaste = SelectedCaste?.Name ?? "";
-        character.ClanTrainingField = GetSelectedChoice(SelectedLateChildhood, "branch");
-        character.EarlyChildhood = childhood.Name;
-        character.LateChildhood = lateChildhood.Name;
+        character.ClanTrainingField = lateChildhood is null
+            ? ""
+            : GetSelectedChoice(lateChildhood, "branch");
+        character.EarlyChildhood = childhood?.Name ?? "";
+        character.LateChildhood = lateChildhood?.Name ?? "";
         character.School = school?.Name ?? "";
-        character.BasicSchool = SelectedBasicField?.Name ?? "";
-        character.AdvancedSchool = SelectedAdvancedField?.Name ?? "";
-        character.SpecialSchool = SelectedSpecialistField?.Name ?? "";
+        character.BasicSchool = throughStep >= 4 ? SelectedBasicField?.Name ?? "" : "";
+        character.AdvancedSchool = throughStep >= 4 ? SelectedAdvancedField?.Name ?? "" : "";
+        character.SpecialSchool = throughStep >= 4 ? SelectedSpecialistField?.Name ?? "" : "";
         character.RealLife =
-            SelectedSecondRealLife?.Name ?? SelectedRealLife?.Name ?? "";
-        var phenotype = GetSelectedChoice(SelectedChildhood, "phenotype");
+            throughStep >= 5
+                ? SelectedSecondRealLife?.Name ?? SelectedRealLife?.Name ?? ""
+                : "";
+        var phenotype = childhood is null ? "" : GetSelectedChoice(childhood, "phenotype");
         if (phenotype.Length > 0) character.Phenotype = phenotype;
 
-        var selectedModules = SelectedModuleEntries().ToArray();
+        var selectedModules = SelectedModuleEntries()
+            .Where(entry => ChoiceStep(entry) <= throughStep)
+            .ToArray();
         var modules = selectedModules.Select(entry => entry.Module).ToArray();
         foreach (var selectedModule in selectedModules)
         {
@@ -1766,8 +1815,14 @@ public partial class CharacterWizardWindow : Window
                 LifePathEngine.Apply(character, selection);
             }
         }
-        LifePathEngine.ApplyAffiliationContext(character, affiliation, childhood, language);
-        LifePathEngine.ApplyAffiliationContext(character, affiliation, lateChildhood, language);
+        if (childhood is not null)
+        {
+            LifePathEngine.ApplyAffiliationContext(character, affiliation, childhood, language);
+        }
+        if (lateChildhood is not null)
+        {
+            LifePathEngine.ApplyAffiliationContext(character, affiliation, lateChildhood, language);
+        }
         if (school is not null)
         {
             LifePathEngine.ApplyAffiliationContext(character, affiliation, school, language);
@@ -1789,8 +1844,8 @@ public partial class CharacterWizardWindow : Window
             $"\nBirth affiliation: {character.BirthAffiliation}" +
             $"\nBirth sub-affiliation: {character.BirthSubAffiliation}" +
             $"\nClan caste: {character.ClanCaste}" +
-            $"\nEarly Childhood: {childhood.Name}" +
-            $"\nLate Childhood: {lateChildhood.Name}" +
+            $"\nEarly Childhood: {character.EarlyChildhood}" +
+            $"\nLate Childhood: {character.LateChildhood}" +
             $"\nSchool: {character.School}" +
             $"\nBasic Field: {character.BasicSchool}" +
             $"\nAdvanced Field: {character.AdvancedSchool}" +
@@ -1839,6 +1894,13 @@ public partial class CharacterWizardWindow : Window
     private IEnumerable<LifePathModule> SelectedModules()
     {
         return SelectedModuleEntries().Select(entry => entry.Module);
+    }
+
+    private IEnumerable<LifePathModule> SelectedModules(int throughStep)
+    {
+        return SelectedModuleEntries()
+            .Where(entry => ChoiceStep(entry) <= throughStep)
+            .Select(entry => entry.Module);
     }
 
     private IEnumerable<SelectedModule> SelectedModuleEntries()

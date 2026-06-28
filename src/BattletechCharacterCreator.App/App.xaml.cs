@@ -122,6 +122,38 @@ public partial class App : Application
             return;
         }
 
+        if (e.Args.Contains("--smoke-stage-preview", StringComparer.Ordinal))
+        {
+            try
+            {
+                var wizard = new CharacterWizardWindow();
+                wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                    DispatcherPriority.ApplicationIdle,
+                    () =>
+                    {
+                        try
+                        {
+                            wizard.SmokeStageLimitedPreview();
+                            wizard.Close();
+                            ShutdownSmoke(0);
+                        }
+                        catch (Exception exception)
+                        {
+                            AppErrorReporter.WriteReport(exception, "Stage preview smoke");
+                            wizard.Close();
+                            ShutdownSmoke(1);
+                        }
+                    });
+                wizard.Show();
+            }
+            catch (Exception exception)
+            {
+                AppErrorReporter.WriteReport(exception, "Stage preview smoke");
+                ShutdownSmoke(1);
+            }
+            return;
+        }
+
         if (e.Args.Contains("--smoke-clan-roundtrip", StringComparer.Ordinal))
         {
             var wizard = new CharacterWizardWindow();

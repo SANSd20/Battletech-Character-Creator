@@ -93,6 +93,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   era notes for Stage 0
 - Stage 0 XP accounting applies universal, affiliation, and sub-affiliation
   module costs together in spent and remaining XP totals
+- Wizard stage previews show only selections picked up through the current
+  stage instead of including later default selections
 - Era quick-start templates for common campaign eras in the editor
 - All affiliations and 68 corrected sub-affiliations
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
