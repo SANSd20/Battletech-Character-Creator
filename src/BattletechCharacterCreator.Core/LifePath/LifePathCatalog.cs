@@ -369,7 +369,7 @@ public static class LifePathCatalog
             [Choice("survival", "Survival specialty", EffectTarget.Skill, 15, 1,
                 ["Survival/Arctic", "Survival/Forests", "Survival/Desert", "Survival/Jungle",
                     "Survival/Ocean", "Survival/Mountain", "Survival/Steppe"]),
-                FlexibleChoice("flex", "Flexible XP", 25, 2)]),
+                FlexibleAttributeOrTraitChoice("flex", "Flexible XP", 25, 2)]),
         new("mercenary-brat", "Born Mercenary Brat", "Raised in the mobile culture of a mercenary command.", 270,
             [Attribute("STR", 75), Attribute("BOD", 50), Attribute("RFL", 100),
                 Attribute("WIL", 25), Attribute("CHA", -25), Attribute("EDG", 25),
@@ -386,7 +386,7 @@ public static class LifePathCatalog
                 Trait("Toughness", 50), Trait("Wealth", -25), Skill("Career/Agriculture", 10),
                 Skill("Animal Handling", 15)],
             [Choice("interests", "Interests", EffectTarget.Skill, 5, 2, Interests),
-                FlexibleChoice("flex", "Flexible XP", 10, 4)]),
+                FlexibleAttributeOrTraitChoice("flex", "Flexible XP", 10, 4)]),
         new("fugitives", "Fugitives", "A childhood spent hiding, moving, and learning self-reliance.", 225,
             [Attribute("STR", 25), Attribute("RFL", 100), Attribute("WIL", 100),
                 Attribute("EDG", 100), Trait("Connections", 75), Trait("Dark Secret", -100),
@@ -398,11 +398,11 @@ public static class LifePathCatalog
                     "Thick-Skinned", "Toughness"]),
                 Choice("language", "Language", EffectTarget.Skill, 5, 1, Languages),
                 Choice("streetwise", "Streetwise", EffectTarget.Skill, 10, 1, StreetwiseOptions),
-                FlexibleChoice("flex", "Flexible XP", 5, 4)]),
+                FlexibleAttributeOrTraitChoice("flex", "Flexible XP", 5, 4)]),
         new("nobility", "Nobility", "A privileged upbringing shaped by status and political expectation.", 215,
             [Trait("Title/Inner Sphere", 300), PreTrait("Wealth", 500),
                 PreTrait("Title", 500), PreTrait("Property", 500)],
-            [FlexibleChoice("flex", "Flexible XP", 5, 4)]),
+            [FlexibleAttributeOrTraitChoice("flex", "Flexible XP", 5, 4)]),
         new("slave", "Slave", "A harsh childhood under forced labor and rigid control.", 45,
             [Attribute("STR", 100), Attribute("BOD", 75), Attribute("DEX", 100),
                 Attribute("INT", -50), Attribute("WIL", -50), Trait("Equipped", -100),
@@ -418,7 +418,7 @@ public static class LifePathCatalog
                         "Exceptional Attribute/INT", "Exceptional Attribute/WIL",
                         "Exceptional Attribute/CHA", "Exceptional Attribute/EDG",
                         "Natural Aptitude/Perception"]),
-                FlexibleChoice("flex", "Flexible XP", 25, 4)],
+                FlexibleAttributeOrTraitChoice("flex", "Flexible XP", 25, 4)],
             AffiliationLanguageXp: -5, AffiliationProtocolXp: 15, AffiliationStreetwiseXp: 15),
         new("street", "Street", "A precarious urban childhood built on instinct and local connections.", 250,
             [Attribute("STR", 25), Attribute("BOD", -20), Attribute("RFL", 100),
@@ -428,7 +428,7 @@ public static class LifePathCatalog
                 Trait("Toughness", 200), Trait("Wealth", -75), Skill("Martial Arts", 15),
                 Skill("Melee Weapons", 5), Skill("Perception", 10), Skill("Running", 10),
                 Skill("Stealth", 10)],
-            [FlexibleChoice("flex", "Flexible XP", 10, 4)],
+            [FlexibleAttributeOrTraitChoice("flex", "Flexible XP", 10, 4)],
             AffiliationLanguageXp: -5, AffiliationStreetwiseXp: 10),
         new("trueborn-creche", "Trueborn Creche", "A Clan trueborn upbringing among a sibko.", 300,
             [Attribute("STR", 100), Attribute("BOD", 125), Attribute("RFL", 125),
@@ -439,13 +439,13 @@ public static class LifePathCatalog
                 Skill("Swimming", 10), PreTrait("Phenotype", 0), PreTrait("Trueborn", 0)],
             [Choice("phenotype", "Phenotype", EffectTarget.Trait, 0, 1,
                 ["Phenotype/Aerospace", "Phenotype/Elemental", "Phenotype/MechWarrior"]),
-                FlexibleChoice("flex", "Flexible XP", 15, 5)]),
+                FlexibleAttributeOrTraitChoice("flex", "Flexible XP", 15, 5)]),
         new("war-orphan", "War Orphan", "Loss and conflict forced an early independence.", 170,
             [Attribute("INT", 50), Attribute("WIL", 100), Attribute("EDG", 100),
                 Trait("Compulsion/Traumatic Memories", -100), Trait("Illiterate", -25),
                 Trait("Introvert", -50), Trait("Reputation", -50), Trait("Sixth Sense", 150),
                 Trait("Wealth", -100), Skill("Perception", 10), Skill("Stealth", 5)],
-            [FlexibleChoice("flex", "Flexible XP", 25, 3)],
+            [FlexibleAttributeOrTraitChoice("flex", "Flexible XP", 25, 3)],
             AffiliationLanguageXp: -5, AffiliationStreetwiseXp: 10),
         new("white-collar", "White Collar", "A sheltered upbringing among prosperous professionals.", 170,
             [Attribute("STR", -50), Attribute("BOD", -50), Attribute("INT", 75),
@@ -455,7 +455,7 @@ public static class LifePathCatalog
                 PreTrait("Wealth", 300)],
             [Choice("art", "Art specialty", EffectTarget.Skill, 10, 1, Arts),
                 Choice("interest", "Interest", EffectTarget.Skill, 10, 1, Interests),
-                FlexibleChoice("flex", "Flexible XP", 5, 3)])
+                FlexibleAttributeOrTraitChoice("flex", "Flexible XP", 5, 3)])
     ];
 
     public static IReadOnlyList<LifePathModule> LateChildhoods { get; } =
@@ -2859,6 +2859,17 @@ public static class LifePathCatalog
         int minimumAttributeOrTraitXp = 0) =>
         Choice(id, label, EffectTarget.Flexible, xp, count,
             Attributes.Concat(FlexibleTraits).Concat(FlexibleSkills).ToArray())
+        with
+        {
+            AttributeMaximumXp = attributeMaximumXp,
+            MinimumAttributeOrTraitXp = minimumAttributeOrTraitXp
+        };
+
+    private static ModuleChoice FlexibleAttributeOrTraitChoice(
+        string id, string label, int xp, int count, int? attributeMaximumXp = null,
+        int minimumAttributeOrTraitXp = 0) =>
+        Choice(id, label, EffectTarget.Flexible, xp, count,
+            Attributes.Concat(FlexibleTraits).ToArray())
         with
         {
             AttributeMaximumXp = attributeMaximumXp,

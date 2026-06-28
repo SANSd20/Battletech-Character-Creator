@@ -589,7 +589,7 @@ static void CheckLifePath()
         new Dictionary<string, IReadOnlyList<string>>
         {
             ["survival"] = ["Survival/Desert"],
-            ["flex"] = ["DEX", "Leadership"]
+            ["flex"] = ["DEX", "Toughness"]
         }));
 
     Assert(character.Affiliation.Length == 0,
@@ -600,8 +600,8 @@ static void CheckLifePath()
         "Flexible XP may target attributes.");
     Assert(character.Skills.Single(item => item.Name == "Perception").Value == 15,
         "Life-path skills must merge with base skills.");
-    Assert(character.Skills.Single(item => item.Name == "Leadership").Value == 25,
-        "Flexible XP may target skills.");
+    Assert(character.Traits.Single(item => item.Name == "Toughness").Value == 100,
+        "Stage 1 flexible XP may target traits.");
     Assert(character.Traits.Single(item => item.Name == "Natural Aptitude/Strategy").Value == 100,
         "Affiliation choices must apply traits.");
     Assert(character.PreAttributes.Single(item => item.Name == "BOD").Value == 500,
@@ -623,6 +623,24 @@ static void CheckLifePath()
         duplicateChoiceRejected = true;
     }
     Assert(duplicateChoiceRejected, "Distinct life-path choices must reject duplicates.");
+
+    var invalidSkillTargetRejected = false;
+    try
+    {
+        LifePathEngine.Apply(new Character(), new ModuleSelection(
+            childhood,
+            new Dictionary<string, IReadOnlyList<string>>
+            {
+                ["survival"] = ["Survival/Desert"],
+                ["flex"] = ["DEX", "Leadership"]
+            }));
+    }
+    catch (InvalidOperationException)
+    {
+        invalidSkillTargetRejected = true;
+    }
+    Assert(invalidSkillTargetRejected,
+        "Stage 1 flexible XP must reject skill targets when only attributes or traits are allowed.");
 }
 
 static void CheckExpandedLifePaths()
@@ -745,7 +763,7 @@ static void CheckExpandedLifePaths()
     LifePathEngine.Apply(character, new ModuleSelection(street,
         new Dictionary<string, IReadOnlyList<string>>
         {
-            ["flex"] = ["STR", "Toughness", "Stealth", "Leadership"]
+            ["flex"] = ["STR", "Toughness", "Patient", "Good Hearing"]
         }));
     LifePathEngine.ApplyAffiliationContext(character,
         LifePathCatalog.Affiliations.Single(module => module.Id == "fed-suns"),
@@ -810,6 +828,16 @@ static void CheckLifePathAvailability()
         clanLateChildhoods.Contains("late-trueborn-sibko") &&
         !clanLateChildhoods.Contains("late-high-school"),
         "Clan affiliations must offer Clan Sibko modules and hide non-Clan High School.");
+
+    var earlyChildhoodFlexibleChoices = LifePathCatalog.Childhoods
+        .SelectMany(module => module.Choices)
+        .Where(choice => choice.Target == EffectTarget.Flexible)
+        .ToArray();
+    Assert(earlyChildhoodFlexibleChoices.All(choice =>
+            choice.Options.All(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) is
+                    EffectTarget.Attribute or EffectTarget.Trait)),
+        "Stage 1 flexible XP choices must only offer attributes or traits.");
 }
 
 static LifePathModule FindSubAffiliation(

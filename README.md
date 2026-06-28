@@ -102,6 +102,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - All affiliations and 68 corrected sub-affiliations
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation
 - Stage 1 flexible XP target lists include cataloged Compulsion traits
+- Stage 1 flexible XP target lists are restricted to attributes and traits
+  instead of later-stage skill targets
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
 - Character editor with guided Attribute, Trait, and Skill XP controls
