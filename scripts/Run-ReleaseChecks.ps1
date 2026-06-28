@@ -134,6 +134,8 @@ Invoke-AppSmoke "Start window smoke" @("--smoke-start")
 
 Invoke-AppSmoke "Wizard smoke" @("--smoke-wizard")
 
+Invoke-AppSmoke "Affiliation-filtered childhood smoke" @("--smoke-affiliation-filtered-childhoods")
+
 Invoke-AppSmoke "Clan round-trip smoke" @("--smoke-clan-roundtrip")
 
 Invoke-AppSmoke "Representative life paths smoke" @("--smoke-complete-life-paths")

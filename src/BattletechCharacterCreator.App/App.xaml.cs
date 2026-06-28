@@ -154,6 +154,41 @@ public partial class App : Application
             return;
         }
 
+        if (e.Args.Contains("--smoke-affiliation-filtered-childhoods",
+                StringComparer.Ordinal))
+        {
+            try
+            {
+                var wizard = new CharacterWizardWindow();
+                wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                    DispatcherPriority.ApplicationIdle,
+                    () =>
+                    {
+                        try
+                        {
+                            wizard.SmokeAffiliationFilteredChildhoods();
+                            wizard.Close();
+                            ShutdownSmoke(0);
+                        }
+                        catch (Exception exception)
+                        {
+                            AppErrorReporter.WriteReport(
+                                exception, "Affiliation-filtered childhood smoke");
+                            wizard.Close();
+                            ShutdownSmoke(1);
+                        }
+                    });
+                wizard.Show();
+            }
+            catch (Exception exception)
+            {
+                AppErrorReporter.WriteReport(
+                    exception, "Affiliation-filtered childhood smoke");
+                ShutdownSmoke(1);
+            }
+            return;
+        }
+
         if (e.Args.Contains("--smoke-clan-roundtrip", StringComparer.Ordinal))
         {
             var wizard = new CharacterWizardWindow();

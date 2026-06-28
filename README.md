@@ -96,6 +96,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   module costs together in spent and remaining XP totals
 - Wizard stage previews show only selections picked up through the current
   stage instead of including later default selections
+- Stage 1 and Stage 2 wizard choices hide Clan-only childhood modules unless
+  the selected affiliation is Invading Clan or Homeworld Clan
 - Era quick-start templates for common campaign eras in the editor
 - All affiliations and 68 corrected sub-affiliations
 - Life-path effects, prerequisites, repeat rules, and flexible XP allocation

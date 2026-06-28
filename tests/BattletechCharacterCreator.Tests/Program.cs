@@ -262,6 +262,7 @@ CheckSample("test.btcc", 5_000, 5_494, 6, 18, 36);
 CheckSample("lisa.btcc", 3_580, 1_000, 3, 14, 28);
 CheckLifePath();
 CheckExpandedLifePaths();
+CheckLifePathAvailability();
 CheckLateChildhoods();
 CheckEducation();
 CheckLifePathAccounting();
@@ -770,6 +771,45 @@ static void CheckExpandedLifePaths()
     Assert(PrerequisiteRules.Evaluate(invalid)
             .Any(issue => issue.Category == "Affiliation"),
         "Trueborn Creche must require a Clan affiliation.");
+}
+
+static void CheckLifePathAvailability()
+{
+    var innerSphereChildhoods = LifePathAvailability.FilterChildhoods(
+            LifePathCatalog.Childhoods,
+            isClanAffiliation: false)
+        .Select(module => module.Id)
+        .ToArray();
+    var innerSphereLateChildhoods = LifePathAvailability.FilterLateChildhoods(
+            LifePathCatalog.LateChildhoods,
+            isClanAffiliation: false)
+        .Select(module => module.Id)
+        .ToArray();
+
+    Assert(!innerSphereChildhoods.Contains("trueborn-creche"),
+        "Inner Sphere affiliations must not offer Trueborn Creche.");
+    Assert(!innerSphereLateChildhoods.Contains("late-clan-apprenticeship") &&
+        !innerSphereLateChildhoods.Contains("late-freeborn-sibko") &&
+        !innerSphereLateChildhoods.Contains("late-trueborn-sibko"),
+        "Inner Sphere affiliations must not offer Clan-only late childhood modules.");
+
+    var clanChildhoods = LifePathAvailability.FilterChildhoods(
+            LifePathCatalog.Childhoods,
+            isClanAffiliation: true)
+        .Select(module => module.Id)
+        .ToArray();
+    var clanLateChildhoods = LifePathAvailability.FilterLateChildhoods(
+            LifePathCatalog.LateChildhoods,
+            isClanAffiliation: true)
+        .Select(module => module.Id)
+        .ToArray();
+
+    Assert(clanChildhoods.Contains("trueborn-creche"),
+        "Clan affiliations must offer Trueborn Creche.");
+    Assert(clanLateChildhoods.Contains("late-freeborn-sibko") &&
+        clanLateChildhoods.Contains("late-trueborn-sibko") &&
+        !clanLateChildhoods.Contains("late-high-school"),
+        "Clan affiliations must offer Clan Sibko modules and hide non-Clan High School.");
 }
 
 static LifePathModule FindSubAffiliation(

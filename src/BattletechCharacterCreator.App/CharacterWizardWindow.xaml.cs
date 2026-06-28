@@ -57,14 +57,11 @@ public partial class CharacterWizardWindow : Window
 
         RefreshEraAvailability();
         AffiliationPicker.ItemsSource = BirthAffiliations;
-        ChildhoodPicker.ItemsSource = LifePathCatalog.Childhoods;
-        LateChildhoodPicker.ItemsSource = LifePathCatalog.LateChildhoods;
         SchoolPicker.ItemsSource = LifePathCatalog.EducationSchools;
         RealLifePicker.ItemsSource = LifePathCatalog.RealLifeModules;
         SecondRealLifePicker.ItemsSource = LifePathCatalog.RealLifeModules;
         AffiliationPicker.SelectedIndex = 0;
-        ChildhoodPicker.SelectedIndex = 0;
-        LateChildhoodPicker.SelectedIndex = 0;
+        RefreshChildhoodAvailability(null, null);
         SchoolPicker.SelectedIndex = -1;
         RealLifePicker.SelectedIndex = -1;
         SecondRealLifePicker.SelectedIndex = -1;
@@ -314,9 +311,48 @@ public partial class CharacterWizardWindow : Window
         }
     }
 
+    public void SmokeAffiliationFilteredChildhoods()
+    {
+        SelectAffiliationForCapture("fed-suns");
+        var innerSphereChildhoods = ChildhoodPicker.Items
+            .Cast<LifePathModule>()
+            .Select(module => module.Id)
+            .ToArray();
+        var innerSphereLateChildhoods = LateChildhoodPicker.Items
+            .Cast<LifePathModule>()
+            .Select(module => module.Id)
+            .ToArray();
+        if (innerSphereChildhoods.Contains("trueborn-creche") ||
+            innerSphereLateChildhoods.Contains("late-clan-apprenticeship") ||
+            innerSphereLateChildhoods.Contains("late-freeborn-sibko") ||
+            innerSphereLateChildhoods.Contains("late-trueborn-sibko"))
+        {
+            throw new InvalidOperationException(
+                "Inner Sphere affiliations must not offer Clan-only childhood modules.");
+        }
+
+        SelectAffiliationForCapture("invading-clan");
+        var clanChildhoods = ChildhoodPicker.Items
+            .Cast<LifePathModule>()
+            .Select(module => module.Id)
+            .ToArray();
+        var clanLateChildhoods = LateChildhoodPicker.Items
+            .Cast<LifePathModule>()
+            .Select(module => module.Id)
+            .ToArray();
+        if (!clanChildhoods.Contains("trueborn-creche") ||
+            !clanLateChildhoods.Contains("late-freeborn-sibko") ||
+            !clanLateChildhoods.Contains("late-trueborn-sibko") ||
+            clanLateChildhoods.Contains("late-high-school"))
+        {
+            throw new InvalidOperationException(
+                "Clan affiliations must offer Clan childhood modules and hide non-Clan High School.");
+        }
+    }
+
     public void SelectLateChildhoodForCapture(string lateChildhoodId)
     {
-        LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
+        LateChildhoodPicker.SelectedItem = AvailableLateChildhoods()
             .First(module => module.Id == lateChildhoodId);
         RefreshModules();
     }
@@ -719,9 +755,12 @@ public partial class CharacterWizardWindow : Window
             .ToArray(),
             CurrentGameYear);
 
+    private bool SelectedAffiliationIsClan =>
+        SelectedAffiliation?.Id is "invading-clan" or "homeworld-clan";
+
     private void ModuleSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (!IsLoaded) return;
+        if (!IsLoaded || refreshing) return;
         RefreshModules();
     }
 
@@ -797,6 +836,9 @@ public partial class CharacterWizardWindow : Window
         var childhood = SelectedChildhood;
         var lateChildhood = SelectedLateChildhood;
         var school = SelectedSchool;
+        RefreshChildhoodAvailability(childhood, lateChildhood);
+        childhood = SelectedChildhood;
+        lateChildhood = SelectedLateChildhood;
         AffiliationDescription.Text = BuildAffiliationDescription(
             affiliation,
             birthAffiliation);
@@ -838,6 +880,50 @@ public partial class CharacterWizardWindow : Window
         BuildChoiceControls();
         refreshing = false;
         UpdatePreview();
+    }
+
+    private void RefreshChildhoodAvailability(
+        LifePathModule? previousChildhood,
+        LifePathModule? previousLateChildhood)
+    {
+        var childhoods = AvailableChildhoods();
+        ChildhoodPicker.ItemsSource = childhoods;
+        SelectAvailableModule(ChildhoodPicker, childhoods, previousChildhood);
+
+        var lateChildhoods = AvailableLateChildhoods();
+        LateChildhoodPicker.ItemsSource = lateChildhoods;
+        SelectAvailableModule(
+            LateChildhoodPicker, lateChildhoods, previousLateChildhood);
+    }
+
+    private IReadOnlyList<LifePathModule> AvailableChildhoods()
+    {
+        return LifePathAvailability.FilterChildhoods(
+            LifePathCatalog.Childhoods,
+            SelectedAffiliationIsClan);
+    }
+
+    private IReadOnlyList<LifePathModule> AvailableLateChildhoods()
+    {
+        return LifePathAvailability.FilterLateChildhoods(
+            LifePathCatalog.LateChildhoods,
+            SelectedAffiliationIsClan);
+    }
+
+    private static void SelectAvailableModule(
+        ComboBox picker,
+        IReadOnlyList<LifePathModule> modules,
+        LifePathModule? previous)
+    {
+        if (previous is not null &&
+            modules.Any(module => module.Id == previous.Id))
+        {
+            picker.SelectedItem = modules.First(module => module.Id == previous.Id);
+        }
+        else
+        {
+            picker.SelectedIndex = modules.Count > 0 ? 0 : -1;
+        }
     }
 
     private string BuildAffiliationDescription(
