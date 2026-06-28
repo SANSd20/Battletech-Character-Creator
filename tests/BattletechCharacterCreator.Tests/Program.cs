@@ -257,9 +257,9 @@ vehicleWarningCharacter.Traits.Add(new NamedValue("Custom Vehicle", 100));
 Assert(CharacterRules.UnbackedVehiclePurchases(vehicleWarningCharacter) == 0,
     "Vehicle purchase warnings must clear when the Custom Vehicle trait is present.");
 
-CheckSample("newchar.btcc", 2_900, 100, 6, 18, 36);
-CheckSample("test.btcc", 4_212, 5_494, 6, 18, 36);
-CheckSample("lisa.btcc", 3_610, 1_000, 3, 14, 28);
+CheckSample("newchar.btcc", 3_300, 100, 6, 18, 36);
+CheckSample("test.btcc", 5_000, 5_494, 6, 18, 36);
+CheckSample("lisa.btcc", 3_580, 1_000, 3, 14, 28);
 CheckLifePath();
 CheckExpandedLifePaths();
 CheckLateChildhoods();
@@ -970,9 +970,22 @@ static void CheckLifePathAccounting()
         "Life-path cost must include the universal module.");
 
     LifePathEngine.ApplyModuleAccounting(baseCharacter, modules);
-    Assert(CharacterRules.Calculate(baseCharacter).FreeXp ==
-        LifePathEngine.StartingXp - expectedCost,
-        "Wizard characters must retain the module-based remaining XP.");
+    var moduleSummary = CharacterRules.Calculate(baseCharacter);
+    Assert(moduleSummary.SpentXp == expectedCost &&
+        moduleSummary.FreeXp == LifePathEngine.StartingXp - expectedCost,
+        "Wizard characters must retain the module-based spent and remaining XP.");
+
+    var subAffiliation = affiliation.SubAffiliations!.Single(module =>
+        module.Name == "Capellan March");
+    var stage0Modules = new[] { affiliation, subAffiliation };
+    var expectedStage0Cost = LifePathEngine.UniversalModuleCost +
+        affiliation.ModuleCost + subAffiliation.ModuleCost;
+    var stage0Character = LifePathEngine.CreateBase("Stage 0", "Language/English");
+    LifePathEngine.ApplyModuleAccounting(stage0Character, stage0Modules);
+    var stage0Summary = CharacterRules.Calculate(stage0Character);
+    Assert(stage0Summary.SpentXp == expectedStage0Cost &&
+        stage0Summary.FreeXp == LifePathEngine.StartingXp - expectedStage0Cost,
+        "Stage 0 must apply universal, affiliation, and sub-affiliation module costs together.");
 
     var technical = LifePathCatalog.EducationSchools
         .Single(module => module.Id == "technical-college");

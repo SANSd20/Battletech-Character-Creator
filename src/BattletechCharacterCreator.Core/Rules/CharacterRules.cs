@@ -65,7 +65,8 @@ public static class CharacterRules
         var attributeXp = character.Attributes.Sum(item => item.Value);
         var skillXp = character.Skills.Sum(item => item.Value);
         var traitXp = character.Traits.Sum(item => item.Value);
-        var spentXp = attributeXp + skillXp + traitXp;
+        var allocatedXp = attributeXp + skillXp + traitXp;
+        var spentXp = allocatedXp + character.GmXpModifier;
 
         var strength = FindValue(character.Attributes, "STR");
         var reflexes = FindValue(character.Attributes, "RFL");
@@ -107,7 +108,7 @@ public static class CharacterRules
             skillXp,
             traitXp,
             spentXp,
-            startingXp - spentXp - character.GmXpModifier,
+            startingXp - spentXp,
             wealthLevel,
             inventoryCost,
             startingCBills - inventoryCost,
