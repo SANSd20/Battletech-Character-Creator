@@ -82,6 +82,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 ### Completed
 
 - .NET 10 and WPF application foundation
+- A Time of War app icon applied to the executable and installer
 - First-launch choice window for opening the Character Wizard or Character
   Editor
 - Character wizard from basic information through Stage 4

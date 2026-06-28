@@ -13,6 +13,8 @@
 
 Name "${APP_NAME} ${VERSION}"
 OutFile "atow-character-creator-${VERSION}-setup.exe"
+Icon "..\ico1.ico"
+UninstallIcon "..\ico1.ico"
 InstallDir "$LOCALAPPDATA\A Time of War Character Creator"
 RequestExecutionLevel user
 
