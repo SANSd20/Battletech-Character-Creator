@@ -8,8 +8,8 @@ not the final stable release.
 
 Attach these files from `artifacts\release\0.1.0-preview`:
 
-- `atow-character-creator-0.1.0-preview-setup.exe`
-- `atow-character-creator-0.1.0-preview-setup.exe.sha256`
+- `atow-character-creator-0.1.0-preview-<commit>-setup.exe`
+- `atow-character-creator-0.1.0-preview-<commit>-setup.exe.sha256`
 - `PREVIEW_RELEASE_NOTES.md`
 - `release-manifest.txt`
 
@@ -109,6 +109,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Installer smoke validates character-sheet PDF export from the installed app
 - Per-user Windows installer
 - Release packaging guard against stale installers when release checks are skipped
+- Release package filenames include the packaged build commit
 - GitHub release validation cross-checks manifest installer metadata
 - GitHub release validation cross-checks the packaged release version
 - GitHub release validation checks the draft notes match the requested version

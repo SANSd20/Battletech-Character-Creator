@@ -10,11 +10,13 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $repoRoot
 
+$commit = git rev-parse --short HEAD
 $installerName = "atow-character-creator-$Version-setup.exe"
+$releaseInstallerName = "atow-character-creator-$Version-$commit-setup.exe"
 $installerPath = Join-Path $repoRoot "niss\$installerName"
 $releaseDir = Join-Path $repoRoot "artifacts\release\$Version"
-$releaseInstaller = Join-Path $releaseDir $installerName
-$checksumPath = Join-Path $releaseDir "$installerName.sha256"
+$releaseInstaller = Join-Path $releaseDir $releaseInstallerName
+$checksumPath = Join-Path $releaseDir "$releaseInstallerName.sha256"
 $manifestPath = Join-Path $releaseDir "release-manifest.txt"
 $notesSourcePath = Join-Path $repoRoot "docs\PREVIEW_RELEASE_NOTES.md"
 $notesOutputPath = Join-Path $releaseDir "PREVIEW_RELEASE_NOTES.md"
@@ -58,12 +60,11 @@ Copy-Item -LiteralPath $installerPath -Destination $releaseInstaller
 Copy-Item -LiteralPath $notesSourcePath -Destination $notesOutputPath
 
 $hash = Get-FileHash -LiteralPath $releaseInstaller -Algorithm SHA256
-"$($hash.Hash)  $installerName" | Set-Content -LiteralPath $checksumPath
+"$($hash.Hash)  $releaseInstallerName" | Set-Content -LiteralPath $checksumPath
 $releaseDraft = Get-Content -LiteralPath $releaseDraftSourcePath -Raw
 $releaseDraft.Replace("{{INSTALLER_SHA256}}", $hash.Hash) |
     Set-Content -LiteralPath $releaseDraftOutputPath
 
-$commit = git rev-parse --short HEAD
 $created = Get-Date -Format "yyyy-MM-dd HH:mm:ss K"
 $installerSize = (Get-Item -LiteralPath $releaseInstaller).Length
 $installerBuilt = $installerInfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss K")
@@ -74,7 +75,8 @@ $installerBuilt = $installerInfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss K")
     "Commit: $commit",
     "Dirty working tree: $isDirty",
     "Created: $created",
-    "Installer: $installerName",
+    "Source installer: $installerName",
+    "Installer: $releaseInstallerName",
     "Installer bytes: $installerSize",
     "Installer built: $installerBuilt",
     "Release notes: PREVIEW_RELEASE_NOTES.md",

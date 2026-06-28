@@ -22,7 +22,8 @@ if ([string]::IsNullOrWhiteSpace($Title)) {
 }
 
 $releaseDir = Join-Path $repoRoot "artifacts\release\$Version"
-$installerName = "atow-character-creator-$Version-setup.exe"
+$currentCommit = git rev-parse --short HEAD
+$installerName = "atow-character-creator-$Version-$currentCommit-setup.exe"
 $installerPath = Join-Path $releaseDir $installerName
 $checksumPath = Join-Path $releaseDir "$installerName.sha256"
 $notesPath = Join-Path $releaseDir "GITHUB_RELEASE.md"
@@ -74,9 +75,11 @@ if ($manifestText -notmatch "Version:\s*$([regex]::Escape($Version))\b") {
     throw "Release manifest version does not match requested version ($Version). Rebuild the package."
 }
 
-$currentCommit = git rev-parse --short HEAD
 if ($manifestText -notmatch "Commit:\s*$currentCommit\b") {
     throw "Release manifest commit does not match HEAD ($currentCommit). Rebuild the package after committing."
+}
+if ($manifestText -notmatch "Installer:\s*$([regex]::Escape($installerName))\b") {
+    throw "Release manifest installer name does not match expected build artifact ($installerName). Rebuild the package."
 }
 
 $installerSize = (Get-Item -LiteralPath $installerPath).Length

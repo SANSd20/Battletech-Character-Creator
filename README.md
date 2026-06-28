@@ -160,6 +160,7 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   character path without the slower exhaustive UI selection sweep
 - Preview release packaging script with installer checksum, stale-installer
   guard, and manifest output
+- Preview release package filenames include the packaged build commit
 - Preview release notes included in packaged release artifacts
 - GitHub-ready preview release draft included in packaged release artifacts
 - GitHub release publish helper with package, checksum, manifest, and installer

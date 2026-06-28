@@ -121,6 +121,14 @@ manifest to:
 artifacts\release\0.1.0-preview
 ```
 
+The packaged installer and checksum include the current short Git commit in
+their filenames, for example:
+
+```text
+atow-character-creator-0.1.0-preview-935d889-setup.exe
+atow-character-creator-0.1.0-preview-935d889-setup.exe.sha256
+```
+
 Validate the prepared GitHub release without publishing it:
 
 ```powershell
@@ -140,11 +148,11 @@ assets from the current package, rerun with:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Publish-GitHubRelease.ps1 -UpdateExisting
 ```
 
-The publish helper checks that the installer, checksum, release notes, GitHub
-release draft, and manifest are present. It also verifies that the checksum
-matches the installer, that the preview notes and GitHub release draft include
-the requested version, that the draft includes the current installer hash, and
-that the manifest was generated from the current clean commit and requested
-version with matching installer hash, size, and build timestamp before creating
-the prerelease. If `-UpdateExisting` is used, the helper updates the existing
-prerelease notes and uploads the current assets with `--clobber`.
+The publish helper checks that the commit-suffixed installer, checksum, release
+notes, GitHub release draft, and manifest are present. It also verifies that the
+checksum matches the installer, that the preview notes and GitHub release draft
+include the requested version, that the draft includes the current installer
+hash, and that the manifest was generated from the current clean commit and
+requested version with matching installer name, hash, size, and build timestamp
+before creating the prerelease. If `-UpdateExisting` is used, the helper updates
+the existing prerelease notes and uploads the current assets with `--clobber`.

@@ -1,7 +1,7 @@
 param(
     [string]$Version = "0.1.0-preview",
     [string]$Tester = $env:USERNAME,
-    [string]$InstallerPath = "artifacts\release\0.1.0-preview\atow-character-creator-0.1.0-preview-setup.exe",
+    [string]$InstallerPath = "",
     [string]$OutputDirectory = "artifacts\manual-tests"
 )
 
@@ -16,6 +16,9 @@ if (!(Test-Path -LiteralPath $planPath)) {
 }
 
 $commit = git rev-parse --short HEAD
+if ([string]::IsNullOrWhiteSpace($InstallerPath)) {
+    $InstallerPath = "artifacts\release\$Version\atow-character-creator-$Version-$commit-setup.exe"
+}
 $created = Get-Date -Format "yyyy-MM-dd HH:mm:ss K"
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $outputRoot = Join-Path $repoRoot $OutputDirectory

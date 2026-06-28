@@ -64,6 +64,7 @@ release.
 - Installer smoke validates character-sheet PDF export from the installed app
 - Per-user Windows installer and release package manifest/checksum output
 - Release packaging guard against stale installers when release checks are skipped
+- Release package filenames include the packaged build commit
 - GitHub release validation cross-checks manifest installer metadata
 - GitHub release validation cross-checks the packaged release version
 - GitHub release validation checks the draft notes match the requested version
