@@ -219,57 +219,47 @@ public partial class App : Application
         if (e.Args.Contains("--smoke-complete-life-paths",
                 StringComparer.Ordinal))
         {
-            var wizard = new CharacterWizardWindow();
-            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
-                DispatcherPriority.ApplicationIdle,
-                () =>
+            var paths = new List<string>();
+            var errorPath = Path.Combine(
+                Path.GetTempPath(),
+                "atow-complete-life-paths.error.txt");
+            try
+            {
+                File.Delete(errorPath);
+                foreach (var character in SmokeRepresentativeLifePathsHeadless())
                 {
-                    var paths = new List<string>();
-                    var errorPath = Path.Combine(
+                    var path = Path.Combine(
                         Path.GetTempPath(),
-                        "atow-complete-life-paths.error.txt");
-                    try
+                        $"atow-life-path-{Guid.NewGuid():N}.btcc");
+                    paths.Add(path);
+                    BattletechCharacterCreator.Core.Persistence
+                        .LegacyCharacterSerializer.Save(character, path);
+                    var loaded = BattletechCharacterCreator.Core.Persistence
+                        .LegacyCharacterSerializer.Load(path);
+                    if (loaded.Affiliation != character.Affiliation ||
+                        !loaded.RealLifeHistory.SequenceEqual(
+                            character.RealLifeHistory) ||
+                        CharacterRules.Calculate(loaded).FreeXp !=
+                        CharacterRules.Calculate(character).FreeXp)
                     {
-                        File.Delete(errorPath);
-                        foreach (var character in
-                                 wizard.SmokeRepresentativeLifePaths())
-                        {
-                            var path = Path.Combine(
-                                Path.GetTempPath(),
-                                $"atow-life-path-{Guid.NewGuid():N}.btcc");
-                            paths.Add(path);
-                            BattletechCharacterCreator.Core.Persistence
-                                .LegacyCharacterSerializer.Save(character, path);
-                            var loaded = BattletechCharacterCreator.Core.Persistence
-                                .LegacyCharacterSerializer.Load(path);
-                            if (loaded.Affiliation != character.Affiliation ||
-                                !loaded.RealLifeHistory.SequenceEqual(
-                                    character.RealLifeHistory) ||
-                                CharacterRules.Calculate(loaded).FreeXp !=
-                                CharacterRules.Calculate(character).FreeXp)
-                            {
-                                throw new InvalidOperationException(
-                                    $"{character.Name} did not round-trip correctly.");
-                            }
-                        }
-                        wizard.Close();
-                        ShutdownSmoke(0);
+                        throw new InvalidOperationException(
+                            $"{character.Name} did not round-trip correctly.");
                     }
-                    catch (Exception ex)
-                    {
-                        File.WriteAllText(errorPath, ex.ToString());
-                        wizard.Close();
-                        ShutdownSmoke(1);
-                    }
-                    finally
-                    {
-                        foreach (var path in paths)
-                        {
-                            File.Delete(path);
-                        }
-                    }
-                });
-            wizard.Show();
+                }
+                ShutdownSmoke(0);
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(errorPath, ex.ToString());
+                ShutdownSmoke(1);
+            }
+            finally
+            {
+                foreach (var path in paths)
+                {
+                    File.Delete(path);
+                }
+            }
             return;
         }
 
@@ -832,15 +822,168 @@ public partial class App : Application
         }
     }
 
-    private static ModuleSelection CreateDefaultSelection(LifePathModule module)
+    private static IReadOnlyList<Character> SmokeRepresentativeLifePathsHeadless()
+    {
+        var characters = new List<Character>
+        {
+            BuildSmokeLifePathHeadless(
+                "lyran", null, null, "street", "late-street", "real-agitator"),
+            BuildSmokeLifePathHeadless(
+                "comstar", null, null, "street", "late-street",
+                "real-comstar-service"),
+            BuildSmokeLifePathHeadless(
+                "major-periphery", null, null, "street", "late-street",
+                "real-explorer"),
+            BuildSmokeLifePathHeadless(
+                "homeworld-clan", "Goliath Scorpion", "MechWarrior",
+                "trueborn-creche", "late-trueborn-sibko",
+                "real-goliath-scorpion-seeker",
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["phenotype"] = ["Phenotype/MechWarrior"]
+                },
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["branch"] = ["MechWarrior"]
+                })
+        };
+
+        ValidateSmokeEffect(characters[0], "Protocol/Lyran",
+            "Lyran Alliance affiliation");
+        ValidateSmokeEffect(characters[0], "Leadership", "Agitator career");
+        ValidateSmokeEffect(characters[1], "Protocol/ComStar",
+            "ComStar affiliation");
+        ValidateSmokeEffect(characters[1], "Communications/HPG",
+            "ComStar Service career");
+        if (!characters[2].Traits.Any(item =>
+                item.Name == "Equipped" && item.Value != 0))
+        {
+            throw new InvalidOperationException(
+                "Major Periphery affiliation did not apply Equipped.");
+        }
+        ValidateSmokeEffect(characters[2], "Sensor Operations",
+            "Explorer career");
+        ValidateSmokeEffect(characters[3], "Interests/Star League History",
+            "Goliath Scorpion Seeker career");
+
+        return characters;
+    }
+
+    private static Character BuildSmokeLifePathHeadless(
+        string affiliationId,
+        string? subAffiliationName,
+        string? casteName,
+        string childhoodId,
+        string lateChildhoodId,
+        string careerId,
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? childhoodChoices = null,
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? lateChildhoodChoices = null)
+    {
+        var affiliation = LifePathCatalog.Affiliations
+            .First(module => module.Id == affiliationId);
+        var subAffiliation = subAffiliationName is null
+            ? null
+            : affiliation.SubAffiliations?.First(module =>
+                module.Name == subAffiliationName);
+        var caste = casteName is null
+            ? null
+            : affiliation.Castes?.First(module => module.Name == casteName);
+        var childhood = LifePathCatalog.Childhoods
+            .First(module => module.Id == childhoodId);
+        var lateChildhood = LifePathCatalog.LateChildhoods
+            .First(module => module.Id == lateChildhoodId);
+        var career = LifePathCatalog.RealLifeModules
+            .First(module => module.Id == careerId);
+        var language = affiliation.Languages?.FirstOrDefault() ?? "Language/English";
+
+        var character = LifePathEngine.CreateBase(
+            $"Smoke: {affiliation.Name} {career.Name}", language);
+        character.Affiliation = affiliation.Name;
+        character.SubAffiliation = subAffiliation?.Name ?? "";
+        character.ClanCaste = caste?.Name ?? "";
+        character.EarlyChildhood = childhood.Name;
+        character.LateChildhood = lateChildhood.Name;
+        character.BirthYear = 3026;
+        character.GameYear = 3052;
+        character.Phenotype = childhoodChoices is not null &&
+            childhoodChoices.TryGetValue("phenotype", out var phenotype)
+                ? phenotype.FirstOrDefault() ?? ""
+                : "";
+        character.ClanTrainingField = lateChildhoodChoices is not null &&
+            lateChildhoodChoices.TryGetValue("branch", out var branch)
+                ? branch.FirstOrDefault() ?? ""
+                : "";
+
+        var modules = new[]
+            {
+                affiliation, subAffiliation, caste, childhood, lateChildhood,
+                career
+            }
+            .Where(module => module is not null)
+            .Cast<LifePathModule>()
+            .ToArray();
+
+        LifePathEngine.Apply(character, CreateDefaultSelection(affiliation));
+        if (subAffiliation is not null)
+        {
+            LifePathEngine.Apply(character, CreateDefaultSelection(subAffiliation));
+        }
+        if (caste is not null)
+        {
+            LifePathEngine.Apply(character, CreateDefaultSelection(caste));
+        }
+        LifePathEngine.Apply(
+            character, CreateDefaultSelection(childhood, childhoodChoices));
+        LifePathEngine.Apply(
+            character, CreateDefaultSelection(lateChildhood, lateChildhoodChoices));
+        LifePathEngine.ApplyStage4(character, CreateDefaultSelection(career));
+        LifePathEngine.ApplyAffiliationContext(
+            character, affiliation, childhood, language);
+        LifePathEngine.ApplyAffiliationContext(
+            character, affiliation, lateChildhood, language);
+        LifePathEngine.ApplyAffiliationContext(
+            character, affiliation, career, language);
+        LifePathEngine.ApplyModuleAccounting(character, modules);
+
+        if (PrerequisiteRules.Evaluate(character)
+            .Any(issue => issue.Category == "Affiliation" ||
+                          issue.Category == "Caste"))
+        {
+            throw new InvalidOperationException(
+                $"{character.Name} has a representative path conflict.");
+        }
+
+        return character;
+    }
+
+    private static void ValidateSmokeEffect(
+        Character character,
+        string name,
+        string source)
+    {
+        if (!character.Skills.Any(item => item.Name == name && item.Value != 0) &&
+            !character.Traits.Any(item => item.Name == name && item.Value != 0) &&
+            !character.Attributes.Any(item => item.Name == name && item.Value != 0))
+        {
+            throw new InvalidOperationException(
+                $"{source} did not apply expected {name} effect.");
+        }
+    }
+
+    private static ModuleSelection CreateDefaultSelection(
+        LifePathModule module,
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? overrides = null)
     {
         var choices = module.Choices.ToDictionary(
             choice => choice.Id,
             choice =>
-                (IReadOnlyList<string>)choice.Options
-                    .DefaultIfEmpty("Perception")
-                    .Take(choice.Count)
-                    .ToArray());
+                overrides is not null &&
+                overrides.TryGetValue(choice.Id, out var selected)
+                    ? selected
+                    : (IReadOnlyList<string>)choice.Options
+                        .DefaultIfEmpty("Perception")
+                        .Take(choice.Count)
+                        .ToArray());
         return new ModuleSelection(module, choices);
     }
 
