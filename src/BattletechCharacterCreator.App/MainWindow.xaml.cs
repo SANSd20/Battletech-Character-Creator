@@ -419,12 +419,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             throw new InvalidOperationException(
                 "Editor XP allocation rejected an affordable Attribute increase.");
         }
-        if (Summary.FreeXp != originalFreeXp - 75 ||
+        var expectedFreeXp = originalFreeXp - required;
+        if (Summary.FreeXp != expectedFreeXp ||
             PrerequisiteIssues.Any(issue =>
                 issue.Category == "Attribute" && issue.Name == "BOD"))
         {
             throw new InvalidOperationException(
-                "Editor XP allocation did not update totals and prerequisites.");
+                "Editor XP allocation did not update totals and prerequisites. " +
+                $"Expected Free XP {expectedFreeXp}, actual {Summary.FreeXp}; " +
+                $"BOD XP {bod.Xp}.");
         }
 
         var beforeRejectedSpend = bod.Xp;
