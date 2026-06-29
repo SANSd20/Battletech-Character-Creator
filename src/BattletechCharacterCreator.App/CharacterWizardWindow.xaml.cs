@@ -1238,7 +1238,7 @@ public partial class CharacterWizardWindow : Window
                         columnHeader.Children.Add(xpHeader);
                         allocatorPanel.Children.Add(columnHeader);
 
-                        for (var i = 0; i < 6; i++)
+                        for (var i = 0; i < defaults.Count; i++)
                         {
                             var row = new Grid { Margin = new Thickness(0, 2, 0, 2) };
                             row.ColumnDefinitions.Add(new ColumnDefinition());
@@ -1592,11 +1592,12 @@ public partial class CharacterWizardWindow : Window
             .Select(group => new ChoiceAllocation(
                 group.Key, group.Sum(allocation => allocation.Xp)))
             .ToList();
-        while (allocations.Count < 6)
+        var rowCount = Math.Max(1, choice.Count);
+        while (allocations.Count < rowCount)
         {
             allocations.Add(new ChoiceAllocation("", 0));
         }
-        return allocations.Take(6).ToArray();
+        return allocations.Take(rowCount).ToArray();
     }
 
     private sealed record FlexibleChoiceResult(
