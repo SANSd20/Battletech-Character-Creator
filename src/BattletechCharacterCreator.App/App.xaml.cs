@@ -12,6 +12,8 @@ namespace BattletechCharacterCreator.App;
 
 public partial class App : Application
 {
+    private const string SmokeFailureReportPrefix = "--smoke-failure-report=";
+
     public App()
     {
         DispatcherUnhandledException += (_, e) =>
@@ -86,7 +88,10 @@ public partial class App : Application
             }
             catch (Exception exception)
             {
-                AppErrorReporter.WriteReport(exception, "Wizard smoke");
+                AppErrorReporter.WriteReport(
+                    exception,
+                    "Wizard smoke",
+                    SmokeFailureReportPath(e.Args));
                 ShutdownSmoke(1);
             }
             return;
@@ -139,7 +144,10 @@ public partial class App : Application
                         }
                         catch (Exception exception)
                         {
-                            AppErrorReporter.WriteReport(exception, "Stage preview smoke");
+                            AppErrorReporter.WriteReport(
+                                exception,
+                                "Stage preview smoke",
+                                SmokeFailureReportPath(e.Args));
                             wizard.Close();
                             ShutdownSmoke(1);
                         }
@@ -148,7 +156,10 @@ public partial class App : Application
             }
             catch (Exception exception)
             {
-                AppErrorReporter.WriteReport(exception, "Stage preview smoke");
+                AppErrorReporter.WriteReport(
+                    exception,
+                    "Stage preview smoke",
+                    SmokeFailureReportPath(e.Args));
                 ShutdownSmoke(1);
             }
             return;
@@ -173,7 +184,9 @@ public partial class App : Application
                         catch (Exception exception)
                         {
                             AppErrorReporter.WriteReport(
-                                exception, "Affiliation-filtered childhood smoke");
+                                exception,
+                                "Affiliation-filtered childhood smoke",
+                                SmokeFailureReportPath(e.Args));
                             wizard.Close();
                             ShutdownSmoke(1);
                         }
@@ -183,7 +196,9 @@ public partial class App : Application
             catch (Exception exception)
             {
                 AppErrorReporter.WriteReport(
-                    exception, "Affiliation-filtered childhood smoke");
+                    exception,
+                    "Affiliation-filtered childhood smoke",
+                    SmokeFailureReportPath(e.Args));
                 ShutdownSmoke(1);
             }
             return;
@@ -191,28 +206,48 @@ public partial class App : Application
 
         if (e.Args.Contains("--smoke-clan-roundtrip", StringComparer.Ordinal))
         {
-            var wizard = new CharacterWizardWindow();
-            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
-                DispatcherPriority.ApplicationIdle,
-                () =>
-                {
-                    var path = Path.Combine(
-                        Path.GetTempPath(), $"atow-clan-{Guid.NewGuid():N}.btcc");
-                    try
+            try
+            {
+                var wizard = new CharacterWizardWindow();
+                wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                    DispatcherPriority.ApplicationIdle,
+                    () =>
                     {
-                        wizard.SmokeHomeworldClanCharacter();
-                        var editor = new MainWindow(wizard.CreatedCharacter!);
-                        editor.SmokeSaveAndReload(path);
-                        editor.Close();
-                        wizard.Close();
-                        ShutdownSmoke(0);
-                    }
-                    finally
-                    {
-                        File.Delete(path);
-                    }
-                });
-            wizard.Show();
+                        var path = Path.Combine(
+                            Path.GetTempPath(), $"atow-clan-{Guid.NewGuid():N}.btcc");
+                        try
+                        {
+                            wizard.SmokeHomeworldClanCharacter();
+                            var editor = new MainWindow(wizard.CreatedCharacter!);
+                            editor.SmokeSaveAndReload(path);
+                            editor.Close();
+                            wizard.Close();
+                            ShutdownSmoke(0);
+                        }
+                        catch (Exception exception)
+                        {
+                            AppErrorReporter.WriteReport(
+                                exception,
+                                "Clan round-trip smoke",
+                                SmokeFailureReportPath(e.Args));
+                            wizard.Close();
+                            ShutdownSmoke(1);
+                        }
+                        finally
+                        {
+                            File.Delete(path);
+                        }
+                    });
+                wizard.Show();
+            }
+            catch (Exception exception)
+            {
+                AppErrorReporter.WriteReport(
+                    exception,
+                    "Clan round-trip smoke",
+                    SmokeFailureReportPath(e.Args));
+                ShutdownSmoke(1);
+            }
             return;
         }
 
@@ -265,33 +300,45 @@ public partial class App : Application
 
         if (e.Args.Contains("--smoke-editor-allocation", StringComparer.Ordinal))
         {
-            var wizard = new CharacterWizardWindow();
-            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
-                DispatcherPriority.ApplicationIdle,
-                () =>
-                {
-                    MainWindow? editor = null;
-                    try
+            try
+            {
+                var wizard = new CharacterWizardWindow();
+                wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
+                    DispatcherPriority.ApplicationIdle,
+                    () =>
                     {
-                        wizard.SmokeHomeworldClanCharacter();
-                        editor = new MainWindow(wizard.CreatedCharacter!);
-                        editor.SmokeCampaignYearEraSelection();
-                        editor.SmokeXpAllocation();
-                        editor.Close();
-                        wizard.Close();
-                        ShutdownSmoke(0);
-                    }
-                    catch (Exception exception)
-                    {
-                        AppErrorReporter.WriteReport(
-                            exception,
-                            "Editor allocation smoke");
-                        editor?.Close();
-                        wizard.Close();
-                        ShutdownSmoke(1);
-                    }
-                });
-            wizard.Show();
+                        MainWindow? editor = null;
+                        try
+                        {
+                            wizard.SmokeHomeworldClanCharacter();
+                            editor = new MainWindow(wizard.CreatedCharacter!);
+                            editor.SmokeCampaignYearEraSelection();
+                            editor.SmokeXpAllocation();
+                            editor.Close();
+                            wizard.Close();
+                            ShutdownSmoke(0);
+                        }
+                        catch (Exception exception)
+                        {
+                            AppErrorReporter.WriteReport(
+                                exception,
+                                "Editor allocation smoke",
+                                SmokeFailureReportPath(e.Args));
+                            editor?.Close();
+                            wizard.Close();
+                            ShutdownSmoke(1);
+                        }
+                    });
+                wizard.Show();
+            }
+            catch (Exception exception)
+            {
+                AppErrorReporter.WriteReport(
+                    exception,
+                    "Editor allocation smoke",
+                    SmokeFailureReportPath(e.Args));
+                ShutdownSmoke(1);
+            }
             return;
         }
 
@@ -304,7 +351,7 @@ public partial class App : Application
             }
             catch (Exception exception)
             {
-                var reportPath = Path.Combine(
+                var reportPath = SmokeFailureReportPath(e.Args) ?? Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                     "inventory-smoke-error-report.txt");
                 AppErrorReporter.WriteReport(
@@ -743,6 +790,15 @@ public partial class App : Application
             throw new InvalidOperationException(
                 "Vehicle trait support warnings did not clear with the Vehicle trait.");
         }
+    }
+
+    private static string? SmokeFailureReportPath(IEnumerable<string> args)
+    {
+        var argument = args.FirstOrDefault(value =>
+            value.StartsWith(SmokeFailureReportPrefix, StringComparison.Ordinal));
+        return argument is null
+            ? null
+            : Path.GetFullPath(argument[SmokeFailureReportPrefix.Length..]);
     }
 
     private static void SmokeWizardHeadless()

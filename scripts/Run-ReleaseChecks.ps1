@@ -1,5 +1,6 @@
 param(
     [string]$Version = "0.1.0-preview",
+    [string]$Configuration = "Release",
     [switch]$SkipInstallerBuild
 )
 
@@ -71,11 +72,18 @@ function Stop-RepoAppProcesses([string]$RepoRoot, [string]$Reason) {
 
 function Invoke-AppSmoke([string]$Name, [string[]]$Arguments) {
     Invoke-Step $Name {
+        $safeName = $Name -replace '[^A-Za-z0-9]+', '-'
+        $failureReportPath = Join-Path $appData "$safeName-error-report.txt"
+        Remove-Item -LiteralPath $failureReportPath -ErrorAction SilentlyContinue
         try {
             Stop-RepoAppProcesses $repoRoot $Name
-            dotnet run --no-build --project src\BattletechCharacterCreator.App `
-                /p:UseSharedCompilation=false -- @Arguments
+            dotnet run --configuration $Configuration --no-build --project src\BattletechCharacterCreator.App `
+                /p:UseSharedCompilation=false -- @Arguments "--smoke-failure-report=$failureReportPath"
             if ($LASTEXITCODE -ne 0) {
+                if (Test-Path -LiteralPath $failureReportPath) {
+                    $failureReport = Get-Content -LiteralPath $failureReportPath -Raw
+                    throw "$Name failed with exit code $LASTEXITCODE. Failure report: $failureReport"
+                }
                 throw "$Name failed with exit code $LASTEXITCODE."
             }
         } finally {
@@ -126,7 +134,7 @@ Invoke-Step "Migration tests" {
 
 Invoke-Step "App smoke build" {
     Stop-RepoAppProcesses $repoRoot "app smoke build"
-    dotnet build src\BattletechCharacterCreator.App --no-restore `
+    dotnet build src\BattletechCharacterCreator.App --configuration $Configuration --no-restore `
         /p:UseSharedCompilation=false
 }
 
@@ -147,7 +155,7 @@ Invoke-AppSmoke "Inventory smoke" @("--smoke-inventory")
 Invoke-Step "Sheet export smoke" {
     try {
         Stop-RepoAppProcesses $repoRoot "sheet export smoke"
-        dotnet run --no-build --project src\BattletechCharacterCreator.App `
+        dotnet run --configuration $Configuration --no-build --project src\BattletechCharacterCreator.App `
             /p:UseSharedCompilation=false -- --smoke-sheet-export=$sheetExportPath
         if ($LASTEXITCODE -ne 0) {
             throw "Sheet export smoke failed with exit code $LASTEXITCODE."
@@ -170,7 +178,7 @@ Invoke-Step "Sheet export smoke" {
 Invoke-Step "Error report smoke" {
     try {
         Stop-RepoAppProcesses $repoRoot "error report smoke"
-        dotnet run --no-build --project src\BattletechCharacterCreator.App `
+        dotnet run --configuration $Configuration --no-build --project src\BattletechCharacterCreator.App `
             /p:UseSharedCompilation=false -- --smoke-error-report=$errorReportPath
         if ($LASTEXITCODE -ne 0) {
             throw "Error report smoke failed with exit code $LASTEXITCODE."
@@ -184,7 +192,7 @@ Invoke-Step "Error report smoke" {
 Invoke-Step "Operation report smoke" {
     try {
         Stop-RepoAppProcesses $repoRoot "operation report smoke"
-        dotnet run --no-build --project src\BattletechCharacterCreator.App `
+        dotnet run --configuration $Configuration --no-build --project src\BattletechCharacterCreator.App `
             /p:UseSharedCompilation=false -- --smoke-operation-error-report=$operationReportPath
         if ($LASTEXITCODE -ne 0) {
             throw "Operation report smoke failed with exit code $LASTEXITCODE."
@@ -197,12 +205,12 @@ Invoke-Step "Operation report smoke" {
 
 Invoke-Step "Solution build" {
     Stop-RepoAppProcesses $repoRoot "solution build"
-    dotnet build BattletechCharacterCreator.sln /p:UseSharedCompilation=false
+    dotnet build BattletechCharacterCreator.sln --configuration $Configuration /p:UseSharedCompilation=false
 }
 
 Invoke-Step "Folder publish" {
     Stop-RepoAppProcesses $repoRoot "folder publish"
-    dotnet publish src\BattletechCharacterCreator.App `
+    dotnet publish src\BattletechCharacterCreator.App --configuration $Configuration `
         /p:PublishProfile=win-x64-folder `
         /p:UseSharedCompilation=false
 }
