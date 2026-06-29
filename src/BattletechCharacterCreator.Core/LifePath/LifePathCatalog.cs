@@ -469,7 +469,7 @@ public static class LifePathCatalog
                 Skill("Negotiation", 15), Skill("Perception", 25), Skill("Running", 40),
                 Skill("Small Arms", 20), Skill("Stealth", 30)],
             [Choice("survival", "Survival", EffectTarget.Skill, 25, 1, SurvivalSkills),
-                FlexibleChoice("flex", "Flexible XP", 130, 1)],
+                FlexiblePoolChoice("flex", "Flexible XP", 130)],
             AffiliationLanguageXp: -25, AffiliationProtocolXp: -10,
             AffiliationStreetwiseXp: 45),
         new("late-back-woods", "Back Woods",
@@ -480,7 +480,7 @@ public static class LifePathCatalog
                 Skill("MedTech", 20), Skill("Melee Weapons", 20), Skill("Perception", 45),
                 Skill("Small Arms", 20), Skill("Stealth", 40),
                 Skill("Survival/Forests", 25), Skill("Tracking/Wilds", 30)],
-            [FlexibleChoice("flex", "Flexible XP", 125, 1)],
+            [FlexiblePoolChoice("flex", "Flexible XP", 125)],
             AffiliationProtocolXp: -15),
         new("late-clan-apprenticeship", "Clan Apprenticeship",
             "A lower-caste Clan apprenticeship in an assigned trade.", 500,
@@ -516,7 +516,7 @@ public static class LifePathCatalog
                             PreAttribute("DEX", 400)
                         ]
                     }),
-                FlexibleChoice("flex", "Flexible XP", 165, 1)]),
+                FlexiblePoolChoice("flex", "Flexible XP", 165)]),
         new("late-farm", "Farm", "Teenage years spent learning agricultural work.", 400,
             [Attribute("DEX", 40), Attribute("CHA", -20), Trait("Animal Empathy", 30),
                 Skill("Administration", 35), Skill("Animal Handling", 30),
@@ -524,7 +524,7 @@ public static class LifePathCatalog
                 Skill("Small Arms", 30)],
             [Choice("interest-major", "Primary interest", EffectTarget.Skill, 40, 1, Interests),
                 Choice("interest-minor", "Secondary interest", EffectTarget.Skill, 20, 1, Interests),
-                FlexibleChoice("flex", "Flexible XP", 115, 1)]),
+                FlexiblePoolChoice("flex", "Flexible XP", 115)]),
         new("late-freeborn-sibko", "Freeborn Sibko",
             "Clan military training for an aspiring freeborn warrior.", 950,
             [Attribute("BOD", 50), Attribute("WIL", 50), Attribute("CHA", -30),
@@ -539,7 +539,7 @@ public static class LifePathCatalog
             [Attribute("CHA", 25), Attribute("INT", 25), Trait("Connections", 20),
                 Skill("Computers", 20), Skill("Swimming", 20)],
             [Choice("interest", "Interest", EffectTarget.Skill, 35, 1, Interests),
-                FlexibleChoice("flex", "Flexible XP", 185, 1)],
+                FlexiblePoolChoice("flex", "Flexible XP", 185)],
             AffiliationLanguageXp: 10, AffiliationStreetwiseXp: 20),
         new("late-mercenary-brat", "Mercenary Brat",
             "Teenage years traveling and working with a mercenary command.", 600,
@@ -556,7 +556,7 @@ public static class LifePathCatalog
                         "Tactics/Space"]),
                 Choice("technician", "Technician", EffectTarget.Skill, 30, 1, Technicians),
                 Choice("second-interest", "Additional interest", EffectTarget.Skill, 20, 1, Interests),
-                FlexibleChoice("flex", "Flexible XP", 150, 1)]),
+                FlexiblePoolChoice("flex", "Flexible XP", 150)]),
         new("late-military-school", "Military School",
             "A disciplined military education during the teenage years.", 500,
             [Attribute("CHA", 50), Trait("Connections", 15), Trait("Fit", 15),
@@ -566,7 +566,7 @@ public static class LifePathCatalog
                 Skill("Running", 30), Skill("Small Arms", 50), Skill("Strategy", 10),
                 Skill("Swimming", 30), PreAttribute("WIL", 300)],
             [Choice("interest", "Interest", EffectTarget.Skill, 30, 1, Interests),
-                FlexibleChoice("flex", "Flexible XP", 40, 1)],
+                FlexiblePoolChoice("flex", "Flexible XP", 40)],
             AffiliationProtocolXp: 30),
         new("late-preparatory-school", "Preparatory School",
             "An elite education aimed at university and influential careers.", 500,
@@ -577,7 +577,7 @@ public static class LifePathCatalog
                 Choice("interest-two", "Secondary interest", EffectTarget.Skill, 20, 1, Interests),
                 Choice("interest-three", "Additional interest", EffectTarget.Skill, 20, 1, Interests),
                 Choice("language", "Language", EffectTarget.Skill, 20, 1, Languages),
-                FlexibleChoice("flex", "Flexible XP", 160, 1)],
+                FlexiblePoolChoice("flex", "Flexible XP", 160)],
             AffiliationProtocolXp: 40),
         new("late-spacer-family", "Spacer Family",
             "Raised aboard DropShips and JumpShips in low gravity.", 490,
@@ -593,7 +593,7 @@ public static class LifePathCatalog
                 PreAttribute("DEX", 400), PreAttribute("INT", 400),
                 PreSkill("Zero-G Operations", 50)],
             [Choice("language", "Language", EffectTarget.Skill, 15, 1, Languages),
-                FlexibleChoice("flex", "Flexible XP", 175, 1)]),
+                FlexiblePoolChoice("flex", "Flexible XP", 175)]),
         new("late-street", "Street", "Teenage survival among gangs and authorities.", 400,
             [Attribute("BOD", 20), Attribute("EDG", 40), Attribute("WIL", 10),
                 Attribute("CHA", -20), Trait("Combat Sense", 15), Trait("Connections", 20),
@@ -604,7 +604,7 @@ public static class LifePathCatalog
                 Skill("Negotiation", 20), Skill("Perception", 25), Skill("Running", 25),
                 Skill("Small Arms", 20), Skill("Stealth", 15)],
             [Choice("interest", "Interest", EffectTarget.Skill, 20, 1, Interests),
-                FlexibleChoice("flex", "Flexible XP", 60, 1)],
+                FlexiblePoolChoice("flex", "Flexible XP", 60)],
             AffiliationStreetwiseXp: 40),
         new("late-trueborn-sibko", "Trueborn Sibko",
             "The intense military training regimen of a trueborn Clan warrior.", 1500,
@@ -620,7 +620,7 @@ public static class LifePathCatalog
                 Choice("driving", "Driving", EffectTarget.Skill, 60, 1,
                     ["Driving/Ground Vehicles", "Driving/Rail Vehicles", "Driving/Sea Vehicles"]),
                 Choice("interest", "Interest", EffectTarget.Skill, 100, 1, Interests),
-                FlexibleChoice("flex", "Flexible XP", 85, 1)],
+                FlexiblePoolChoice("flex", "Flexible XP", 85)],
             AffiliationProtocolXp: 50)
     ];
 
@@ -2864,6 +2864,22 @@ public static class LifePathCatalog
             AttributeMaximumXp = attributeMaximumXp,
             MinimumAttributeOrTraitXp = minimumAttributeOrTraitXp,
             FixedFlexibleSelections = true
+        };
+
+    private static ModuleChoice FlexiblePoolChoice(
+        string id, string label, int xp, int count = 1,
+        int? attributeMaximumXp = 200,
+        int? traitMaximumXp = 200,
+        int? skillMaximumXp = 35,
+        int minimumAttributeOrTraitXp = 0) =>
+        Choice(id, label, EffectTarget.Flexible, xp, count,
+            Attributes.Concat(FlexibleTraits).Concat(FlexibleSkills).ToArray())
+        with
+        {
+            AttributeMaximumXp = attributeMaximumXp,
+            TraitMaximumXp = traitMaximumXp,
+            SkillMaximumXp = skillMaximumXp,
+            MinimumAttributeOrTraitXp = minimumAttributeOrTraitXp
         };
 
     private static ModuleChoice FlexibleAttributeOrTraitChoice(

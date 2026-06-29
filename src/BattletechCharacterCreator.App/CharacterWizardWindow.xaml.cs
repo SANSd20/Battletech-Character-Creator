@@ -1485,6 +1485,34 @@ public partial class CharacterWizardWindow : Window
                     $"{maximum} XP from this pool.");
             }
         }
+        if (choice.TraitMaximumXp is int traitMaximum)
+        {
+            var excessiveTrait = active
+                .Where(item => LifePathEngine.ClassifyFlexibleTarget(item.Name) ==
+                    EffectTarget.Trait)
+                .GroupBy(item => item.Name, StringComparer.Ordinal)
+                .FirstOrDefault(group => group.Sum(item => item.Xp) > traitMaximum);
+            if (excessiveTrait is not null)
+            {
+                return new FlexibleChoiceResult(false, 0,
+                    $"{input.ModuleName}: no Trait may receive more than " +
+                    $"{traitMaximum} XP from this pool.");
+            }
+        }
+        if (choice.SkillMaximumXp is int skillMaximum)
+        {
+            var excessiveSkill = active
+                .Where(item => LifePathEngine.ClassifyFlexibleTarget(item.Name) ==
+                    EffectTarget.Skill)
+                .GroupBy(item => item.Name, StringComparer.Ordinal)
+                .FirstOrDefault(group => group.Sum(item => item.Xp) > skillMaximum);
+            if (excessiveSkill is not null)
+            {
+                return new FlexibleChoiceResult(false, 0,
+                    $"{input.ModuleName}: no Skill may receive more than " +
+                    $"{skillMaximum} XP from this pool.");
+            }
+        }
 
         var educationOptions = ResolveEducationFieldOptions(choice);
         var educationAllocations = active.Where(item =>
@@ -1521,6 +1549,14 @@ public partial class CharacterWizardWindow : Window
         if (choice.AttributeMaximumXp is int maximum)
         {
             rules.Add($"Maximum {maximum} XP per Attribute.");
+        }
+        if (choice.TraitMaximumXp is int traitMaximum)
+        {
+            rules.Add($"Maximum {traitMaximum} XP per Trait.");
+        }
+        if (choice.SkillMaximumXp is int skillMaximum)
+        {
+            rules.Add($"Maximum {skillMaximum} XP per Skill.");
         }
         if (choice.MinimumEducationFieldSkillXp > 0)
         {

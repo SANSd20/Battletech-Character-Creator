@@ -26,6 +26,8 @@ public sealed record ModuleChoice(
     bool Distinct = true,
     IReadOnlyDictionary<string, IReadOnlyList<ModuleEffect>>? OptionEffects = null,
     int? AttributeMaximumXp = null,
+    int? TraitMaximumXp = null,
+    int? SkillMaximumXp = null,
     int MinimumAttributeOrTraitXp = 0,
     IReadOnlyList<string>? EducationFieldNames = null,
     int MinimumEducationFieldSkillXp = 0,
@@ -307,6 +309,26 @@ public static class LifePathEngine
         {
             throw new InvalidOperationException(
                 $"{module.Name}: '{choice.Label}' allows at most {maximum} XP per Attribute.");
+        }
+        if (choice.TraitMaximumXp is int traitMaximum &&
+            active.Where(allocation =>
+                    ClassifyFlexibleTarget(allocation.Name) ==
+                    EffectTarget.Trait)
+                .GroupBy(allocation => allocation.Name, StringComparer.Ordinal)
+                .Any(group => group.Sum(allocation => allocation.Xp) > traitMaximum))
+        {
+            throw new InvalidOperationException(
+                $"{module.Name}: '{choice.Label}' allows at most {traitMaximum} XP per Trait.");
+        }
+        if (choice.SkillMaximumXp is int skillMaximum &&
+            active.Where(allocation =>
+                    ClassifyFlexibleTarget(allocation.Name) ==
+                    EffectTarget.Skill)
+                .GroupBy(allocation => allocation.Name, StringComparer.Ordinal)
+                .Any(group => group.Sum(allocation => allocation.Xp) > skillMaximum))
+        {
+            throw new InvalidOperationException(
+                $"{module.Name}: '{choice.Label}' allows at most {skillMaximum} XP per Skill.");
         }
 
         foreach (var allocation in active)

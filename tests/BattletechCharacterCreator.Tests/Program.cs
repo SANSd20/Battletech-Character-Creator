@@ -881,6 +881,25 @@ static void CheckLateChildhoods()
     Assert(LifePathCatalog.LateChildhoods
             .All(module => module.Effects.Count > 0 || module.Choices.Count > 0),
         "Every late-childhood module must provide effects or choices.");
+    var lateFlexibleChoices = LifePathCatalog.LateChildhoods
+        .SelectMany(module => module.Choices)
+        .Where(choice => choice.Target == EffectTarget.Flexible)
+        .ToArray();
+    Assert(lateFlexibleChoices.All(choice => !choice.FixedFlexibleSelections),
+        "Stage 2 flexible XP choices must use spendable allocation pools.");
+    Assert(lateFlexibleChoices.All(choice =>
+            choice.AttributeMaximumXp == 200 &&
+            choice.TraitMaximumXp == 200 &&
+            choice.SkillMaximumXp == 35),
+        "Stage 2 flexible XP choices must enforce page 77 per-target caps.");
+    Assert(lateFlexibleChoices.All(choice =>
+            choice.Options.Any(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) == EffectTarget.Attribute) &&
+            choice.Options.Any(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) == EffectTarget.Trait) &&
+            choice.Options.Any(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) == EffectTarget.Skill)),
+        "Stage 2 flexible XP choices must allow Attributes, Traits, and Skills.");
 
     var affiliation = LifePathCatalog.Affiliations.Single(module => module.Id == "fed-suns");
     var warfare = LifePathCatalog.LateChildhoods
@@ -941,9 +960,27 @@ static void CheckLateChildhoods()
 }
 
 static ModuleSelection SelectDefaults(LifePathModule module) =>
-    new(module, module.Choices.ToDictionary(
-        choice => choice.Id,
-        choice => (IReadOnlyList<string>)choice.Options.Take(choice.Count).ToArray()));
+    new(
+        module,
+        module.Choices.ToDictionary(
+            choice => choice.Id,
+            choice => choice.Target == EffectTarget.Flexible &&
+                !choice.FixedFlexibleSelections
+                ? []
+                : (IReadOnlyList<string>)choice.Options.Take(choice.Count).ToArray()),
+        module.Choices
+            .Where(choice => choice.Target == EffectTarget.Flexible &&
+                !choice.FixedFlexibleSelections)
+            .ToDictionary(
+                choice => choice.Id,
+                choice => (IReadOnlyList<ChoiceAllocation>)
+                [
+                    new(
+                        choice.Options.First(option =>
+                            LifePathEngine.ClassifyFlexibleTarget(option) ==
+                            EffectTarget.Attribute),
+                        choice.Xp * choice.Count)
+                ]));
 
 static void CheckEducation()
 {
@@ -1087,14 +1124,14 @@ static void CheckFlexibleAllocations()
         {
             [flex.Id] =
             [
-                new("DEX", 60),
-                new("Swimming", flex.Xp * flex.Count - 60)
+                new("DEX", flex.Xp * flex.Count - 35),
+                new("Swimming", 35)
             ]
         }));
-    Assert(character.Attributes.Single(item => item.Name == "DEX").Value == 160,
+    Assert(character.Attributes.Single(item => item.Name == "DEX").Value ==
+        100 + flex.Xp * flex.Count - 35,
         "Flexible XP may be split into an attribute.");
-    Assert(character.Skills.Single(item => item.Name == "Swimming").Value ==
-        flex.Xp * flex.Count - 60,
+    Assert(character.Skills.Single(item => item.Name == "Swimming").Value == 35,
         "Flexible XP may be split into a skill.");
 
     var fixedFlexibleModule = LifePathCatalog.Childhoods
@@ -1136,6 +1173,24 @@ static void CheckFlexibleAllocations()
         invalidRejected = true;
     }
     Assert(invalidRejected, "Flexible allocations must spend their exact XP pool.");
+
+    var skillCapRejected = false;
+    try
+    {
+        LifePathEngine.Apply(new Character(), new ModuleSelection(
+            module,
+            regularChoices,
+            new Dictionary<string, IReadOnlyList<ChoiceAllocation>>
+            {
+                [flex.Id] = [new("DEX", flex.Xp * flex.Count - 40), new("Swimming", 40)]
+            }));
+    }
+    catch (InvalidOperationException)
+    {
+        skillCapRejected = true;
+    }
+    Assert(skillCapRejected,
+        "Stage 2 flexible allocations must cap each Skill at 35 XP.");
 }
 
 static void CheckRealLifeModules()
