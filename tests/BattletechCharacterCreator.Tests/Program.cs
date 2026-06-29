@@ -1097,6 +1097,29 @@ static void CheckFlexibleAllocations()
         flex.Xp * flex.Count - 60,
         "Flexible XP may be split into a skill.");
 
+    var fixedFlexibleModule = LifePathCatalog.Childhoods
+        .Single(item => item.Id == "back-woods");
+    var fixedFlexible = fixedFlexibleModule.Choices
+        .Single(choice => choice.Target == EffectTarget.Flexible);
+    var fixedFlexibleCharacter = new Character();
+    LifePathEngine.Apply(fixedFlexibleCharacter, new ModuleSelection(
+        fixedFlexibleModule,
+        new Dictionary<string, IReadOnlyList<string>>
+        {
+            ["survival"] = ["Survival/Desert"],
+            [fixedFlexible.Id] = []
+        },
+        new Dictionary<string, IReadOnlyList<ChoiceAllocation>>
+        {
+            [fixedFlexible.Id] =
+            [
+                new("DEX", fixedFlexible.Xp),
+                new("DEX", fixedFlexible.Xp)
+            ]
+        }));
+    Assert(fixedFlexibleCharacter.Attributes.Single(item => item.Name == "DEX").Value == 150,
+        "Fixed flexible selections must combine repeated Attribute targets as allocations.");
+
     var invalidRejected = false;
     try
     {

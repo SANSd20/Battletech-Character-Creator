@@ -1968,6 +1968,17 @@ public partial class CharacterWizardWindow : Window
                 choices[choice.Id] = [];
                 continue;
             }
+            if (choice.Target == EffectTarget.Flexible &&
+                choice.FixedFlexibleSelections)
+            {
+                allocations[choice.Id] = input.Pickers
+                    .Select(picker => picker.SelectedItem as string ?? "")
+                    .Where(name => name.Length > 0)
+                    .Select(name => new ChoiceAllocation(name, choice.Xp))
+                    .ToArray();
+                choices[choice.Id] = [];
+                continue;
+            }
 
             var selected = input.Pickers
                 .Select(control => control.SelectedItem as string ?? "")
