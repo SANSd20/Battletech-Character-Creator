@@ -2862,7 +2862,8 @@ public static class LifePathCatalog
         with
         {
             AttributeMaximumXp = attributeMaximumXp,
-            MinimumAttributeOrTraitXp = minimumAttributeOrTraitXp
+            MinimumAttributeOrTraitXp = minimumAttributeOrTraitXp,
+            FixedFlexibleSelections = true
         };
 
     private static ModuleChoice FlexibleAttributeOrTraitChoice(
@@ -2873,7 +2874,8 @@ public static class LifePathCatalog
         with
         {
             AttributeMaximumXp = attributeMaximumXp,
-            MinimumAttributeOrTraitXp = minimumAttributeOrTraitXp
+            MinimumAttributeOrTraitXp = minimumAttributeOrTraitXp,
+            FixedFlexibleSelections = true
         };
 
     private static ModuleChoice Choice(

@@ -104,8 +104,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Stage 1 flexible XP target lists include cataloged Compulsion traits
 - Stage 1 flexible XP target lists are restricted to attributes and traits
   instead of later-stage skill targets
-- Flexible XP allocators show only the number of target rows required by the
-  selected module choice
+- Fixed flexible XP choices show only the required target dropdowns and apply
+  the listed XP amount without split controls
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
 - Character editor with guided Attribute, Trait, and Skill XP controls

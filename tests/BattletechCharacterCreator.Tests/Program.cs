@@ -838,6 +838,8 @@ static void CheckLifePathAvailability()
                 LifePathEngine.ClassifyFlexibleTarget(option) is
                     EffectTarget.Attribute or EffectTarget.Trait)),
         "Stage 1 flexible XP choices must only offer attributes or traits.");
+    Assert(earlyChildhoodFlexibleChoices.All(choice => choice.FixedFlexibleSelections),
+        "Stage 1 flexible XP choices must use fixed per-target XP dropdowns.");
 }
 
 static LifePathModule FindSubAffiliation(
