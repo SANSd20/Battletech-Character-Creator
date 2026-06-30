@@ -88,8 +88,6 @@
                     <TextBox x:Name="CharacterName" Text="New Character"/>
                     <TextBlock Text="Sex" Style="{StaticResource FieldLabel}"/>
                     <ComboBox x:Name="SexPicker"/>
-                    <TextBlock Text="Year of birth" Style="{StaticResource FieldLabel}"/>
-                    <TextBox x:Name="BirthYearInput" Text="3024"/>
                     <TextBlock Text="Campaign year" Style="{StaticResource FieldLabel}"/>
                     <TextBox x:Name="GameYearInput" Text="3045"
                              TextChanged="GameYearInputChanged"/>

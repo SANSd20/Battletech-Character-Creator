@@ -483,14 +483,8 @@ public partial class CharacterWizardWindow : Window
         {
             0 when string.IsNullOrWhiteSpace(CharacterName.Text) =>
                 "Enter a character name.",
-            0 when !TryReadPositiveNumber(BirthYearInput, out _) =>
-                "Enter a valid year of birth.",
             0 when !TryReadPositiveNumber(GameYearInput, out _) =>
                 "Enter a valid campaign year.",
-            0 when TryReadPositiveNumber(BirthYearInput, out var birthYear) &&
-                TryReadPositiveNumber(GameYearInput, out var gameYear) &&
-                gameYear < birthYear =>
-                "Enter a campaign year that is the same as or later than the year of birth.",
             0 when !TryReadPositiveNumber(HeightInput, out _) =>
                 "Enter a valid height.",
             0 when !TryReadPositiveNumber(WeightInput, out _) =>
@@ -1875,7 +1869,7 @@ public partial class CharacterWizardWindow : Window
 
         ReviewCharacterSummary.Text =
             $"{character.Name}{Environment.NewLine}" +
-            $"{character.Sex}, born {character.BirthYear}, game year {character.GameYear}, age {character.Age}{Environment.NewLine}" +
+            $"{character.Sex}, campaign year {character.GameYear}{Environment.NewLine}" +
             $"Height / Weight: {character.Height} cm / {character.Weight} kg{Environment.NewLine}" +
             $"Hair / Eyes: {ValueOrDash(character.HairColor)} / {ValueOrDash(character.EyeColor)}";
 
@@ -1934,8 +1928,6 @@ public partial class CharacterWizardWindow : Window
 
         var character = LifePathEngine.CreateBase(CharacterName.Text.Trim(), language);
         character.Sex = SexPicker.SelectedItem as string ?? "Male";
-        character.BirthYear = TryReadPositiveNumber(BirthYearInput, out var birthYear)
-            ? birthYear : 3024;
         character.GameYear = TryReadPositiveNumber(GameYearInput, out var gameYear)
             ? gameYear : 3045;
         character.Height = TryReadPositiveNumber(HeightInput, out var height)
