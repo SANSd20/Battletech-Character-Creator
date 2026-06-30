@@ -1673,21 +1673,6 @@ public partial class CharacterWizardWindow : Window
             }
         }
 
-        if (remaining > 0)
-        {
-            var target = options.FirstOrDefault(option =>
-                LifePathEngine.ClassifyFlexibleTarget(option) ==
-                EffectTarget.Attribute);
-            target ??= options.FirstOrDefault(option =>
-                LifePathEngine.ClassifyFlexibleTarget(option) ==
-                EffectTarget.Trait);
-            target ??= options.FirstOrDefault();
-            if (target is not null)
-            {
-                allocations.Add(new ChoiceAllocation(target, remaining));
-            }
-        }
-
         allocations = allocations
             .Where(allocation => allocation.Xp > 0)
             .GroupBy(allocation => allocation.Name, StringComparer.Ordinal)

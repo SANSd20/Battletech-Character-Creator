@@ -1204,6 +1204,51 @@ static void CheckFlexibleAllocations()
     }
     Assert(skillCapRejected,
         "Stage 2 flexible allocations must cap each Skill at 35 XP.");
+
+    var cappedChoice = flex with { Xp = 250 };
+    var cappedModule = new LifePathModule(
+        "test-capped-flex",
+        "Test Capped Flex",
+        "",
+        0,
+        [],
+        [cappedChoice]);
+
+    var attributeCapRejected = false;
+    try
+    {
+        LifePathEngine.Apply(new Character(), new ModuleSelection(
+            cappedModule,
+            new Dictionary<string, IReadOnlyList<string>>(),
+            new Dictionary<string, IReadOnlyList<ChoiceAllocation>>
+            {
+                [cappedChoice.Id] = [new("DEX", 205), new("STR", 45)]
+            }));
+    }
+    catch (InvalidOperationException)
+    {
+        attributeCapRejected = true;
+    }
+    Assert(attributeCapRejected,
+        "Stage 2 flexible allocations must cap each Attribute at 200 XP.");
+
+    var traitCapRejected = false;
+    try
+    {
+        LifePathEngine.Apply(new Character(), new ModuleSelection(
+            cappedModule,
+            new Dictionary<string, IReadOnlyList<string>>(),
+            new Dictionary<string, IReadOnlyList<ChoiceAllocation>>
+            {
+                [cappedChoice.Id] = [new("Compulsion/Paranoid", 205), new("DEX", 45)]
+            }));
+    }
+    catch (InvalidOperationException)
+    {
+        traitCapRejected = true;
+    }
+    Assert(traitCapRejected,
+        "Stage 2 flexible allocations must cap each Trait at 200 XP.");
 }
 
 static void CheckRealLifeModules()
