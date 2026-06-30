@@ -1019,9 +1019,11 @@ static void CheckEducation()
         "Repeated education placeholders must become a multi-selection.");
     Assert(analysis.Effects.All(effect => !effect.Name.Contains("/Any")),
         "Education fields must not apply unresolved Any placeholders.");
-
     var generalStudies = university.BasicFields!
         .Single(module => module.Name == "General Studies");
+    Assert(generalStudies.TimeYears == 1 && analysis.TimeYears == 2 &&
+        university.SpecialistFields!.Single(module => module.Name == "Doctor").TimeYears == 2,
+        "Education fields must retain their age durations.");
     Assert(generalStudies.AffiliationProtocolXp == 30,
         "Affiliation education skills must retain their field XP.");
     var affiliatedCharacter = new Character();

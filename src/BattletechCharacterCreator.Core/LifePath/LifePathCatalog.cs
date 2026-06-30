@@ -658,7 +658,7 @@ public static class LifePathCatalog
                 "HPG Technician", "Planetary Surveyor", "Medical Assistant", "Politician",
                 "Technician - Aerospace", "Technician - Vehicle"],
             ["Doctor", "Lawyer", "Military Scientist", "Technician - Mech",
-                "Technician - Military"], protocolXp: 20),
+                "Technician - Military"], specialistFieldYears: 2, protocolXp: 20),
         School("solaris-internship", "Solaris Internship", 700,
             [Attribute("CHA", 150), Attribute("EDG", 50), Trait("Connections", 100),
                 Trait("Enemy", -50), Trait("Reputation", 100), Skill("Acting", 25),
@@ -672,7 +672,8 @@ public static class LifePathCatalog
                 FlexibleChoice("flex", "Flexible XP", 100, 1)],
             ["Communications", "Manager", "Technician - Military"],
             ["Cavalry", "Journalist", "MechWarrior", "Pilot - Battle Armor", "Politician",
-                "Technician - Mech"]),
+                "Technician - Mech"],
+            basicFieldYears: 2),
         School("police-academy", "Police Academy", 680,
             [Attribute("RFL", 100), Attribute("WIL", 100), Trait("Connections", 50),
                 Trait("Rank", 100), Trait("Reputation", 100), Skill("Computers", 15),
@@ -686,6 +687,7 @@ public static class LifePathCatalog
                 "Technician - Military"],
             ["Covert Operations", "Police Tactical Officer", "Special Forces",
                 "Technician - Aerospace", "Technician - Vehicle"],
+            basicFieldYears: 0, advancedFieldYears: 1, specialistFieldYears: 2,
             protocolXp: 25, streetwiseXp: 30),
         School("intelligence-training", "Intelligence Operative Training", 760,
             [Attribute("INT", 100), Attribute("WIL", 150), Trait("Alternate ID", 50),
@@ -699,7 +701,8 @@ public static class LifePathCatalog
             ["Basic Training"],
             ["Analysis", "Covert Operations", "Detective", "Intelligence", "Police Officer",
                 "Scout"],
-            ["Police Tactical Officer", "Special Forces"], protocolXp: 20),
+            ["Police Tactical Officer", "Special Forces"],
+            advancedFieldYears: 1, specialistFieldYears: 2, protocolXp: 20),
         School("military-academy", "Military Academy", 830,
             [Attribute("STR", 50), Attribute("BOD", 100), Attribute("RFL", 125),
                 Attribute("WIL", 100), Trait("Equipped", 100), Trait("Rank", 200),
@@ -711,7 +714,8 @@ public static class LifePathCatalog
                 "Pilot - Aerospace (Combat)", "Pilot - Aircraft (Combat)",
                 "Pilot - DropShip (Civilian)", "Scientist", "Scout", "Ship's Crew"],
             ["Doctor", "Infantry - Anti-'Mech", "Military Scientist", "Pilot - Battle Armor",
-                "Pilot - JumpShip", "Pilot - WarShip", "Special Forces"], protocolXp: 15),
+                "Pilot - JumpShip", "Pilot - WarShip", "Special Forces"],
+            advancedFieldYears: 1, specialistFieldYears: 2, protocolXp: 15),
         School("military-enlistment", "Military Enlistment", 720,
             [Attribute("STR", 125), Attribute("BOD", 125), Attribute("RFL", 100),
                 Attribute("WIL", 100), Attribute("CHA", -100), Trait("Equipped", 50),
@@ -721,7 +725,8 @@ public static class LifePathCatalog
             ["Cavalry", "Infantry", "Marine", "Medical Assistant", "Police Officer", "Scout",
                 "Ship's Crew", "Technician - Military"],
             ["Police Tactical Officer", "Infantry - Anti-'Mech", "Special Forces",
-                "Technician - Aerospace", "Technician - Mech", "Technician - Vehicle"]),
+                "Technician - Aerospace", "Technician - Mech", "Technician - Vehicle"],
+            basicFieldYears: 0, advancedFieldYears: 1, specialistFieldYears: 1),
         School("family-training", "Family Training", 570,
             [Attribute("STR", 75), Attribute("BOD", 75), Attribute("RFL", 50),
                 Attribute("WIL", 50), Trait("Equipped", 50), Trait("Rank", 100),
@@ -737,6 +742,7 @@ public static class LifePathCatalog
                 "Pilot - Aircraft (Combat)", "Pilot - DropShip (Civilian)", "Scout",
                 "Ship's Crew"],
             ["Infantry - Anti-'Mech", "Pilot - Battle Armor", "Pilot - JumpShip"],
+            basicFieldYears: 0, advancedFieldYears: 1, specialistFieldYears: 2,
             protocolXp: 15),
         School("officer-candidate", "Officer Candidate School", 550,
             [Attribute("CHA", 100), Attribute("EDG", -200), Trait("Connections", 50),
@@ -2594,14 +2600,18 @@ public static class LifePathCatalog
         string id, string name, int cost, IReadOnlyList<ModuleEffect> effects,
         IReadOnlyList<ModuleChoice> choices, IReadOnlyList<string> basicFields,
         IReadOnlyList<string> advancedFields, IReadOnlyList<string>? specialistFields = null,
+        int basicFieldYears = 1, int advancedFieldYears = 2, int specialistFieldYears = 0,
         int protocolXp = 0, int streetwiseXp = 0) =>
         new(id, name, $"Education at {name}.", cost, effects, choices,
-            BasicFields: basicFields.Select(CreateEducationField).ToArray(),
-            AdvancedFields: advancedFields.Select(CreateEducationField).ToArray(),
-            SpecialistFields: (specialistFields ?? []).Select(CreateEducationField).ToArray(),
+            BasicFields: basicFields.Select(field =>
+                CreateEducationField(field, basicFieldYears)).ToArray(),
+            AdvancedFields: advancedFields.Select(field =>
+                CreateEducationField(field, advancedFieldYears)).ToArray(),
+            SpecialistFields: (specialistFields ?? []).Select(field =>
+                CreateEducationField(field, specialistFieldYears)).ToArray(),
             AffiliationProtocolXp: protocolXp, AffiliationStreetwiseXp: streetwiseXp);
 
-    private static LifePathModule CreateEducationField(string name)
+    private static LifePathModule CreateEducationField(string name, int timeYears)
     {
         var skills = EducationFieldData.Skills.TryGetValue(name, out var fieldSkills)
             ? fieldSkills
@@ -2640,7 +2650,8 @@ public static class LifePathCatalog
         return new($"field-{Slug(name)}", name, "", skills.Length * 30,
             effects, choices,
             AffiliationProtocolXp: affiliationProtocolXp,
-            AffiliationStreetwiseXp: affiliationStreetwiseXp);
+            AffiliationStreetwiseXp: affiliationStreetwiseXp,
+            TimeYears: timeYears);
     }
 
     private static class EducationFieldData

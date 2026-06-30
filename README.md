@@ -86,8 +86,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - First-launch choice window for opening the Character Wizard or Character
   Editor
 - Character wizard from basic information through Stage 4
-- Basic information uses year of birth and game year, with age calculated for
-  summaries and exports
+- Basic information uses campaign year, with age calculated from life-path
+  choices for summaries and exports
 - Campaign year infers the matching era from the imported `Eras.xlsx`
   chronology
 - Era-aware affiliation and sub-affiliation availability filters with visible

@@ -11,6 +11,9 @@ namespace BattletechCharacterCreator.App;
 
 public partial class CharacterWizardWindow : Window
 {
+    private const int LateChildhoodCompletionAge = 16;
+    private const int AdultNoEducationAge = 18;
+
     private readonly Dictionary<string, ChoiceInput> choiceControls = [];
     private readonly List<(FrameworkElement Element, int Step)> choiceGroups = [];
     private readonly FrameworkElement[] pages;
@@ -414,6 +417,10 @@ public partial class CharacterWizardWindow : Window
                 .Cast<LifePathModule>()
                 .First(module => module.Id == secondCareerId);
         }
+        else
+        {
+            SecondCareerCheck.IsChecked = false;
+        }
         UpdateCareerSummary();
         BuildChoiceControls();
         UpdatePreview();
@@ -706,6 +713,19 @@ public partial class CharacterWizardWindow : Window
         {
             throw new InvalidOperationException(
                 $"{affiliation} / {career} has incorrect XP accounting.");
+        }
+        var expectedAge = AdultNoEducationAge + new[]
+            {
+                SelectedRealLife,
+                SelectedSecondRealLife
+            }
+            .Where(module => module is not null)
+            .Sum(module => module!.TimeYears);
+        if (character.Age != expectedAge ||
+            character.BirthYear != character.GameYear - expectedAge)
+        {
+            throw new InvalidOperationException(
+                $"{affiliation} / {career} has incorrect age accounting.");
         }
     }
 
@@ -1869,7 +1889,7 @@ public partial class CharacterWizardWindow : Window
 
         ReviewCharacterSummary.Text =
             $"{character.Name}{Environment.NewLine}" +
-            $"{character.Sex}, campaign year {character.GameYear}{Environment.NewLine}" +
+            $"{character.Sex}, campaign year {character.GameYear}, age {character.Age}{Environment.NewLine}" +
             $"Height / Weight: {character.Height} cm / {character.Weight} kg{Environment.NewLine}" +
             $"Hair / Eyes: {ValueOrDash(character.HairColor)} / {ValueOrDash(character.EyeColor)}";
 
@@ -1967,6 +1987,11 @@ public partial class CharacterWizardWindow : Window
             .Where(entry => ChoiceStep(entry) <= throughStep)
             .ToArray();
         var modules = selectedModules.Select(entry => entry.Module).ToArray();
+        var calculatedAge = CalculateLifePathAge(throughStep, selectedModules);
+        if (calculatedAge > 0)
+        {
+            character.Age = calculatedAge;
+        }
         foreach (var selectedModule in selectedModules)
         {
             var module = selectedModule.Module;
@@ -2018,6 +2043,37 @@ public partial class CharacterWizardWindow : Window
             $"\nSpecialist Field: {character.SpecialSchool}" +
             $"\nCareers: {string.Join(" -> ", character.RealLifeHistory)}";
         return character;
+    }
+
+    private static int CalculateLifePathAge(
+        int throughStep,
+        IReadOnlyList<SelectedModule> selectedModules)
+    {
+        if (throughStep < 3)
+        {
+            return 0;
+        }
+
+        var age = LateChildhoodCompletionAge;
+        var educationYears = throughStep >= 4
+            ? selectedModules
+                .Where(entry => !entry.IsStage4 &&
+                    entry.Module.Id.StartsWith("field-", StringComparison.Ordinal))
+                .Sum(entry => entry.Module.TimeYears)
+            : 0;
+        if (throughStep >= 4)
+        {
+            age = educationYears > 0
+                ? age + educationYears
+                : AdultNoEducationAge;
+        }
+        if (throughStep >= 5)
+        {
+            age += selectedModules
+                .Where(entry => entry.IsStage4)
+                .Sum(entry => entry.Module.TimeYears);
+        }
+        return age;
     }
 
     private ModuleSelection CreateSelection(SelectedModule selectedModule)
