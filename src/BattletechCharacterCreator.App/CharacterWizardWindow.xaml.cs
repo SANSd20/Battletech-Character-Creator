@@ -29,6 +29,12 @@ public partial class CharacterWizardWindow : Window
 
     private sealed record XpAdjustment(TextBox Input, int Delta);
 
+    private sealed record FlexibleRowRequest(
+        Panel RowHost,
+        IReadOnlyList<string> Options,
+        List<ComboBox> Pickers,
+        List<TextBox> Amounts);
+
     private sealed record SelectedModule(
         LifePathModule Module,
         int Occurrence,
@@ -1255,66 +1261,25 @@ public partial class CharacterWizardWindow : Window
                         columnHeader.Children.Add(xpHeader);
                         allocatorPanel.Children.Add(columnHeader);
 
+                        var rowHost = new StackPanel();
+                        allocatorPanel.Children.Add(rowHost);
                         for (var i = 0; i < defaults.Count; i++)
                         {
-                            var row = new Grid { Margin = new Thickness(0, 2, 0, 2) };
-                            row.ColumnDefinitions.Add(new ColumnDefinition());
-                            row.ColumnDefinitions.Add(new ColumnDefinition
-                            {
-                                Width = new GridLength(116)
-                            });
-                            var picker = new ComboBox
-                            {
-                                ItemsSource = options,
-                                Margin = new Thickness(0, 0, 6, 0)
-                            };
-                            picker.SelectionChanged += ChoiceSelectionChanged;
-                            picker.SelectedItem = defaults[i].Name;
-                            var amount = new TextBox
-                            {
-                                Text = defaults[i].Xp.ToString(),
-                                Width = 48,
-                                Margin = new Thickness(2, 0, 2, 0),
-                                HorizontalContentAlignment = HorizontalAlignment.Right
-                            };
-                            var xpControls = new StackPanel
-                            {
-                                Orientation = Orientation.Horizontal,
-                                HorizontalAlignment = HorizontalAlignment.Right
-                            };
-                            var subtract = new Button
-                            {
-                                Content = "−",
-                                Width = 27,
-                                Height = 27,
-                                Padding = new Thickness(0),
-                                Margin = new Thickness(0),
-                                ToolTip = "Remove 5 XP",
-                                Tag = new XpAdjustment(amount, -5)
-                            };
-                            subtract.Click += FlexibleXpAdjust_Click;
-                            var add = new Button
-                            {
-                                Content = "+",
-                                Width = 27,
-                                Height = 27,
-                                Padding = new Thickness(0),
-                                Margin = new Thickness(0),
-                                ToolTip = "Add 5 XP",
-                                Tag = new XpAdjustment(amount, 5)
-                            };
-                            add.Click += FlexibleXpAdjust_Click;
-                            xpControls.Children.Add(subtract);
-                            xpControls.Children.Add(amount);
-                            xpControls.Children.Add(add);
-                            Grid.SetColumn(xpControls, 1);
-                            row.Children.Add(picker);
-                            row.Children.Add(xpControls);
-                            amount.TextChanged += ChoiceAmountChanged;
-                            controls.Add(picker);
-                            amounts.Add(amount);
-                            allocatorPanel.Children.Add(row);
+                            AddFlexibleAllocationRow(
+                                rowHost, options, controls, amounts,
+                                defaults[i].Name, defaults[i].Xp);
                         }
+                        var addTarget = new Button
+                        {
+                            Content = "Add target",
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            Margin = new Thickness(0, 6, 0, 0),
+                            Padding = new Thickness(10, 3, 10, 3),
+                            Tag = new FlexibleRowRequest(
+                                rowHost, options, controls, amounts)
+                        };
+                        addTarget.Click += FlexibleRowAdd_Click;
+                        allocatorPanel.Children.Add(addTarget);
                         var status = new TextBlock
                         {
                             TextWrapping = TextWrapping.Wrap,
@@ -1409,6 +1374,87 @@ public partial class CharacterWizardWindow : Window
         adjustment.Input.Text = Math.Max(0, current + adjustment.Delta).ToString();
         adjustment.Input.Focus();
         adjustment.Input.SelectAll();
+    }
+
+    private void FlexibleRowAdd_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: FlexibleRowRequest request }) return;
+        AddFlexibleAllocationRow(
+            request.RowHost,
+            request.Options,
+            request.Pickers,
+            request.Amounts,
+            "",
+            0);
+        UpdateFlexibleChoiceDisplays();
+        UpdatePreview();
+    }
+
+    private void AddFlexibleAllocationRow(
+        Panel rowHost,
+        IReadOnlyList<string> options,
+        List<ComboBox> controls,
+        List<TextBox> amounts,
+        string selectedName,
+        int xp)
+    {
+        var row = new Grid { Margin = new Thickness(0, 2, 0, 2) };
+        row.ColumnDefinitions.Add(new ColumnDefinition());
+        row.ColumnDefinitions.Add(new ColumnDefinition
+        {
+            Width = new GridLength(116)
+        });
+        var picker = new ComboBox
+        {
+            ItemsSource = options,
+            Margin = new Thickness(0, 0, 6, 0)
+        };
+        picker.SelectionChanged += ChoiceSelectionChanged;
+        picker.SelectedItem = selectedName;
+        var amount = new TextBox
+        {
+            Text = xp.ToString(),
+            Width = 48,
+            Margin = new Thickness(2, 0, 2, 0),
+            HorizontalContentAlignment = HorizontalAlignment.Right
+        };
+        var xpControls = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            HorizontalAlignment = HorizontalAlignment.Right
+        };
+        var subtract = new Button
+        {
+            Content = "−",
+            Width = 27,
+            Height = 27,
+            Padding = new Thickness(0),
+            Margin = new Thickness(0),
+            ToolTip = "Remove 5 XP",
+            Tag = new XpAdjustment(amount, -5)
+        };
+        subtract.Click += FlexibleXpAdjust_Click;
+        var add = new Button
+        {
+            Content = "+",
+            Width = 27,
+            Height = 27,
+            Padding = new Thickness(0),
+            Margin = new Thickness(0),
+            ToolTip = "Add 5 XP",
+            Tag = new XpAdjustment(amount, 5)
+        };
+        add.Click += FlexibleXpAdjust_Click;
+        xpControls.Children.Add(subtract);
+        xpControls.Children.Add(amount);
+        xpControls.Children.Add(add);
+        Grid.SetColumn(xpControls, 1);
+        row.Children.Add(picker);
+        row.Children.Add(xpControls);
+        amount.TextChanged += ChoiceAmountChanged;
+        controls.Add(picker);
+        amounts.Add(amount);
+        rowHost.Children.Add(row);
     }
 
     private void UpdateFlexibleChoiceDisplays()
