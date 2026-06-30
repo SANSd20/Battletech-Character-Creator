@@ -1630,8 +1630,11 @@ public partial class CharacterWizardWindow : Window
         if (remaining > 0)
         {
             var target = options.FirstOrDefault(option =>
-                LifePathEngine.ClassifyFlexibleTarget(option) !=
+                LifePathEngine.ClassifyFlexibleTarget(option) ==
                 EffectTarget.Attribute);
+            target ??= options.FirstOrDefault(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) ==
+                EffectTarget.Trait);
             target ??= options.FirstOrDefault();
             if (target is not null)
             {
@@ -1645,12 +1648,33 @@ public partial class CharacterWizardWindow : Window
             .Select(group => new ChoiceAllocation(
                 group.Key, group.Sum(allocation => allocation.Xp)))
             .ToList();
-        var rowCount = Math.Max(1, choice.Count);
+        var rowCount = FlexibleAllocationRowCount(choice, options);
         while (allocations.Count < rowCount)
         {
             allocations.Add(new ChoiceAllocation("", 0));
         }
         return allocations.Take(rowCount).ToArray();
+    }
+
+    private static int FlexibleAllocationRowCount(
+        ModuleChoice choice,
+        IReadOnlyList<string> options)
+    {
+        var totalXp = choice.Xp * choice.Count;
+        var smallestCap = options
+            .Select(option => LifePathEngine.ClassifyFlexibleTarget(option) switch
+            {
+                EffectTarget.Attribute => choice.AttributeMaximumXp,
+                EffectTarget.Trait => choice.TraitMaximumXp,
+                EffectTarget.Skill => choice.SkillMaximumXp,
+                _ => null
+            })
+            .Where(cap => cap is > 0)
+            .Select(cap => cap!.Value)
+            .DefaultIfEmpty(totalXp)
+            .Min();
+        return Math.Max(choice.Count, Math.Max(1,
+            (int)Math.Ceiling(totalXp / (double)smallestCap)));
     }
 
     private sealed record FlexibleChoiceResult(
