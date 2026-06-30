@@ -34,6 +34,10 @@ public partial class CharacterWizardWindow : Window
         int Occurrence,
         bool IsStage4 = false);
 
+    private sealed record SubAffiliationOption(
+        string Name,
+        LifePathModule? Module);
+
     public CharacterWizardWindow()
     {
         InitializeComponent();
@@ -94,6 +98,20 @@ public partial class CharacterWizardWindow : Window
         RefreshModules();
     }
 
+    private void SelectSubAffiliationForCapture(string subAffiliationName)
+    {
+        SubAffiliationPicker.SelectedItem = SubAffiliationPicker.Items
+            .Cast<SubAffiliationOption>()
+            .First(option => option.Module?.Name == subAffiliationName);
+    }
+
+    private string[] AvailableSubAffiliationNames() =>
+        SubAffiliationPicker.Items
+            .Cast<SubAffiliationOption>()
+            .Where(option => option.Module is not null)
+            .Select(option => option.Name)
+            .ToArray();
+
     private void EnsureAffiliationAvailableForCapture(string affiliationId)
     {
         if (EraAvailabilityCatalog.EarliestAffiliationYear(affiliationId) is not { } earliest ||
@@ -126,9 +144,7 @@ public partial class CharacterWizardWindow : Window
         LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
             .First(module => module.Id == "late-trueborn-sibko");
         RefreshModules();
-        SubAffiliationPicker.SelectedItem = SubAffiliationPicker.Items
-            .Cast<LifePathModule>()
-            .First(module => module.Name == subAffiliationName);
+        SelectSubAffiliationForCapture(subAffiliationName);
         CastePicker.SelectedItem = CastePicker.Items
             .Cast<LifePathModule>()
             .First(module => module.Name == "MechWarrior");
@@ -254,10 +270,7 @@ public partial class CharacterWizardWindow : Window
         GameYearInput.Text = "3052";
         RefreshEraAvailability();
         SelectAffiliationForCapture("rasalhague");
-        var clanInvasionSubAffiliations = SubAffiliationPicker.Items
-            .Cast<LifePathModule>()
-            .Select(module => module.Name)
-            .ToArray();
+        var clanInvasionSubAffiliations = AvailableSubAffiliationNames();
         if (!clanInvasionSubAffiliations.Contains("Clan War Expatriate") ||
             clanInvasionSubAffiliations.Contains("Ghost Bear Dominion"))
         {
@@ -268,9 +281,7 @@ public partial class CharacterWizardWindow : Window
         GameYearInput.Text = "3062";
         RefreshEraAvailability();
         SelectAffiliationForCapture("rasalhague");
-        if (!SubAffiliationPicker.Items
-            .Cast<LifePathModule>()
-            .Any(module => module.Name == "Ghost Bear Dominion"))
+        if (!AvailableSubAffiliationNames().Contains("Ghost Bear Dominion"))
         {
             throw new InvalidOperationException(
                 "Civil War Rasalhague sub-affiliation availability did not reveal Ghost Bear Dominion.");
@@ -282,9 +293,7 @@ public partial class CharacterWizardWindow : Window
         GameYearInput.Text = "3052";
         RefreshEraAvailability();
         SelectAffiliationForCapture("fed-suns");
-        SubAffiliationPicker.SelectedItem = SubAffiliationPicker.Items
-            .Cast<LifePathModule>()
-            .First(module => module.Name == "Capellan March");
+        SelectSubAffiliationForCapture("Capellan March");
         BuildChoiceControls();
         ShowStep(1);
         var stage0Attributes = Stage0Attributes.ItemsSource
@@ -517,7 +526,7 @@ public partial class CharacterWizardWindow : Window
             RefreshModules();
             foreach (var subAffiliation in affiliation.SubAffiliations ?? [])
             {
-                SubAffiliationPicker.SelectedItem = subAffiliation;
+                SelectSubAffiliationForCapture(subAffiliation.Name);
                 BuildChoiceControls();
                 UpdatePreview();
             }
@@ -727,7 +736,9 @@ public partial class CharacterWizardWindow : Window
             : null;
     private LifePathModule? SelectedAffiliation =>
         SelectedOrderAffiliation ?? SelectedBirthAffiliation;
-    private LifePathModule? SelectedSubAffiliation => SubAffiliationPicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedSubAffiliation =>
+        (SubAffiliationPicker.SelectedItem as SubAffiliationOption)?.Module ??
+        SubAffiliationPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedCaste => CastePicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedChildhood => ChildhoodPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedLateChildhood => LateChildhoodPicker.SelectedItem as LifePathModule;
@@ -853,16 +864,22 @@ public partial class CharacterWizardWindow : Window
                 birthAffiliation.Id,
                 birthAffiliation.SubAffiliations ?? [],
                 CurrentGameYear);
-        SubAffiliationPicker.ItemsSource = subAffiliations;
-        SubAffiliationPanel.Visibility = SubAffiliationPicker.Items.Count > 0
+        var subAffiliationOptions = subAffiliations.Count == 0
+            ? Array.Empty<SubAffiliationOption>()
+            : new[] { new SubAffiliationOption("None", null) }
+                .Concat(subAffiliations.Select(module =>
+                    new SubAffiliationOption(module.Name, module)))
+                .ToArray();
+        SubAffiliationPicker.ItemsSource = subAffiliationOptions;
+        SubAffiliationPanel.Visibility = subAffiliationOptions.Length > 0
             ? Visibility.Visible : Visibility.Collapsed;
         if (subAffiliation is not null &&
             subAffiliations.Any(module => module.Id == subAffiliation.Id))
         {
-            SubAffiliationPicker.SelectedItem = subAffiliations
-                .First(module => module.Id == subAffiliation.Id);
+            SubAffiliationPicker.SelectedItem = subAffiliationOptions
+                .First(option => option.Module?.Id == subAffiliation.Id);
         }
-        else if (SubAffiliationPicker.Items.Count > 0)
+        else if (subAffiliationOptions.Length > 0)
         {
             SubAffiliationPicker.SelectedIndex = 0;
         }

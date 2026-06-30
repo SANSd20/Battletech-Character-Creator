@@ -1082,6 +1082,19 @@ static void CheckLifePathAccounting()
         moduleSummary.FreeXp == LifePathEngine.StartingXp - expectedCost,
         "Wizard characters must retain the module-based spent and remaining XP.");
 
+    var affiliationOnlyCharacter = LifePathEngine.CreateBase(
+        "Stage 0 Optional", "Language/English");
+    var affiliationOnlyModules = new[] { affiliation };
+    var expectedAffiliationOnlyCost = LifePathEngine.UniversalModuleCost +
+        affiliation.ModuleCost;
+    LifePathEngine.ApplyModuleAccounting(
+        affiliationOnlyCharacter, affiliationOnlyModules);
+    var affiliationOnlySummary = CharacterRules.Calculate(affiliationOnlyCharacter);
+    Assert(affiliationOnlySummary.SpentXp == expectedAffiliationOnlyCost &&
+        affiliationOnlySummary.FreeXp == LifePathEngine.StartingXp -
+        expectedAffiliationOnlyCost,
+        "Stage 0 must allow affiliation without a sub-affiliation.");
+
     var subAffiliation = affiliation.SubAffiliations!.Single(module =>
         module.Name == "Capellan March");
     var stage0Modules = new[] { affiliation, subAffiliation };
