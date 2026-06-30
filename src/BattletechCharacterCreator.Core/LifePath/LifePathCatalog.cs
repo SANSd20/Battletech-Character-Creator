@@ -769,7 +769,7 @@ public static class LifePathCatalog
                     EffectTarget.Skill, 100, 1,
                     ["Prestidigitation/Pick Pocket", "Prestidigitation/Quickdraw",
                         "Prestidigitation/Sleight of Hand"]),
-                FlexibleChoice("flex", "Flexible XP", 125, 1, 50)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 125, 50)],
             AffiliationStreetwiseXp: 75,
             TimeYears: 4),
         .. CreateCovertOperationsModules(),
@@ -803,7 +803,7 @@ public static class LifePathCatalog
                     ResolveFieldDefinitionSkills(
                         "Communications", "Manager", "Politician"),
                     SolarisInternshipFieldSkillsOnly: true),
-                FlexibleChoice("flex", "Flexible XP", 100, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 100)],
             TimeYears: 4,
             RepeatEffects: [Trait("In For Life", -100)]),
         new("real-solaris-vii-games", "Solaris VII Games",
@@ -831,7 +831,7 @@ public static class LifePathCatalog
                             .Where(field => field != "Officer")
                             .Distinct(StringComparer.Ordinal).ToArray(),
                     ClanWarriorFieldSkillsOnly: true),
-                FlexibleChoice("flex", "Flexible XP", 125, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 125)],
             TimeYears: 4,
             RepeatEffects: [Trait("In For Life", -150)]),
         new("real-dark-caste", "Dark Caste",
@@ -859,7 +859,7 @@ public static class LifePathCatalog
                     EffectTarget.Skill, 45, 1, Technicians),
                 Choice("technician-25", "Secondary Technician specialty",
                     EffectTarget.Skill, 25, 1, Technicians),
-                FlexibleChoice("flex", "Flexible XP", 115, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 115)],
             TimeYears: 4),
         new("real-civilian-job", "Civilian Job",
             "An ordinary working life supporting the infrastructure of society.",
@@ -880,7 +880,7 @@ public static class LifePathCatalog
                     EducationFieldNames: null,
                     SelectedEducationFieldSkillsOnly: true,
                     FixedFlexibleSelections: true),
-                FlexibleChoice("flex", "Flexible XP", 85, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 85)],
             AffiliationProtocolXp: 50,
             TimeYears: 6),
         new("real-combat-correspondent", "Combat Correspondent",
@@ -898,7 +898,7 @@ public static class LifePathCatalog
                     NavigationSkills),
                 Choice("survival", "Survival specialty", EffectTarget.Skill, 35, 1,
                     SurvivalSkills),
-                FlexibleChoice("flex", "Flexible XP", 90, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 90)],
             AffiliationLanguageXp: 50,
             TimeYears: 4),
         new("real-explorer", "Explorer",
@@ -928,7 +928,7 @@ public static class LifePathCatalog
                     StreetwiseOptions),
                 Choice("tracking", "Tracking specialty", EffectTarget.Skill, 25, 1,
                     ["Tracking/Urban", "Tracking/Wilds"]),
-                FlexibleChoice("flex", "Flexible XP", 170, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 170)],
             AffiliationLanguageXp: 25,
             TimeYears: 6),
         new("real-neer-do-well", "Ne'er-Do-Well",
@@ -968,7 +968,7 @@ public static class LifePathCatalog
                     MedTechSkills),
                 Choice("survival", "Survival specialty", EffectTarget.Skill, 40, 1,
                     SurvivalSkills),
-                FlexibleChoice("flex", "Flexible XP", 160, 1,
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 160,
                     minimumAttributeOrTraitXp: 100)],
             TimeYears: 4),
         new("real-protomech-pilot", "ProtoMech Pilot Training",
@@ -984,7 +984,7 @@ public static class LifePathCatalog
                 Skill("Tactics/Land", 75), Skill("Gunnery/ProtoMech", 25),
                 Skill("Navigation/Ground", 25), Skill("Piloting/ProtoMech", 25),
                 Skill("Sensor Operations", 25)],
-            [FlexibleChoice("flex", "Flexible XP", 30, 1)],
+            [CareerFlexiblePoolChoice("flex", "Flexible XP", 30)],
             TimeYears: 2,
             Repeatable: false),
         new("real-scientist-caste-service", "Scientist Caste Service",
@@ -1007,7 +1007,7 @@ public static class LifePathCatalog
                 Choice("science", "Science specialty", EffectTarget.Skill, 85, 1,
                     ["Science/Biology", "Science/Chemistry", "Science/Mathematics",
                         "Science/Physics"]),
-                FlexibleChoice("flex", "Flexible XP", 50, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 50)],
             AffiliationProtocolXp: 65,
             TimeYears: 4),
         new("real-think-tank", "Think Tank",
@@ -1049,7 +1049,7 @@ public static class LifePathCatalog
                 Choice("language", "Language", EffectTarget.Skill, 35, 1, Languages),
                 Choice("survival", "Survival specialty", EffectTarget.Skill, 25, 1,
                     SurvivalSkills),
-                FlexibleChoice("flex", "Flexible XP", 110, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 110)],
             AffiliationLanguageXp: 50,
             TimeYears: 6),
         new("real-serve-protect", "To Serve and Protect",
@@ -1081,7 +1081,7 @@ public static class LifePathCatalog
                     [
                         "Police Officer", "Police Tactical Officer", "Detective"
                     ]),
-                FlexibleChoice("flex", "Flexible XP", 50, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 50)],
             AffiliationProtocolXp: 25,
             AffiliationStreetwiseXp: 45,
             TimeYears: 4),
@@ -1098,7 +1098,7 @@ public static class LifePathCatalog
                 Choice("language", "Language", EffectTarget.Skill, 50, 1, Languages),
                 Choice("survival", "Survival specialty", EffectTarget.Skill, 35, 1,
                     SurvivalSkills),
-                FlexibleChoice("flex", "Flexible XP", 175, 1) with
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 175) with
                 {
                     EducationFieldNames = UniversityFieldNames,
                     MinimumEducationFieldSkillXp = 100,
@@ -1118,7 +1118,7 @@ public static class LifePathCatalog
                 new ModuleChoice("warrior-skills", "Clan Warrior Field skills",
                     EffectTarget.Skill, 25, 3, [],
                     ClanWarriorFieldSkillsOnly: true),
-                FlexibleChoice("flex", "Flexible XP", 150, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 150)],
             TimeYears: 3,
             Repeatable: false),
         new("real-tour-duty-periphery", "Tour of Duty - Periphery",
@@ -1138,7 +1138,7 @@ public static class LifePathCatalog
                     EffectTarget.Skill, 25, 6, [],
                     EducationFieldNames: MilitaryFieldNames,
                     ClanWarriorFieldSkillsOnly: true),
-                FlexibleChoice("flex", "Flexible XP", 100, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 100)],
             AffiliationProtocolXp: 40,
             TimeYears: 3),
         new("real-tour-duty-inner-sphere", "Tour of Duty - Inner Sphere",
@@ -1162,7 +1162,7 @@ public static class LifePathCatalog
                     EffectTarget.Skill, 25, 7, [],
                     EducationFieldNames: MilitaryFieldNames,
                     ClanWarriorFieldSkillsOnly: true),
-                FlexibleChoice("flex", "Flexible XP", 100, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 100)],
             AffiliationLanguageXp: 15,
             AffiliationProtocolXp: 40,
             TimeYears: 3),
@@ -1189,7 +1189,7 @@ public static class LifePathCatalog
                     EffectTarget.Skill, 25, 10, [],
                     EducationFieldNames: MilitaryFieldNames,
                     ClanWarriorFieldSkillsOnly: true),
-                FlexibleChoice("flex", "Flexible XP", 100, 1)],
+                CareerFlexiblePoolChoice("flex", "Flexible XP", 100)],
             AffiliationProtocolXp: 40,
             TimeYears: 3)
     ];
@@ -1560,7 +1560,7 @@ public static class LifePathCatalog
         {
             Choice("tracking", "Tracking specialty", EffectTarget.Skill, 80, 1,
                 TrackingSkills),
-            FlexibleChoice("flex", "Flexible XP", 175, 1)
+            CareerFlexiblePoolChoice("flex", "Flexible XP", 175)
         };
 
         return
@@ -1625,7 +1625,7 @@ public static class LifePathCatalog
             new ModuleChoice("warrior-skills", "Reduced Clan Warrior Field skills",
                 EffectTarget.Skill, -30, 2, [],
                 ClanWarriorFieldSkillsOnly: true),
-            FlexibleChoice("flex", "Flexible XP", 185, 1)
+            CareerFlexiblePoolChoice("flex", "Flexible XP", 185)
         };
 
         return
@@ -1712,7 +1712,7 @@ public static class LifePathCatalog
             new ModuleChoice("field-skills", "Selected Field skills",
                 EffectTarget.Skill, 40, 4, FlexibleSkills,
                 SelectedEducationFieldSkillsOnly: true),
-            FlexibleChoice("flex", "Flexible XP", 50, 1)
+            CareerFlexiblePoolChoice("flex", "Flexible XP", 50)
         };
 
         return
@@ -1774,7 +1774,7 @@ public static class LifePathCatalog
                 EffectTarget.Skill, 25, 1, SecuritySystemsSkills),
             Choice("survival", "Survival specialty", EffectTarget.Skill, 35, 1,
                 SurvivalSkills),
-            FlexibleChoice("flex", "Flexible XP", 180, 1)
+            CareerFlexiblePoolChoice("flex", "Flexible XP", 180)
         };
 
         return
@@ -1836,7 +1836,7 @@ public static class LifePathCatalog
                 ProtocolSkills),
             Choice("protocol-15", "Secondary protocol", EffectTarget.Skill, 15, 1,
                 ProtocolSkills),
-            FlexibleChoice("flex", "Flexible XP", 200, 1)
+            CareerFlexiblePoolChoice("flex", "Flexible XP", 200)
         };
 
         return
@@ -1935,7 +1935,7 @@ public static class LifePathCatalog
                 EffectTarget.Skill, 35, 1, PrestidigitationSkills),
             Choice("security", "Security Systems specialty",
                 EffectTarget.Skill, 45, 1, SecuritySystemsSkills),
-            FlexibleChoice("flex", "Flexible XP", 100, 1)
+            CareerFlexiblePoolChoice("flex", "Flexible XP", 100)
         };
 
         return
@@ -2892,6 +2892,15 @@ public static class LifePathCatalog
             SkillMaximumXp = skillMaximumXp,
             MinimumAttributeOrTraitXp = minimumAttributeOrTraitXp
         };
+
+    private static ModuleChoice CareerFlexiblePoolChoice(
+        string id, string label, int xp, int? attributeMaximumXp = null,
+        int minimumAttributeOrTraitXp = 0) =>
+        FlexiblePoolChoice(id, label, xp,
+            attributeMaximumXp: attributeMaximumXp,
+            traitMaximumXp: null,
+            skillMaximumXp: null,
+            minimumAttributeOrTraitXp: minimumAttributeOrTraitXp);
 
     private static ModuleChoice FlexibleAttributeOrTraitChoice(
         string id, string label, int xp, int count, int? attributeMaximumXp = null,

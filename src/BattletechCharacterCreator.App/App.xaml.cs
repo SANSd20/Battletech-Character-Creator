@@ -1030,17 +1030,67 @@ public partial class App : Application
         LifePathModule module,
         IReadOnlyDictionary<string, IReadOnlyList<string>>? overrides = null)
     {
-        var choices = module.Choices.ToDictionary(
-            choice => choice.Id,
-            choice =>
+        var choices = new Dictionary<string, IReadOnlyList<string>>();
+        var allocations = new Dictionary<string, IReadOnlyList<ChoiceAllocation>>();
+        foreach (var choice in module.Choices)
+        {
+            if (choice.Target == EffectTarget.Flexible &&
+                !choice.FixedFlexibleSelections)
+            {
+                allocations[choice.Id] = CreateDefaultFlexibleAllocations(choice);
+                choices[choice.Id] = [];
+                continue;
+            }
+            if (choice.Target == EffectTarget.Flexible &&
+                choice.FixedFlexibleSelections)
+            {
+                allocations[choice.Id] = choice.Options
+                    .DefaultIfEmpty("Perception")
+                    .Take(choice.Count)
+                    .Select(name => new ChoiceAllocation(name, choice.Xp))
+                    .ToArray();
+                choices[choice.Id] = [];
+                continue;
+            }
+            choices[choice.Id] =
                 overrides is not null &&
                 overrides.TryGetValue(choice.Id, out var selected)
                     ? selected
-                    : (IReadOnlyList<string>)choice.Options
+                    : choice.Options
                         .DefaultIfEmpty("Perception")
                         .Take(choice.Count)
-                        .ToArray());
-        return new ModuleSelection(module, choices);
+                        .ToArray();
+        }
+        return new ModuleSelection(module, choices, allocations);
+    }
+
+    private static IReadOnlyList<ChoiceAllocation> CreateDefaultFlexibleAllocations(
+        ModuleChoice choice)
+    {
+        var allocations = new List<ChoiceAllocation>();
+        var remaining = choice.Xp * choice.Count;
+        foreach (var target in choice.Options.DefaultIfEmpty("Perception"))
+        {
+            if (remaining <= 0) break;
+            var maximum = LifePathEngine.ClassifyFlexibleTarget(target) switch
+            {
+                EffectTarget.Attribute => choice.AttributeMaximumXp,
+                EffectTarget.Trait => choice.TraitMaximumXp,
+                EffectTarget.Skill => choice.SkillMaximumXp,
+                _ => null
+            };
+            var room = maximum ?? remaining;
+            var xp = Math.Min(remaining, room);
+            if (xp <= 0) continue;
+            allocations.Add(new ChoiceAllocation(target, xp));
+            remaining -= xp;
+        }
+        if (remaining > 0)
+        {
+            allocations.Add(new ChoiceAllocation(
+                choice.Options.FirstOrDefault() ?? "Perception", remaining));
+        }
+        return allocations;
     }
 
     private static void CaptureWindow(Window window, string outputPath)

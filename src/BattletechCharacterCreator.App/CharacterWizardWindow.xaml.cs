@@ -47,6 +47,13 @@ public partial class CharacterWizardWindow : Window
         string Name,
         LifePathModule? Module);
 
+    private sealed record CareerAvailability(
+        LifePathModule Module,
+        IReadOnlyList<PrerequisiteIssue> Issues);
+
+    private static string IssueKey(PrerequisiteIssue issue) =>
+        $"{issue.Category}|{issue.Name}|{issue.RequiredXp}|{issue.ActualXp}";
+
     public CharacterWizardWindow()
     {
         InitializeComponent();
@@ -407,9 +414,10 @@ public partial class CharacterWizardWindow : Window
         string? secondCareerId = null)
     {
         FirstCareerCheck.IsChecked = true;
+        RefreshCareerOptions();
         RealLifePicker.SelectedItem = LifePathCatalog.RealLifeModules
             .First(module => module.Id == firstCareerId);
-        RefreshSecondCareerOptions();
+        RefreshCareerOptions();
         if (!string.IsNullOrWhiteSpace(secondCareerId))
         {
             SecondCareerCheck.IsChecked = true;
@@ -481,6 +489,13 @@ public partial class CharacterWizardWindow : Window
         NextButton.IsDefault = currentStep < pages.Length - 1;
         CreateButton.IsDefault = currentStep == pages.Length - 1;
 
+        if (currentStep == 5)
+        {
+            refreshing = true;
+            RefreshCareerOptions();
+            BuildChoiceControls();
+            refreshing = false;
+        }
         if (currentStep > 0) UpdatePreview();
     }
 
@@ -915,6 +930,8 @@ public partial class CharacterWizardWindow : Window
         RefreshEducationFields(school);
         UpdateEducationSummary();
         BuildChoiceControls();
+        RefreshCareerOptions();
+        BuildChoiceControls();
         refreshing = false;
         UpdatePreview();
     }
@@ -1024,7 +1041,7 @@ public partial class CharacterWizardWindow : Window
         if (!IsLoaded || refreshing) return;
         if (sender == RealLifePicker)
         {
-            RefreshSecondCareerOptions();
+            RefreshCareerOptions();
         }
         UpdateCareerSummary();
         BuildChoiceControls();
@@ -1044,7 +1061,7 @@ public partial class CharacterWizardWindow : Window
         {
             SecondCareerCheck.IsChecked = false;
         }
-        RefreshSecondCareerOptions();
+        RefreshCareerOptions();
         if (SecondCareerCheck.IsChecked == true &&
             SecondRealLifePicker.SelectedItem is null)
         {
@@ -1056,18 +1073,293 @@ public partial class CharacterWizardWindow : Window
         UpdatePreview();
     }
 
+    private void RefreshCareerOptions()
+    {
+        var firstPreviousId = (RealLifePicker.SelectedItem as LifePathModule)?.Id;
+        var firstAvailability = EvaluateCareerAvailability(null, out var message);
+        var firstOptions = (message is null
+                ? firstAvailability
+                    .Where(item => item.Issues.Count == 0)
+                    .Select(item => item.Module)
+                : firstAvailability.Select(item => item.Module))
+            .ToArray();
+        RealLifePicker.ItemsSource = firstOptions;
+        RealLifePicker.SelectedItem = firstOptions
+            .FirstOrDefault(module => module.Id == firstPreviousId);
+        if (FirstCareerCheck.IsChecked == true &&
+            RealLifePicker.SelectedItem is null &&
+            firstOptions.Length > 0)
+        {
+            RealLifePicker.SelectedIndex = 0;
+        }
+        RefreshSecondCareerOptions();
+        UpdateCareerAvailabilitySummary(firstAvailability, message);
+    }
+
     private void RefreshSecondCareerOptions()
     {
         var previousId = (SecondRealLifePicker.SelectedItem as LifePathModule)?.Id;
         var firstCareer = SelectedRealLife;
-        var options = LifePathCatalog.RealLifeModules
-            .Where(module => firstCareer is null ||
-                firstCareer.Repeatable ||
-                module.Id != firstCareer.Id)
+        var secondAvailability = EvaluateCareerAvailability(
+            firstCareer, out var message);
+        var options = (message is null
+                ? secondAvailability
+                    .Where(item => item.Issues.Count == 0)
+                    .Select(item => item.Module)
+                : secondAvailability.Select(item => item.Module))
             .ToArray();
         SecondRealLifePicker.ItemsSource = options;
         SecondRealLifePicker.SelectedItem = options
             .FirstOrDefault(module => module.Id == previousId);
+    }
+
+    private IReadOnlyList<CareerAvailability> EvaluateCareerAvailability(
+        LifePathModule? firstCareer,
+        out string? message)
+    {
+        var candidates = LifePathCatalog.RealLifeModules
+            .Where(module => firstCareer is null ||
+                firstCareer.Repeatable ||
+                module.Id != firstCareer.Id)
+            .ToArray();
+        try
+        {
+            var baseCharacter = BuildCharacter(4);
+            if (firstCareer is not null)
+            {
+                ApplyCareerForAvailability(baseCharacter, firstCareer);
+            }
+            var baselineIssues = PrerequisiteRules.Evaluate(baseCharacter)
+                .Select(IssueKey)
+                .ToHashSet(StringComparer.Ordinal);
+            message = null;
+            return candidates
+                .Select(module =>
+                {
+                    try
+                    {
+                        var probe = CloneCharacter(baseCharacter);
+                        ApplyCareerForAvailability(probe, module);
+                        var issues = PrerequisiteRules.Evaluate(probe)
+                            .Where(issue => !baselineIssues.Contains(IssueKey(issue)))
+                            .ToArray();
+                        return new CareerAvailability(module, issues);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        return new CareerAvailability(module,
+                            [new PrerequisiteIssue("Choice",
+                                "Required field choices", 0, 0)]);
+                    }
+                })
+                .ToArray();
+        }
+        catch (InvalidOperationException)
+        {
+            message = "Complete the earlier stage choices to filter career prerequisites.";
+            return candidates
+                .Select(module => new CareerAvailability(
+                    module, Array.Empty<PrerequisiteIssue>()))
+                .ToArray();
+        }
+    }
+
+    private void ApplyCareerForAvailability(
+        Character character,
+        LifePathModule career)
+    {
+        var selection = CreateProbeSelection(career);
+        LifePathEngine.ApplyStage4(character, selection);
+        ApplyCareerState(character, career.Name);
+        if (SelectedAffiliation is not null &&
+            LanguagePicker.SelectedItem is string language)
+        {
+            LifePathEngine.ApplyAffiliationContext(
+                character, SelectedAffiliation, career, language);
+        }
+    }
+
+    private ModuleSelection CreateProbeSelection(LifePathModule module)
+    {
+        var choices = new Dictionary<string, IReadOnlyList<string>>();
+        var allocations = new Dictionary<string, IReadOnlyList<ChoiceAllocation>>();
+        foreach (var choice in module.Choices)
+        {
+            var options = ResolveChoiceOptions(choice);
+            if (choice.Target == EffectTarget.Flexible &&
+                !choice.FixedFlexibleSelections)
+            {
+                var educationOptions =
+                    LifePathCatalog.ResolveEducationFieldSkills(
+                        BuildCharacter(4), choice.EducationFieldNames ?? []);
+                allocations[choice.Id] = CreateProbeFlexibleAllocations(
+                    choice, options, educationOptions);
+                choices[choice.Id] = [];
+                continue;
+            }
+            if (choice.Target == EffectTarget.Flexible &&
+                choice.FixedFlexibleSelections)
+            {
+                allocations[choice.Id] = options
+                    .DefaultIfEmpty("Perception")
+                    .Take(choice.Count)
+                    .Select(name => new ChoiceAllocation(name, choice.Xp))
+                    .ToArray();
+                choices[choice.Id] = [];
+                continue;
+            }
+            choices[choice.Id] = options
+                .DefaultIfEmpty("Perception")
+                .Take(choice.Count)
+                .ToArray();
+        }
+        return new ModuleSelection(module, choices, allocations);
+    }
+
+    private static IReadOnlyList<ChoiceAllocation> CreateProbeFlexibleAllocations(
+        ModuleChoice choice,
+        IReadOnlyList<string> options,
+        IReadOnlyList<string> educationOptions)
+    {
+        var allocations = new List<ChoiceAllocation>();
+        var remaining = choice.Xp * choice.Count;
+        if (choice.MinimumEducationFieldSkillXp > 0 &&
+            educationOptions.FirstOrDefault() is { } educationTarget)
+        {
+            var xp = Math.Min(remaining, choice.MinimumEducationFieldSkillXp);
+            allocations.Add(new ChoiceAllocation(educationTarget, xp));
+            remaining -= xp;
+        }
+        if (choice.MinimumAttributeOrTraitXp > 0)
+        {
+            var target = options.FirstOrDefault(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) is
+                    EffectTarget.Trait or EffectTarget.Attribute);
+            if (target is not null)
+            {
+                var xp = Math.Min(remaining, choice.MinimumAttributeOrTraitXp);
+                allocations.Add(new ChoiceAllocation(target, xp));
+                remaining -= xp;
+            }
+        }
+        foreach (var target in options.Where(option => option.Length > 0))
+        {
+            if (remaining <= 0) break;
+            var maximum = LifePathEngine.ClassifyFlexibleTarget(target) switch
+            {
+                EffectTarget.Attribute => choice.AttributeMaximumXp,
+                EffectTarget.Trait => choice.TraitMaximumXp,
+                EffectTarget.Skill => choice.SkillMaximumXp,
+                _ => null
+            };
+            var current = allocations
+                .Where(allocation => allocation.Name == target)
+                .Sum(allocation => allocation.Xp);
+            var room = maximum is int limit
+                ? Math.Max(0, limit - current)
+                : remaining;
+            var xp = Math.Min(remaining, room);
+            if (xp <= 0) continue;
+            allocations.Add(new ChoiceAllocation(target, xp));
+            remaining -= xp;
+        }
+        if (remaining > 0 && options.FirstOrDefault() is { } fallback)
+        {
+            allocations.Add(new ChoiceAllocation(fallback, remaining));
+        }
+        return allocations
+            .GroupBy(allocation => allocation.Name, StringComparer.Ordinal)
+            .Select(group => new ChoiceAllocation(
+                group.Key, group.Sum(allocation => allocation.Xp)))
+            .ToArray();
+    }
+
+    private static Character CloneCharacter(Character source)
+    {
+        var clone = new Character
+        {
+            Name = source.Name,
+            Affiliation = source.Affiliation,
+            SubAffiliation = source.SubAffiliation,
+            BirthAffiliation = source.BirthAffiliation,
+            BirthSubAffiliation = source.BirthSubAffiliation,
+            ClanCaste = source.ClanCaste,
+            ClanTrainingField = source.ClanTrainingField,
+            EarlyChildhood = source.EarlyChildhood,
+            LateChildhood = source.LateChildhood,
+            School = source.School,
+            BasicSchool = source.BasicSchool,
+            AdvancedSchool = source.AdvancedSchool,
+            SpecialSchool = source.SpecialSchool,
+            RealLife = source.RealLife,
+            Phenotype = source.Phenotype,
+            HomePlanet = source.HomePlanet,
+            Sex = source.Sex,
+            BirthYear = source.BirthYear,
+            GameYear = source.GameYear,
+            HairColor = source.HairColor,
+            EyeColor = source.EyeColor,
+            Height = source.Height,
+            Weight = source.Weight,
+            GmXpModifier = source.GmXpModifier,
+            CBillModifier = source.CBillModifier,
+            Notes = source.Notes
+        };
+        CopyValues(source.Attributes, clone.Attributes);
+        CopyValues(source.Skills, clone.Skills);
+        CopyValues(source.Traits, clone.Traits);
+        CopyValues(source.PreAttributes, clone.PreAttributes);
+        CopyValues(source.PreSkills, clone.PreSkills);
+        CopyValues(source.PreTraits, clone.PreTraits);
+        foreach (var career in source.RealLifeHistory) clone.RealLifeHistory.Add(career);
+        foreach (var item in source.Equipment) clone.Equipment.Add(item);
+        foreach (var item in source.Weapons) clone.Weapons.Add(item);
+        foreach (var weapon in source.EquippedWeapons) clone.EquippedWeapons.Add(weapon);
+        foreach (var location in source.EquipmentLocations)
+        {
+            clone.EquipmentLocations[location.Key] = location.Value;
+        }
+        return clone;
+    }
+
+    private static void CopyValues(
+        IEnumerable<NamedValue> source,
+        ICollection<NamedValue> target)
+    {
+        target.Clear();
+        foreach (var item in source)
+        {
+            target.Add(new NamedValue(item.Name, item.Value));
+        }
+    }
+
+    private void UpdateCareerAvailabilitySummary(
+        IReadOnlyList<CareerAvailability> availability,
+        string? message)
+    {
+        if (message is not null)
+        {
+            CareerAvailabilitySummary.Text = message;
+            return;
+        }
+        var availableCount = availability.Count(item => item.Issues.Count == 0);
+        var hidden = availability.Where(item => item.Issues.Count > 0).ToArray();
+        if (hidden.Length == 0)
+        {
+            CareerAvailabilitySummary.Text =
+                $"{availableCount} career module(s) available.";
+            return;
+        }
+        var examples = hidden
+            .SelectMany(item => item.Issues.Select(issue =>
+                $"{item.Module.Name}: {issue.Category} {issue.Name}"))
+            .Distinct(StringComparer.Ordinal)
+            .Take(3)
+            .ToArray();
+        CareerAvailabilitySummary.Text =
+            $"{availableCount} career module(s) available; " +
+            $"{hidden.Length} hidden by unmet prerequisites. " +
+            string.Join("; ", examples);
     }
 
     private void UpdateCareerSummary()

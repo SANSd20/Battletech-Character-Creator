@@ -1327,6 +1327,22 @@ static void CheckRealLifeModules()
         "Agitator Streetwise XP must resolve through affiliation.");
 
     var flex = agitator.Choices.Single(choice => choice.Target == EffectTarget.Flexible);
+    Assert(!flex.FixedFlexibleSelections &&
+        flex.AttributeMaximumXp == 50 &&
+        flex.TraitMaximumXp is null &&
+        flex.SkillMaximumXp is null,
+        "Agitator flexible XP must use the pooled Stage 4 allocator while preserving its Attribute cap.");
+    Assert(LifePathCatalog.RealLifeModules
+            .SelectMany(module => module.Choices)
+            .Where(choice => choice.Target == EffectTarget.Flexible &&
+                choice.Label == "Flexible XP")
+            .All(choice => !choice.FixedFlexibleSelections),
+        "Stage 4 Flexible XP choices must use pooled allocation controls.");
+    var goliathSeeker = LifePathCatalog.RealLifeModules
+        .Single(module => module.Id == "real-goliath-scorpion-seeker");
+    Assert(goliathSeeker.Choices.Single(choice => choice.Target == EffectTarget.Flexible)
+            .MinimumAttributeOrTraitXp == 100,
+        "Goliath Scorpion Seeker must preserve its 100 XP Attribute or Trait minimum.");
     var choices = agitator.Choices
         .Where(choice => choice.Target != EffectTarget.Flexible)
         .ToDictionary(
