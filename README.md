@@ -106,6 +106,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
   instead of later-stage skill targets
 - Fixed flexible XP choices show only the required target dropdowns and apply
   the listed XP amount without split controls
+- Stage 2 and Stage 3 flexible XP pools start unassigned and can be split
+  across added targets with per-target limits
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
 - Character editor with guided Attribute, Trait, and Skill XP controls

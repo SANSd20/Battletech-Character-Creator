@@ -988,6 +988,25 @@ static void CheckEducation()
         "All legacy education schools must be available.");
     Assert(LifePathCatalog.EducationSchools.All(school => school.BasicFields?.Count > 0),
         "Every education school must offer a basic field.");
+    var educationFlexibleChoices = LifePathCatalog.EducationSchools
+        .SelectMany(module => module.Choices)
+        .Where(choice => choice.Target == EffectTarget.Flexible)
+        .ToArray();
+    Assert(educationFlexibleChoices.All(choice => !choice.FixedFlexibleSelections),
+        "Stage 3 flexible XP choices must use spendable allocation pools.");
+    Assert(educationFlexibleChoices.All(choice =>
+            choice.AttributeMaximumXp == 200 &&
+            choice.TraitMaximumXp == 200 &&
+            choice.SkillMaximumXp == 35),
+        "Stage 3 flexible XP choices must enforce per-target caps.");
+    Assert(educationFlexibleChoices.All(choice =>
+            choice.Options.Any(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) == EffectTarget.Attribute) &&
+            choice.Options.Any(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) == EffectTarget.Trait) &&
+            choice.Options.Any(option =>
+                LifePathEngine.ClassifyFlexibleTarget(option) == EffectTarget.Skill)),
+        "Stage 3 flexible XP choices must allow Attributes, Traits, and Skills.");
 
     var technical = LifePathCatalog.EducationSchools
         .Single(module => module.Id == "technical-college");
@@ -1005,6 +1024,26 @@ static void CheckEducation()
 
     var university = LifePathCatalog.EducationSchools
         .Single(module => module.Id == "university");
+    var universityFlex = university.Choices.Single(choice => choice.Id == "flex");
+    var universityCharacter = new Character();
+    LifePathEngine.Apply(universityCharacter, new ModuleSelection(
+        university,
+        university.Choices
+            .Where(choice => choice.Target != EffectTarget.Flexible)
+            .ToDictionary(
+                choice => choice.Id,
+                choice => (IReadOnlyList<string>)choice.Options.Take(choice.Count).ToArray()),
+        new Dictionary<string, IReadOnlyList<ChoiceAllocation>>
+        {
+            [universityFlex.Id] =
+            [
+                new("DEX", 200),
+                new("Swimming", universityFlex.Xp - 200)
+            ]
+        }));
+    Assert(universityCharacter.Attributes.Single(item => item.Name == "DEX").Value == 300 &&
+        universityCharacter.Skills.Single(item => item.Name == "Swimming").Value == 20,
+        "Stage 3 flexible XP must support split pool allocations.");
     Assert(university.AdvancedFields?.Any(field => field.Name == "Engineer") == true,
         "University advanced fields must be available.");
     Assert(university.SpecialistFields?.Any(field => field.Name == "Doctor") == true,
