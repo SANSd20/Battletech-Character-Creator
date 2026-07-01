@@ -293,6 +293,8 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="10"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -501,7 +503,8 @@
                                    Grid.Row="4"
                                    TextWrapping="Wrap"
                                    Foreground="#6A5A33"
-                                   FontSize="12"/>
+                                   FontSize="12"
+                                   LineHeight="16"/>
                     </Grid>
 
                     <Grid Grid.Row="2">

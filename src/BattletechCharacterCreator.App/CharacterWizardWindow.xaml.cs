@@ -1348,18 +1348,24 @@ public partial class CharacterWizardWindow : Window
         {
             CareerAvailabilitySummary.Text =
                 $"{availableCount} career module(s) available.";
+            CareerAvailabilitySummary.ToolTip = null;
             return;
         }
-        var examples = hidden
+        var blockers = hidden
             .SelectMany(item => item.Issues.Select(issue =>
-                $"{item.Module.Name}: {issue.Category} {issue.Name}"))
+                $"{issue.Category}: {issue.Name}"))
             .Distinct(StringComparer.Ordinal)
-            .Take(3)
             .ToArray();
         CareerAvailabilitySummary.Text =
             $"{availableCount} career module(s) available; " +
             $"{hidden.Length} hidden by unmet prerequisites. " +
-            string.Join("; ", examples);
+            $"First unmet: {blockers.FirstOrDefault() ?? "None"}.";
+        CareerAvailabilitySummary.ToolTip = string.Join(Environment.NewLine,
+            hidden
+                .SelectMany(item => item.Issues.Select(issue =>
+                    $"{item.Module.Name}: {issue.Category} {issue.Name}"))
+                .Distinct(StringComparer.Ordinal)
+                .Take(12));
     }
 
     private void UpdateCareerSummary()
