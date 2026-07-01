@@ -2149,6 +2149,7 @@ public partial class CharacterWizardWindow : Window
         }
         catch (InvalidOperationException)
         {
+            var restoredReview = false;
             if (TotalsHost.Visibility == Visibility.Visible &&
                 lastTotalsCharacter is not null)
             {
@@ -2158,6 +2159,17 @@ public partial class CharacterWizardWindow : Window
                 PreviewTraits.ItemsSource = lastTotalsCharacter.Traits
                     .OrderBy(item => item.Name);
                 RunningFreeXp.Text = lastRunningFreeXp;
+            }
+            if (currentStep == pages.Length - 1 &&
+                lastTotalsCharacter is not null)
+            {
+                ReviewAttributes.ItemsSource = lastTotalsCharacter.Attributes;
+                ReviewSkills.ItemsSource = lastTotalsCharacter.Skills
+                    .OrderBy(item => item.Name);
+                ReviewTraits.ItemsSource = lastTotalsCharacter.Traits
+                    .OrderBy(item => item.Name);
+                UpdateReview(lastTotalsCharacter);
+                restoredReview = true;
             }
             if (TotalsHost.Visibility != Visibility.Visible)
             {
@@ -2171,13 +2183,16 @@ public partial class CharacterWizardWindow : Window
                 Stage0Skills.ItemsSource = null;
                 Stage0Traits.ItemsSource = null;
             }
-            ReviewAttributes.ItemsSource = null;
-            ReviewSkills.ItemsSource = null;
-            ReviewTraits.ItemsSource = null;
-            ReviewIssues.ItemsSource = null;
-            ReviewCharacterSummary.Text = "";
-            ReviewLifePath.Text = "";
-            ReviewRuleStatus.Text = "Complete the earlier stages to review this character.";
+            if (!restoredReview)
+            {
+                ReviewAttributes.ItemsSource = null;
+                ReviewSkills.ItemsSource = null;
+                ReviewTraits.ItemsSource = null;
+                ReviewIssues.ItemsSource = null;
+                ReviewCharacterSummary.Text = "";
+                ReviewLifePath.Text = "";
+                ReviewRuleStatus.Text = "Complete the earlier stages to review this character.";
+            }
             if (TotalsHost.Visibility != Visibility.Visible)
             {
                 RunningFreeXp.Text = "";
