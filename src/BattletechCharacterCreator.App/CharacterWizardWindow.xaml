@@ -232,8 +232,6 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="10"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="8"/>
-                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -354,6 +352,8 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="10"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -463,6 +463,8 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="10"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="STAGE 4 · CAREERS"
                                    Style="{StaticResource SectionTitle}"
@@ -502,6 +504,8 @@
                         <TextBlock x:Name="CareerAvailabilitySummary"
                                    Grid.Row="4"
                                    TextWrapping="Wrap"
+                                   MaxHeight="34"
+                                   TextTrimming="CharacterEllipsis"
                                    Foreground="#6A5A33"
                                    FontSize="12"
                                    LineHeight="16"/>
