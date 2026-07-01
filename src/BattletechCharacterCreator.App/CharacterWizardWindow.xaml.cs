@@ -18,6 +18,8 @@ public partial class CharacterWizardWindow : Window
     private readonly List<(FrameworkElement Element, int Step)> choiceGroups = [];
     private readonly FrameworkElement[] pages;
     private readonly TextBlock[] stepLabels;
+    private Character? lastTotalsCharacter;
+    private string lastRunningFreeXp = "";
     private int currentStep;
     private bool refreshing;
 
@@ -2138,10 +2140,25 @@ public partial class CharacterWizardWindow : Window
             SpentXp.Text = summary.SpentXp.ToString();
             FreeXp.Text = summary.FreeXp.ToString();
             RunningFreeXp.Text = summary.FreeXp.ToString();
+            if (TotalsHost.Visibility == Visibility.Visible)
+            {
+                lastTotalsCharacter = character;
+                lastRunningFreeXp = RunningFreeXp.Text;
+            }
             UpdateReview(character);
         }
         catch (InvalidOperationException)
         {
+            if (TotalsHost.Visibility == Visibility.Visible &&
+                lastTotalsCharacter is not null)
+            {
+                PreviewAttributes.ItemsSource = lastTotalsCharacter.Attributes;
+                PreviewSkills.ItemsSource = lastTotalsCharacter.Skills
+                    .OrderBy(item => item.Name);
+                PreviewTraits.ItemsSource = lastTotalsCharacter.Traits
+                    .OrderBy(item => item.Name);
+                RunningFreeXp.Text = lastRunningFreeXp;
+            }
             if (TotalsHost.Visibility != Visibility.Visible)
             {
                 PreviewAttributes.ItemsSource = null;
