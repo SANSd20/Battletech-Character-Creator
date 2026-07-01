@@ -2050,8 +2050,8 @@ public partial class CharacterWizardWindow : Window
                     SpecialSchool = SelectedSpecialistField?.Name ?? ""
                 });
             return internshipSkills.Count == 0
-                ? choice.Options
-                : internshipSkills;
+                ? SortChoiceOptions(choice, choice.Options)
+                : SortChoiceOptions(choice, internshipSkills);
         }
         if (choice.SelectedEducationFieldSkillsOnly)
         {
@@ -2064,8 +2064,8 @@ public partial class CharacterWizardWindow : Window
                     SpecialSchool = SelectedSpecialistField?.Name ?? ""
                 });
             return selectedFieldSkills.Count == 0
-                ? choice.Options
-                : selectedFieldSkills;
+                ? SortChoiceOptions(choice, choice.Options)
+                : SortChoiceOptions(choice, selectedFieldSkills);
         }
         var options = choice.Options.AsEnumerable();
         if (choice.EducationFieldNames is not null)
@@ -2080,11 +2080,49 @@ public partial class CharacterWizardWindow : Window
                 ClanTrainingField = GetSelectedChoice(SelectedLateChildhood, "branch")
             }));
         }
+        return SortChoiceOptions(choice, options);
+    }
+
+    private static IReadOnlyList<string> SortChoiceOptions(
+        ModuleChoice choice,
+        IEnumerable<string> options)
+    {
+        if (choice.Target != EffectTarget.Flexible)
+        {
+            return options
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(option => option)
+                .ToArray();
+        }
         return options
             .Distinct(StringComparer.Ordinal)
-            .OrderBy(option => option)
+            .OrderBy(FlexibleOptionGroup)
+            .ThenBy(AttributeSortOrder)
+            .ThenBy(option => option)
             .ToArray();
     }
+
+    private static int FlexibleOptionGroup(string option) =>
+        LifePathEngine.ClassifyFlexibleTarget(option) switch
+        {
+            EffectTarget.Attribute => 0,
+            EffectTarget.Trait => 1,
+            _ => 2
+        };
+
+    private static int AttributeSortOrder(string option) =>
+        option switch
+        {
+            "STR" => 0,
+            "BOD" => 1,
+            "RFL" => 2,
+            "DEX" => 3,
+            "INT" => 4,
+            "WIL" => 5,
+            "CHA" => 6,
+            "EDG" => 7,
+            _ => 99
+        };
 
     private IReadOnlyList<string> ResolveEducationFieldOptions(ModuleChoice choice)
     {
