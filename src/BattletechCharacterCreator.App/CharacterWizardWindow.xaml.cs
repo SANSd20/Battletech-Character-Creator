@@ -15,6 +15,8 @@ public partial class CharacterWizardWindow : Window
     private const int AdultNoEducationAge = 18;
 
     private readonly Dictionary<string, ChoiceInput> choiceControls = [];
+    private readonly Dictionary<string, IReadOnlyList<ChoiceAllocation>>
+        flexibleAllocationCache = [];
     private readonly List<(FrameworkElement Element, int Step)> choiceGroups = [];
     private readonly FrameworkElement[] pages;
     private readonly TextBlock[] stepLabels;
@@ -1452,6 +1454,7 @@ public partial class CharacterWizardWindow : Window
         refreshing = true;
         try
         {
+            CaptureFlexibleAllocations();
             ChoicesPanel.Children.Clear();
             choiceControls.Clear();
             choiceGroups.Clear();
@@ -1483,8 +1486,13 @@ public partial class CharacterWizardWindow : Window
                         var amounts = new List<TextBox>();
                         var totalXp = choiceXp;
                         var educationOptions = ResolveEducationFieldOptions(choice);
-                        var defaults = CreateDefaultFlexibleAllocations(
-                            choice, options, educationOptions);
+                        var key = Key(selectedModule, choice);
+                        var defaults = flexibleAllocationCache
+                            .TryGetValue(key, out var cachedAllocations) &&
+                            cachedAllocations.Count > 0
+                            ? cachedAllocations
+                            : CreateDefaultFlexibleAllocations(
+                                choice, options, educationOptions);
                         var allocator = new Border
                         {
                             Background = new SolidColorBrush(
@@ -1606,7 +1614,7 @@ public partial class CharacterWizardWindow : Window
                         var input = new ChoiceInput(
                             controls, amounts, choice, module.Name,
                             ChoiceStep(selectedModule), remaining, status);
-                        choiceControls[Key(selectedModule, choice)] = input;
+                        choiceControls[key] = input;
                         UpdateFlexibleChoiceStatus(input);
                         continue;
                     }
@@ -1633,6 +1641,28 @@ public partial class CharacterWizardWindow : Window
         {
             refreshing = wasRefreshing;
             UpdateChoiceGroupVisibility();
+        }
+    }
+
+    private void CaptureFlexibleAllocations()
+    {
+        foreach (var entry in choiceControls)
+        {
+            var input = entry.Value;
+            if (input.Choice?.Target != EffectTarget.Flexible ||
+                input.Choice.FixedFlexibleSelections ||
+                input.Amounts is null)
+            {
+                continue;
+            }
+            flexibleAllocationCache[entry.Key] = input.Pickers
+                .Zip(input.Amounts)
+                .Select(pair => new ChoiceAllocation(
+                    pair.First.SelectedItem as string ?? "",
+                    int.TryParse(pair.Second.Text, out var xp) ? xp : 0))
+                .Where(allocation =>
+                    allocation.Name.Length > 0 || allocation.Xp > 0)
+                .ToArray();
         }
     }
 
