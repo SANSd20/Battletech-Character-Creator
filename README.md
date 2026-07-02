@@ -56,6 +56,13 @@ dotnet run --project tests/BattletechCharacterCreator.Tests
 The application provides a Life Module character wizard and a detailed
 character editor for *A Time of War*.
 
+## Beta release
+
+The current Windows beta is available from the
+[GitHub Releases page](https://github.com/SANSd20/Battletech-Character-Creator/releases).
+This beta is intended for manual testing and feedback while the final rulebook
+audit, optional Companion coverage, and interface polish continue.
+
 ## Interface mockups
 
 These development mockups show the current direction of the .NET interface.
@@ -75,9 +82,9 @@ Layouts and details may continue to change before the first stable release.
 
 ## Development status
 
-The .NET migration is approximately **99% complete**. There is not yet a stable
-release. Automated release checks and installer smoke tests are passing; the
-next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
+The .NET migration is approximately **99% complete**. The project is now in
+beta testing. Automated release checks and installer smoke tests are passing;
+the next gate is manual beta testing with `docs/MANUAL_TEST_PLAN.md`.
 
 ### Completed
 
@@ -191,7 +198,8 @@ next gate is manual preview testing with `docs/MANUAL_TEST_PLAN.md`.
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery
 - Complete the final rulebook audit
-- Publish the prepared preview release on GitHub after account authentication
+- Continue refreshing beta release notes and assets from validated preview
+  packages
 
 ## License
 Only for Non-commercial use.
