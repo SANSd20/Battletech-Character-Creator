@@ -253,6 +253,19 @@ public partial class CharacterWizardWindow : Window
                 "Star League era availability did not hide later-era affiliations.");
         }
 
+        GameYearInput.Text = "3025";
+        RefreshEraAvailability();
+        if (!AffiliationPicker.Items
+                .Cast<LifePathModule>()
+                .Any(module => module.Id == "invading-clan") ||
+            !AffiliationPicker.Items
+                .Cast<LifePathModule>()
+                .Any(module => module.Id == "homeworld-clan"))
+        {
+            throw new InvalidOperationException(
+                "Pre-invasion era availability did not show both Clan origins.");
+        }
+
         GameYearInput.Text = "3052";
         RefreshEraAvailability();
         if (GameYearInput.Text != "3052")

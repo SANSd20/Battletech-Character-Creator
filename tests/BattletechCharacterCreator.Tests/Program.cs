@@ -481,6 +481,13 @@ static void CheckEraAvailability()
         !starLeagueAffiliations.Any(module => module.Id == "word-of-blake"),
         "Star League era availability must hide later affiliations.");
 
+    var successionWarsAffiliations = EraAvailabilityCatalog.FilterAffiliations(
+        LifePathCatalog.Affiliations,
+        3025);
+    Assert(successionWarsAffiliations.Any(module => module.Id == "invading-clan") &&
+        successionWarsAffiliations.Any(module => module.Id == "homeworld-clan"),
+        "Pre-invasion eras after the Golden Century must show both Clan affiliation origins.");
+
     var clanInvasionAffiliations = EraAvailabilityCatalog.FilterAffiliations(
         LifePathCatalog.Affiliations,
         3052);

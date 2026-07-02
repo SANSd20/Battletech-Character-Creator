@@ -52,9 +52,9 @@ public static class EraAvailabilityCatalog
         new("rasalhague", 3034, null,
             "Free Rasalhague Republic choices are hidden before the state forms.",
             "BattleTech: Era Report: 3052"),
-        new("invading-clan", 3050, null,
-            "Invading Clan choices are hidden before the Clan Invasion.",
-            "BattleTech: Era Report: 3052"),
+        new("invading-clan", 2830, null,
+            "Invading Clan choices remain available before the Clan Invasion for Clan-origin characters.",
+            "BattleTech: Era Digest: Golden Century"),
         new("homeworld-clan", 2830, null,
             "Homeworld Clan choices are hidden before the Golden Century context.",
             "BattleTech: Era Digest: Golden Century")
