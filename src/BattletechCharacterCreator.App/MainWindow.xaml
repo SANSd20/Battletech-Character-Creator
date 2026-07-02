@@ -29,6 +29,10 @@
             <Setter Property="Margin" Value="1,0"/>
             <Setter Property="FontSize" Value="14"/>
         </Style>
+        <Style x:Key="XpButtonWide" TargetType="Button" BasedOn="{StaticResource XpButton}">
+            <Setter Property="Width" Value="38"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
         <Style x:Key="XpRow" TargetType="DataGridRow">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsShort}" Value="True">
@@ -425,10 +429,13 @@
                                                     Width="90" MinWidth="90"/>
                                 <DataGridTextColumn Header="Target" Binding="{Binding TargetText}"
                                                     Width="150" MinWidth="150"/>
-                                <DataGridTemplateColumn Header="XP" Width="155" MinWidth="155">
+                                <DataGridTemplateColumn Header="XP" Width="225" MinWidth="225">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="−10" Style="{StaticResource XpButtonWide}"
+                                                        ToolTip="Remove 10 XP" Tag="{Binding}"
+                                                        Click="DecreaseXp10_Click"/>
                                                 <Button Content="−" Style="{StaticResource XpButton}"
                                                         ToolTip="Remove 5 XP" Tag="{Binding}"
                                                         Click="DecreaseXp_Click"/>
@@ -439,6 +446,9 @@
                                                 <Button Content="+" Style="{StaticResource XpButton}"
                                                         ToolTip="Add 5 XP" Tag="{Binding}"
                                                         Click="IncreaseXp_Click"/>
+                                                <Button Content="+10" Style="{StaticResource XpButtonWide}"
+                                                        ToolTip="Add 10 XP" Tag="{Binding}"
+                                                        Click="IncreaseXp10_Click"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -518,10 +528,13 @@
                                                     Width="80" MinWidth="80"/>
                                 <DataGridTextColumn Header="Target" Binding="{Binding TargetText}"
                                                     Width="150" MinWidth="150"/>
-                                <DataGridTemplateColumn Header="XP" Width="155" MinWidth="155">
+                                <DataGridTemplateColumn Header="XP" Width="225" MinWidth="225">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="−10" Style="{StaticResource XpButtonWide}"
+                                                        ToolTip="Remove 10 XP" Tag="{Binding}"
+                                                        Click="DecreaseXp10_Click"/>
                                                 <Button Content="−" Style="{StaticResource XpButton}"
                                                         ToolTip="Remove 5 XP" Tag="{Binding}"
                                                         Click="DecreaseXp_Click"/>
@@ -532,6 +545,9 @@
                                                 <Button Content="+" Style="{StaticResource XpButton}"
                                                         ToolTip="Add 5 XP" Tag="{Binding}"
                                                         Click="IncreaseXp_Click"/>
+                                                <Button Content="+10" Style="{StaticResource XpButtonWide}"
+                                                        ToolTip="Add 10 XP" Tag="{Binding}"
+                                                        Click="IncreaseXp10_Click"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -610,10 +626,13 @@
                                                     Width="80" MinWidth="80"/>
                                 <DataGridTextColumn Header="Target" Binding="{Binding TargetText}"
                                                     Width="150" MinWidth="150"/>
-                                <DataGridTemplateColumn Header="XP" Width="155" MinWidth="155">
+                                <DataGridTemplateColumn Header="XP" Width="225" MinWidth="225">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="−10" Style="{StaticResource XpButtonWide}"
+                                                        ToolTip="Remove 10 XP" Tag="{Binding}"
+                                                        Click="DecreaseXp10_Click"/>
                                                 <Button Content="−" Style="{StaticResource XpButton}"
                                                         ToolTip="Remove 5 XP" Tag="{Binding}"
                                                         Click="DecreaseXp_Click"/>
@@ -624,6 +643,9 @@
                                                 <Button Content="+" Style="{StaticResource XpButton}"
                                                         ToolTip="Add 5 XP" Tag="{Binding}"
                                                         Click="IncreaseXp_Click"/>
+                                                <Button Content="+10" Style="{StaticResource XpButtonWide}"
+                                                        ToolTip="Add 10 XP" Tag="{Binding}"
+                                                        Click="IncreaseXp10_Click"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>

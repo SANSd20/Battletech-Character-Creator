@@ -1077,11 +1077,27 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
+    private void IncreaseXp10_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: XpEditorRow row })
+        {
+            AdjustXp(row, 10, true);
+        }
+    }
+
     private void DecreaseXp_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button { Tag: XpEditorRow row })
         {
             AdjustXp(row, -5, true);
+        }
+    }
+
+    private void DecreaseXp10_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: XpEditorRow row })
+        {
+            AdjustXp(row, -10, true);
         }
     }
 
@@ -1300,12 +1316,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         grid.Columns[0].MinWidth = 280;
         grid.Columns[1].MinWidth = levelWidth;
         grid.Columns[2].MinWidth = 150;
-        grid.Columns[3].MinWidth = 155;
+        grid.Columns[3].MinWidth = 225;
         grid.Columns[0].Width = new DataGridLength(
             1, DataGridLengthUnitType.Star);
         grid.Columns[1].Width = new DataGridLength(levelWidth);
         grid.Columns[2].Width = new DataGridLength(150);
-        grid.Columns[3].Width = new DataGridLength(155);
+        grid.Columns[3].Width = new DataGridLength(225);
         grid.InvalidateMeasure();
     }
 
