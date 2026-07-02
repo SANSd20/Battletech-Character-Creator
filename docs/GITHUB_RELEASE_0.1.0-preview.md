@@ -1,8 +1,8 @@
-# A Time of War Character Creator 0.1.0-preview
+# A Time of War Character Creator 0.1.0-preview Beta
 
-This is the first packaged preview of the .NET/WPF migration of the original
-BattleTech Character Creator. It is ready for testing and feedback, but it is
-not the final stable release.
+This is the first packaged beta of the .NET/WPF migration of the original
+BattleTech Character Creator. It is ready for broader manual testing and
+feedback, but it is not the final stable release.
 
 ## Download
 
@@ -53,18 +53,25 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 
 - Life Module character wizard from basic information through Stage 4
 - First-launch choice window for opening the Character Wizard or Character Editor
-- Basic information uses year of birth and game year, with calculated age
+- Basic information uses campaign year, with age calculated from life-path choices
 - Campaign year infers the matching era from the imported `Eras.xlsx` chronology
 - Era-aware affiliation availability filters with visible source notes
 - Era-aware Rasalhague sub-affiliation filters with visible source notes
+- Pre-invasion eras after the Golden Century show both Invading Clan and
+  Homeworld Clan origins for Clan characters
 - Era quick-start templates for common campaign starts in the editor
 - All corrected-printing affiliations and 68 sub-affiliations
 - All 24 corrected-printing Stage 4 base modules, including variants
 - Two ordered Stage 4 careers with repeat and prerequisite handling
+- Stage 2, Stage 3, and Stage 4 flexible XP pools preserve user allocations
+  while navigating between wizard pages
+- Flexible XP target dropdowns group Attributes first, then Traits, then Skills
 - Stage 1 flexible XP target lists include cataloged Compulsion traits
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
-- Character editor with XP controls for attributes, skills, and traits
+- Review Character keeps the last valid totals during temporary wizard refreshes
+- Character editor with XP controls for attributes, skills, and traits, including
+  5 XP and 10 XP adjustment buttons
 - Legacy `.btcc` save/load compatibility
 - Searchable equipment and weapon catalogs with C-Bill and mass summaries
 - Equipment and weapon catalog filters for faster inventory selection
