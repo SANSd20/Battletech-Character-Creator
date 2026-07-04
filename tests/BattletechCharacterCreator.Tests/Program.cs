@@ -1102,6 +1102,26 @@ static void CheckEducation()
     Assert(mechWarrior.Effects.Any(effect => effect.Name == "Gunnery/'Mech") &&
         mechWarrior.Effects.Any(effect => effect.Name == "Piloting/'Mech"),
         "MechWarrior training must use the corrected 'Mech skill names.");
+
+    var multiEducation = new Character
+    {
+        School = "University",
+        BasicSchool = "General Studies",
+        AdvancedSchool = "Engineer"
+    };
+    multiEducation.EducationHistory.Add("University");
+    multiEducation.EducationHistory.Add("Officer Candidate School");
+    multiEducation.EducationFields.Add("General Studies");
+    multiEducation.EducationFields.Add("Engineer");
+    multiEducation.EducationFields.Add("Officer");
+    var multiEducationSkills = LifePathCatalog.ResolveEducationFieldSkills(
+        multiEducation, ["Officer"]);
+    Assert(multiEducationSkills.Contains("Leadership"),
+        "Additional education fields must contribute selectable field skills.");
+    Assert(!PrerequisiteRules.Evaluate(multiEducation).Any(issue =>
+            issue.Category == "Education" &&
+            issue.Name == "Basic and advanced fields"),
+        "Officer Candidate School must recognize fields from repeated education choices.");
 }
 
 static void CheckLifePathAccounting()

@@ -53,6 +53,8 @@ public sealed class Character
     public ObservableCollection<NamedValue> PreAttributes { get; } = [];
     public ObservableCollection<NamedValue> PreSkills { get; } = [];
     public ObservableCollection<NamedValue> PreTraits { get; } = [];
+    public ObservableCollection<string> EducationHistory { get; } = [];
+    public ObservableCollection<string> EducationFields { get; } = [];
     public ObservableCollection<string> RealLifeHistory { get; } = [];
     public ObservableCollection<EquipmentItem> Equipment { get; } = [];
     public ObservableCollection<WeaponItem> Weapons { get; } = [];

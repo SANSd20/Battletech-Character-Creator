@@ -70,21 +70,21 @@ public static class PrerequisiteRules
         {
             issues.Add(new("Early childhood", "Not Nobility or Trueborn Creche", 0, 0));
         }
-        if (character.School == "Family Training" &&
+        if (HasEducationSchool(character, "Family Training") &&
             character.LateChildhood is not ("Preparatory School" or "Military School") &&
             FindValue(character.Traits, "Connections") < 100)
         {
             issues.Add(new("Choice", "Preparatory School, Military School, or Connections", 100,
                 FindValue(character.Traits, "Connections")));
         }
-        if (character.School == "Solaris Internship" &&
+        if (HasEducationSchool(character, "Solaris Internship") &&
             FindValue(character.Traits, "Connections") < 200)
         {
             issues.Add(new("Trait", "Connections", 200,
                 FindValue(character.Traits, "Connections")));
         }
-        if (character.School == "Officer Candidate School" &&
-            (character.BasicSchool.Length == 0 || character.AdvancedSchool.Length == 0))
+        if (HasEducationSchool(character, "Officer Candidate School") &&
+            (!HasAnyBasicField(character) || !HasAnyAdvancedField(character)))
         {
             issues.Add(new("Education", "Basic and advanced fields", 0, 0));
         }
@@ -589,10 +589,31 @@ public static class PrerequisiteRules
     private static bool HasEducationField(Character character, string field) =>
         character.BasicSchool == field ||
         character.AdvancedSchool == field ||
-        character.SpecialSchool == field;
+        character.SpecialSchool == field ||
+        character.EducationFields.Contains(field, StringComparer.Ordinal);
+
+    private static bool HasEducationSchool(Character character, string school) =>
+        character.School == school ||
+        character.EducationHistory.Contains(school, StringComparer.Ordinal);
 
     private static bool HasAnyEducationField(Character character, params string[] fields) =>
         fields.Any(field => HasEducationField(character, field));
+
+    private static bool HasAnyBasicField(Character character) =>
+        character.BasicSchool.Length > 0 ||
+        character.EducationFields.Any(IsBasicEducationField);
+
+    private static bool HasAnyAdvancedField(Character character) =>
+        character.AdvancedSchool.Length > 0 ||
+        character.EducationFields.Any(IsAdvancedEducationField);
+
+    private static bool IsBasicEducationField(string field) =>
+        LifePathCatalog.EducationSchools.Any(school =>
+            (school.BasicFields ?? []).Any(module => module.Name == field));
+
+    private static bool IsAdvancedEducationField(string field) =>
+        LifePathCatalog.EducationSchools.Any(school =>
+            (school.AdvancedFields ?? []).Any(module => module.Name == field));
 
     private static bool IsWarriorCaste(string caste) =>
         caste is "MechWarrior" or "Elemental" or "Elemental-Advanced" or

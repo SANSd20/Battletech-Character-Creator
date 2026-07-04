@@ -1202,6 +1202,7 @@ public static class LifePathCatalog
             {
                 character.BasicSchool, character.AdvancedSchool, character.SpecialSchool
             }
+            .Concat(character.EducationFields)
             .Where(name => name.Length > 0 && allowedFieldNames.Contains(name))
             .ToHashSet(StringComparer.Ordinal);
         if (selectedNames.Count == 0) return [];
@@ -1298,7 +1299,12 @@ public static class LifePathCatalog
     public static IReadOnlyList<string> ResolveSolarisInternshipFieldSkills(
         Character character)
     {
-        if (character.School != "Solaris Internship") return [];
+        if (character.School != "Solaris Internship" &&
+            !character.EducationHistory.Contains(
+                "Solaris Internship", StringComparer.Ordinal))
+        {
+            return [];
+        }
         var solaris = EducationSchools.Single(school =>
             school.Name == "Solaris Internship");
         var fieldNames = (solaris.BasicFields ?? [])

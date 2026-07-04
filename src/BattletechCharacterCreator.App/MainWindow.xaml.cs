@@ -31,6 +31,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private string traitFilter = "";
     private string equipmentCatalogFilter = "";
     private string weaponCatalogFilter = "";
+    private string equipmentCatalogCategory = "";
+    private string weaponCatalogCategory = "";
     private string? selectedSkillName;
     private string? selectedTraitName;
     private readonly string resourcePath;
@@ -48,6 +50,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         CollectionViewSource.GetDefaultView(Array.Empty<EquipmentCatalogItem>());
     public ICollectionView WeaponCatalogView { get; private set; } =
         CollectionViewSource.GetDefaultView(Array.Empty<WeaponCatalogItem>());
+    public IReadOnlyList<string> EquipmentCatalogCategories =>
+        ["All equipment",
+            .. Catalog.Equipment
+                .Select(item => item.Category)
+                .Where(category => category.Length > 0)
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(category => category)];
+    public IReadOnlyList<string> WeaponCatalogCategories =>
+        ["All weapons",
+            .. Catalog.Weapons
+                .Select(item => item.Category)
+                .Where(category => category.Length > 0)
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(category => category)];
 
     public MainWindow() : this(new Character())
     {
@@ -374,12 +390,40 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             EquipmentCatalogView.Refresh();
         }
     }
+    public string EquipmentCatalogCategory
+    {
+        get => equipmentCatalogCategory.Length == 0
+            ? "All equipment"
+            : equipmentCatalogCategory;
+        set
+        {
+            equipmentCatalogCategory = value == "All equipment"
+                ? ""
+                : value ?? "";
+            OnPropertyChanged();
+            EquipmentCatalogView.Refresh();
+        }
+    }
     public string WeaponCatalogFilter
     {
         get => weaponCatalogFilter;
         set
         {
             weaponCatalogFilter = value ?? "";
+            OnPropertyChanged();
+            WeaponCatalogView.Refresh();
+        }
+    }
+    public string WeaponCatalogCategory
+    {
+        get => weaponCatalogCategory.Length == 0
+            ? "All weapons"
+            : weaponCatalogCategory;
+        set
+        {
+            weaponCatalogCategory = value == "All weapons"
+                ? ""
+                : value ?? "";
             OnPropertyChanged();
             WeaponCatalogView.Refresh();
         }
@@ -556,6 +600,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         EquipmentCatalogFilter = "";
 
+        EquipmentCatalogCategory = Catalog.Equipment
+            .First(item => item.Name == "Flak/Jacket").Category;
+        if (EquipmentCatalogView.Cast<EquipmentCatalogItem>()
+            .Any(item => item.Category != EquipmentCatalogCategory))
+        {
+            throw new InvalidOperationException(
+                "Editor equipment category filtering returned an unrelated row.");
+        }
+        EquipmentCatalogCategory = "All equipment";
+
         IncludeCompanionContent = true;
         if (!Catalog.Options.IncludeCompanion)
         {
@@ -578,6 +632,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         EquipmentCatalogFilter = "";
         WeaponCatalogFilter = "";
+
+        WeaponCatalogCategory = Catalog.Weapons
+            .First(item => item.Name == "Shock Staff").Category;
+        if (WeaponCatalogView.Cast<WeaponCatalogItem>()
+            .Any(item => item.Category != WeaponCatalogCategory))
+        {
+            throw new InvalidOperationException(
+                "Editor weapon category filtering returned an unrelated row.");
+        }
+        WeaponCatalogCategory = "All weapons";
         GameYear = 3045;
         SelectedEquipmentCatalogItem = Catalog.Equipment.Single(item =>
             item.Name == "Hoodling Sensor HoverJeep");
@@ -1229,6 +1293,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private bool MatchesEquipmentCatalogFilter(object item) =>
         item is EquipmentCatalogItem equipment &&
+        MatchesCatalogCategory(EquipmentCatalogCategory, equipment.Category) &&
         MatchesCatalogText(
             EquipmentCatalogFilter,
             equipment.Name,
@@ -1238,6 +1303,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private bool MatchesWeaponCatalogFilter(object item) =>
         item is WeaponCatalogItem weapon &&
+        MatchesCatalogCategory(WeaponCatalogCategory, weapon.Category) &&
         MatchesCatalogText(
             WeaponCatalogFilter,
             weapon.Name,
@@ -1254,12 +1320,31 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             filter,
             StringComparison.OrdinalIgnoreCase));
 
+    private static bool MatchesCatalogCategory(string selectedCategory, string itemCategory) =>
+        selectedCategory.Length == 0 ||
+        selectedCategory.StartsWith("All ", StringComparison.Ordinal) ||
+        string.Equals(selectedCategory, itemCategory, StringComparison.Ordinal);
+
     private void RebuildCatalogViews()
     {
+        if (equipmentCatalogCategory.Length > 0 &&
+            !Catalog.Equipment.Any(item => item.Category == equipmentCatalogCategory))
+        {
+            equipmentCatalogCategory = "";
+            OnPropertyChanged(nameof(EquipmentCatalogCategory));
+        }
+        if (weaponCatalogCategory.Length > 0 &&
+            !Catalog.Weapons.Any(item => item.Category == weaponCatalogCategory))
+        {
+            weaponCatalogCategory = "";
+            OnPropertyChanged(nameof(WeaponCatalogCategory));
+        }
         EquipmentCatalogView = CollectionViewSource.GetDefaultView(Catalog.Equipment);
         EquipmentCatalogView.Filter = MatchesEquipmentCatalogFilter;
         WeaponCatalogView = CollectionViewSource.GetDefaultView(Catalog.Weapons);
         WeaponCatalogView.Filter = MatchesWeaponCatalogFilter;
+        OnPropertyChanged(nameof(EquipmentCatalogCategories));
+        OnPropertyChanged(nameof(WeaponCatalogCategories));
         OnPropertyChanged(nameof(EquipmentCatalogView));
         OnPropertyChanged(nameof(WeaponCatalogView));
     }

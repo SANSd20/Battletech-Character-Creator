@@ -667,12 +667,18 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="190"/>
                                 <ColumnDefinition Width="260"/>
                             </Grid.ColumnDefinitions>
                             <CheckBox Content="Companion"
                                       IsChecked="{Binding IncludeCompanionContent}"
                                       VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="2"
+                            <ComboBox Grid.Column="2"
+                                      ItemsSource="{Binding EquipmentCatalogCategories}"
+                                      SelectedItem="{Binding EquipmentCatalogCategory}"
+                                      Margin="0,0,8,0"
+                                      VerticalContentAlignment="Center"/>
+                            <TextBox Grid.Column="3"
                                      Text="{Binding EquipmentCatalogFilter, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Filter equipment catalog"
                                      VerticalContentAlignment="Center"/>
@@ -782,12 +788,18 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="190"/>
                                 <ColumnDefinition Width="260"/>
                             </Grid.ColumnDefinitions>
                             <CheckBox Content="Companion"
                                       IsChecked="{Binding IncludeCompanionContent}"
                                       VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="2"
+                            <ComboBox Grid.Column="2"
+                                      ItemsSource="{Binding WeaponCatalogCategories}"
+                                      SelectedItem="{Binding WeaponCatalogCategory}"
+                                      Margin="0,0,8,0"
+                                      VerticalContentAlignment="Center"/>
+                            <TextBox Grid.Column="3"
                                      Text="{Binding WeaponCatalogFilter, UpdateSourceTrigger=PropertyChanged}"
                                      ToolTip="Filter weapon catalog"
                                      VerticalContentAlignment="Center"/>

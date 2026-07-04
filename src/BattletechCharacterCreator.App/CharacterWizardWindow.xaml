@@ -415,6 +415,106 @@
                                               SelectionChanged="DependentSelectionChanged"/>
                                 </StackPanel>
                             </Grid>
+                            <CheckBox x:Name="SecondEducationCheck"
+                                      Content="Add another education"
+                                      Margin="0,12,0,7"
+                                      FontWeight="SemiBold"
+                                      Checked="EducationSelectionChanged"
+                                      Unchecked="EducationSelectionChanged"/>
+                            <Grid x:Name="SecondEducationFieldsPanel"
+                                  IsEnabled="{Binding IsChecked, ElementName=SecondEducationCheck}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="School"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="SecondSchoolPicker"
+                                              DisplayMemberPath="Name"
+                                              SelectionChanged="SchoolSelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel x:Name="SecondBasicFieldPanel" Grid.Column="2">
+                                    <TextBlock Text="Basic field"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="SecondBasicFieldPicker" DisplayMemberPath="Name"
+                                              SelectionChanged="DependentSelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel x:Name="SecondAdvancedFieldPanel" Grid.Row="2">
+                                    <TextBlock Text="Advanced field (optional)"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="SecondAdvancedFieldPicker" DisplayMemberPath="Name"
+                                              SelectionChanged="AdvancedFieldSelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel x:Name="SecondSpecialistFieldPanel"
+                                            Grid.Row="2"
+                                            Grid.Column="2">
+                                    <TextBlock Text="Third field (optional)"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="SecondSpecialistFieldPicker" DisplayMemberPath="Name"
+                                              SelectionChanged="DependentSelectionChanged"/>
+                                </StackPanel>
+                            </Grid>
+                            <CheckBox x:Name="ThirdEducationCheck"
+                                      Content="Add third education"
+                                      Margin="0,12,0,7"
+                                      FontWeight="SemiBold"
+                                      Checked="EducationSelectionChanged"
+                                      Unchecked="EducationSelectionChanged"/>
+                            <Grid x:Name="ThirdEducationFieldsPanel"
+                                  IsEnabled="{Binding IsChecked, ElementName=ThirdEducationCheck}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="School"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="ThirdSchoolPicker"
+                                              DisplayMemberPath="Name"
+                                              SelectionChanged="SchoolSelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel x:Name="ThirdBasicFieldPanel" Grid.Column="2">
+                                    <TextBlock Text="Basic field"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="ThirdBasicFieldPicker" DisplayMemberPath="Name"
+                                              SelectionChanged="DependentSelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel x:Name="ThirdAdvancedFieldPanel" Grid.Row="2">
+                                    <TextBlock Text="Advanced field (optional)"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="ThirdAdvancedFieldPicker" DisplayMemberPath="Name"
+                                              SelectionChanged="AdvancedFieldSelectionChanged"/>
+                                </StackPanel>
+                                <StackPanel x:Name="ThirdSpecialistFieldPanel"
+                                            Grid.Row="2"
+                                            Grid.Column="2">
+                                    <TextBlock Text="Third field (optional)"
+                                               Style="{StaticResource FieldLabel}"
+                                               Margin="0,0,0,2"/>
+                                    <ComboBox x:Name="ThirdSpecialistFieldPicker" DisplayMemberPath="Name"
+                                              SelectionChanged="DependentSelectionChanged"/>
+                                </StackPanel>
+                            </Grid>
                         </StackPanel>
                         <Border Grid.Row="2"
                                 Grid.Column="2"

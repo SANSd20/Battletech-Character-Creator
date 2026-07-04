@@ -82,11 +82,15 @@ public partial class CharacterWizardWindow : Window
         RefreshEraAvailability();
         AffiliationPicker.ItemsSource = BirthAffiliations;
         SchoolPicker.ItemsSource = LifePathCatalog.EducationSchools;
+        SecondSchoolPicker.ItemsSource = LifePathCatalog.EducationSchools;
+        ThirdSchoolPicker.ItemsSource = LifePathCatalog.EducationSchools;
         RealLifePicker.ItemsSource = LifePathCatalog.RealLifeModules;
         SecondRealLifePicker.ItemsSource = LifePathCatalog.RealLifeModules;
         AffiliationPicker.SelectedIndex = 0;
         RefreshChildhoodAvailability(null, null);
         SchoolPicker.SelectedIndex = -1;
+        SecondSchoolPicker.SelectedIndex = -1;
+        ThirdSchoolPicker.SelectedIndex = -1;
         RealLifePicker.SelectedIndex = -1;
         SecondRealLifePicker.SelectedIndex = -1;
         Loaded += (_, _) =>
@@ -538,6 +542,18 @@ public partial class CharacterWizardWindow : Window
                 "Choose a late childhood.",
             4 when SelectedSchool is not null && SelectedBasicField is null =>
                 "Choose one Basic Field for the selected school.",
+            4 when SelectedSecondSchool is not null && SelectedSecondBasicField is null =>
+                "Choose one Basic Field for the second selected school.",
+            4 when SelectedThirdSchool is not null && SelectedThirdBasicField is null =>
+                "Choose one Basic Field for the third selected school.",
+            4 when SelectedSpecialistField is not null && SelectedAdvancedField is null =>
+                "Choose an Advanced Field before adding a third field.",
+            4 when SelectedSecondSpecialistField is not null &&
+                SelectedSecondAdvancedField is null =>
+                "Choose an Advanced Field before adding a third field to the second education.",
+            4 when SelectedThirdSpecialistField is not null &&
+                SelectedThirdAdvancedField is null =>
+                "Choose an Advanced Field before adding a third field to the third education.",
             _ => null
         };
         message ??= choiceControls.Values
@@ -800,6 +816,18 @@ public partial class CharacterWizardWindow : Window
     private LifePathModule? SelectedBasicField => BasicFieldPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedAdvancedField => AdvancedFieldPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedSpecialistField => SpecialistFieldPicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedSecondSchool => SecondEducationCheck.IsChecked == true
+        ? SecondSchoolPicker.SelectedItem as LifePathModule
+        : null;
+    private LifePathModule? SelectedSecondBasicField => SecondBasicFieldPicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedSecondAdvancedField => SecondAdvancedFieldPicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedSecondSpecialistField => SecondSpecialistFieldPicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedThirdSchool => ThirdEducationCheck.IsChecked == true
+        ? ThirdSchoolPicker.SelectedItem as LifePathModule
+        : null;
+    private LifePathModule? SelectedThirdBasicField => ThirdBasicFieldPicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedThirdAdvancedField => ThirdAdvancedFieldPicker.SelectedItem as LifePathModule;
+    private LifePathModule? SelectedThirdSpecialistField => ThirdSpecialistFieldPicker.SelectedItem as LifePathModule;
     private LifePathModule? SelectedRealLife => FirstCareerCheck.IsChecked == true
         ? RealLifePicker.SelectedItem as LifePathModule
         : null;
@@ -899,6 +927,8 @@ public partial class CharacterWizardWindow : Window
         var childhood = SelectedChildhood;
         var lateChildhood = SelectedLateChildhood;
         var school = SelectedSchool;
+        var secondSchool = SelectedSecondSchool;
+        var thirdSchool = SelectedThirdSchool;
         RefreshChildhoodAvailability(childhood, lateChildhood);
         childhood = SelectedChildhood;
         lateChildhood = SelectedLateChildhood;
@@ -945,6 +975,8 @@ public partial class CharacterWizardWindow : Window
         if (LanguagePicker.Items.Count > 0) LanguagePicker.SelectedIndex = 0;
 
         RefreshEducationFields(school);
+        RefreshSecondEducationFields(secondSchool);
+        RefreshThirdEducationFields(thirdSchool);
         UpdateEducationSummary();
         BuildChoiceControls();
         RefreshCareerOptions();
@@ -1049,6 +1081,16 @@ public partial class CharacterWizardWindow : Window
         if (EducationCheck.IsChecked == true && SchoolPicker.SelectedItem is null)
         {
             SchoolPicker.SelectedIndex = 0;
+        }
+        if (SecondEducationCheck.IsChecked == true &&
+            SecondSchoolPicker.SelectedItem is null)
+        {
+            SecondSchoolPicker.SelectedIndex = 0;
+        }
+        if (ThirdEducationCheck.IsChecked == true &&
+            ThirdSchoolPicker.SelectedItem is null)
+        {
+            ThirdSchoolPicker.SelectedIndex = 0;
         }
         RefreshModules();
     }
@@ -1328,6 +1370,8 @@ public partial class CharacterWizardWindow : Window
         CopyValues(source.PreAttributes, clone.PreAttributes);
         CopyValues(source.PreSkills, clone.PreSkills);
         CopyValues(source.PreTraits, clone.PreTraits);
+        foreach (var education in source.EducationHistory) clone.EducationHistory.Add(education);
+        foreach (var field in source.EducationFields) clone.EducationFields.Add(field);
         foreach (var career in source.RealLifeHistory) clone.RealLifeHistory.Add(career);
         foreach (var item in source.Equipment) clone.Equipment.Add(item);
         foreach (var item in source.Weapons) clone.Weapons.Add(item);
@@ -1412,6 +1456,24 @@ public partial class CharacterWizardWindow : Window
         RefreshThirdField(school);
     }
 
+    private void RefreshSecondEducationFields(LifePathModule? school)
+    {
+        SetDependentPicker(SecondBasicFieldPicker, SecondBasicFieldPanel,
+            school?.BasicFields, true);
+        SetDependentPicker(SecondAdvancedFieldPicker, SecondAdvancedFieldPanel,
+            school?.AdvancedFields, false);
+        RefreshSecondThirdField(school);
+    }
+
+    private void RefreshThirdEducationFields(LifePathModule? school)
+    {
+        SetDependentPicker(ThirdBasicFieldPicker, ThirdBasicFieldPanel,
+            school?.BasicFields, true);
+        SetDependentPicker(ThirdAdvancedFieldPicker, ThirdAdvancedFieldPanel,
+            school?.AdvancedFields, false);
+        RefreshThirdEducationThirdField(school);
+    }
+
     private void RefreshThirdField(LifePathModule? school)
     {
         var fields = SelectedAdvancedField is null
@@ -1423,33 +1485,68 @@ public partial class CharacterWizardWindow : Window
         SetDependentPicker(SpecialistFieldPicker, SpecialistFieldPanel, fields, false);
     }
 
+    private void RefreshSecondThirdField(LifePathModule? school)
+    {
+        var fields = SelectedSecondAdvancedField is null
+            ? []
+            : (school?.AdvancedFields ?? [])
+                .Where(field => field.Id != SelectedSecondAdvancedField.Id)
+                .Concat(school?.SpecialistFields ?? [])
+                .ToArray();
+        SetDependentPicker(SecondSpecialistFieldPicker,
+            SecondSpecialistFieldPanel, fields, false);
+    }
+
+    private void RefreshThirdEducationThirdField(LifePathModule? school)
+    {
+        var fields = SelectedThirdAdvancedField is null
+            ? []
+            : (school?.AdvancedFields ?? [])
+                .Where(field => field.Id != SelectedThirdAdvancedField.Id)
+                .Concat(school?.SpecialistFields ?? [])
+                .ToArray();
+        SetDependentPicker(ThirdSpecialistFieldPicker,
+            ThirdSpecialistFieldPanel, fields, false);
+    }
+
     private void UpdateEducationSummary()
     {
         var school = SelectedSchool;
-        SchoolDescription.Text = school?.Description ??
+        var secondSchool = SelectedSecondSchool;
+        var thirdSchool = SelectedThirdSchool;
+        SchoolDescription.Text = string.Join(Environment.NewLine + Environment.NewLine,
+            new[] { school, secondSchool, thirdSchool }
+                .Where(module => module is not null)
+                .Select((module, index) =>
+                    $"Education {index + 1}: {module!.Name} ({module.TimeYears} years){Environment.NewLine}{module.Description}"));
+        if (SchoolDescription.Text.Length == 0)
+        {
+            SchoolDescription.Text =
             "No formal education selected.";
-        var fields = new[]
+        }
+        var fields = EducationSummaryEntries().ToArray();
+        EducationFieldsSummary.Text = string.Join(Environment.NewLine, fields);
+        EducationModuleCost.Text = SelectedEducationModules()
+            .Sum(module => module.ModuleCost)
+            .ToString();
+    }
+
+    private IEnumerable<string> EducationSummaryEntries()
+    {
+        return new[]
             {
-                ("Basic field", SelectedBasicField),
-                ("Advanced field", SelectedAdvancedField),
-                ("Third field", SelectedSpecialistField)
+                ("Education 1 basic field", SelectedBasicField),
+                ("Education 1 advanced field", SelectedAdvancedField),
+                ("Education 1 third field", SelectedSpecialistField),
+                ("Education 2 basic field", SelectedSecondBasicField),
+                ("Education 2 advanced field", SelectedSecondAdvancedField),
+                ("Education 2 third field", SelectedSecondSpecialistField),
+                ("Education 3 basic field", SelectedThirdBasicField),
+                ("Education 3 advanced field", SelectedThirdAdvancedField),
+                ("Education 3 third field", SelectedThirdSpecialistField)
             }
             .Where(entry => entry.Item2 is not null)
-            .Select(entry => $"{entry.Item1}: {entry.Item2!.Name}")
-            .ToArray();
-        EducationFieldsSummary.Text = string.Join(Environment.NewLine, fields);
-        EducationModuleCost.Text = school is null
-            ? "0"
-            : new[]
-                {
-                    school,
-                    SelectedBasicField,
-                    SelectedAdvancedField,
-                    SelectedSpecialistField
-                }
-                .Where(module => module is not null)
-                .Sum(module => module!.ModuleCost)
-                .ToString();
+            .Select(entry => $"{entry.Item1}: {entry.Item2!.Name}");
     }
 
     private static void SetDependentPicker(
@@ -1684,10 +1781,8 @@ public partial class CharacterWizardWindow : Window
         if (selectedModule.IsStage4) return 5;
         if (selectedModule.Module == SelectedChildhood) return 2;
         if (selectedModule.Module == SelectedLateChildhood) return 3;
-        if (selectedModule.Module == SelectedSchool ||
-            selectedModule.Module == SelectedBasicField ||
-            selectedModule.Module == SelectedAdvancedField ||
-            selectedModule.Module == SelectedSpecialistField)
+        if (SelectedEducationModules().Any(module =>
+                module.Id == selectedModule.Module.Id))
         {
             return 4;
         }
@@ -2054,14 +2149,8 @@ public partial class CharacterWizardWindow : Window
         if (choice.SolarisInternshipFieldSkillsOnly)
         {
             var internshipSkills =
-                LifePathCatalog.ResolveSolarisInternshipFieldSkills(new Character
-                {
-                    School = SelectedSchool?.Name ?? "",
-                    Affiliation = SelectedAffiliation?.Name ?? "",
-                    BasicSchool = SelectedBasicField?.Name ?? "",
-                    AdvancedSchool = SelectedAdvancedField?.Name ?? "",
-                    SpecialSchool = SelectedSpecialistField?.Name ?? ""
-                });
+                LifePathCatalog.ResolveSolarisInternshipFieldSkills(
+                    BuildEducationContextCharacter());
             return internshipSkills.Count == 0
                 ? SortChoiceOptions(choice, choice.Options)
                 : SortChoiceOptions(choice, internshipSkills);
@@ -2069,13 +2158,8 @@ public partial class CharacterWizardWindow : Window
         if (choice.SelectedEducationFieldSkillsOnly)
         {
             var selectedFieldSkills =
-                LifePathCatalog.ResolveSelectedEducationFieldSkills(new Character
-                {
-                    Affiliation = SelectedAffiliation?.Name ?? "",
-                    BasicSchool = SelectedBasicField?.Name ?? "",
-                    AdvancedSchool = SelectedAdvancedField?.Name ?? "",
-                    SpecialSchool = SelectedSpecialistField?.Name ?? ""
-                });
+                LifePathCatalog.ResolveSelectedEducationFieldSkills(
+                    BuildEducationContextCharacter());
             return selectedFieldSkills.Count == 0
                 ? SortChoiceOptions(choice, choice.Options)
                 : SortChoiceOptions(choice, selectedFieldSkills);
@@ -2141,14 +2225,29 @@ public partial class CharacterWizardWindow : Window
     {
         if (choice.EducationFieldNames is null) return [];
         return LifePathCatalog.ResolveEducationFieldSkills(
-            new Character
-            {
-                Affiliation = SelectedAffiliation?.Name ?? "",
-                BasicSchool = SelectedBasicField?.Name ?? "",
-                AdvancedSchool = SelectedAdvancedField?.Name ?? "",
-                SpecialSchool = SelectedSpecialistField?.Name ?? ""
-            },
+            BuildEducationContextCharacter(),
             choice.EducationFieldNames);
+    }
+
+    private Character BuildEducationContextCharacter()
+    {
+        var character = new Character
+        {
+            School = SelectedSchool?.Name ?? "",
+            Affiliation = SelectedAffiliation?.Name ?? "",
+            BasicSchool = SelectedBasicField?.Name ?? "",
+            AdvancedSchool = SelectedAdvancedField?.Name ?? "",
+            SpecialSchool = SelectedSpecialistField?.Name ?? ""
+        };
+        foreach (var school in SelectedEducationSchools())
+        {
+            character.EducationHistory.Add(school.Name);
+        }
+        foreach (var field in SelectedEducationFields())
+        {
+            character.EducationFields.Add(field.Name);
+        }
+        return character;
     }
 
     private string GetSelectedChoice(LifePathModule? module, string choiceId)
@@ -2192,7 +2291,18 @@ public partial class CharacterWizardWindow : Window
     {
         if (!IsLoaded || refreshing) return;
         refreshing = true;
-        RefreshThirdField(SelectedSchool);
+        if (sender == ThirdAdvancedFieldPicker)
+        {
+            RefreshThirdEducationThirdField(SelectedThirdSchool);
+        }
+        else if (sender == SecondAdvancedFieldPicker)
+        {
+            RefreshSecondThirdField(SelectedSecondSchool);
+        }
+        else
+        {
+            RefreshThirdField(SelectedSchool);
+        }
         BuildChoiceControls();
         refreshing = false;
         UpdateEducationSummary();
@@ -2307,15 +2417,12 @@ public partial class CharacterWizardWindow : Window
         var affiliation = character.BirthAffiliation.Length > 0
             ? $"{character.Affiliation} (born {character.BirthAffiliation})"
             : character.Affiliation;
-        var education = character.School.Length == 0
+        var educationFields = character.EducationFields.Count == 0
+            ? ""
+            : $" ({string.Join(" / ", character.EducationFields)})";
+        var education = character.EducationHistory.Count == 0
             ? "None"
-            : string.Join(" / ", new[]
-                {
-                    character.School,
-                    character.BasicSchool,
-                    character.AdvancedSchool,
-                    character.SpecialSchool
-                }.Where(value => value.Length > 0));
+            : $"{string.Join(" -> ", character.EducationHistory)}{educationFields}";
         ReviewLifePath.Text =
             $"Affiliation: {affiliation}{Environment.NewLine}" +
             $"Sub-affiliation: {ValueOrDash(character.SubAffiliation.Length > 0 ? character.SubAffiliation : character.BirthSubAffiliation)}{Environment.NewLine}" +
@@ -2347,12 +2454,36 @@ public partial class CharacterWizardWindow : Window
         {
             throw new InvalidOperationException("Choose one Basic Field for the selected school.");
         }
+        var secondSchool = throughStep >= 4 ? SelectedSecondSchool : null;
+        if (secondSchool is not null && SelectedSecondBasicField is null)
+        {
+            throw new InvalidOperationException("Choose one Basic Field for the second selected school.");
+        }
+        var thirdSchool = throughStep >= 4 ? SelectedThirdSchool : null;
+        if (thirdSchool is not null && SelectedThirdBasicField is null)
+        {
+            throw new InvalidOperationException("Choose one Basic Field for the third selected school.");
+        }
         if (throughStep >= 4 &&
             SelectedSpecialistField is not null &&
             SelectedAdvancedField is null)
         {
             throw new InvalidOperationException(
                 "Choose an Advanced Field before adding a third field.");
+        }
+        if (throughStep >= 4 &&
+            SelectedSecondSpecialistField is not null &&
+            SelectedSecondAdvancedField is null)
+        {
+            throw new InvalidOperationException(
+                "Choose an Advanced Field before adding a third field to the second education.");
+        }
+        if (throughStep >= 4 &&
+            SelectedThirdSpecialistField is not null &&
+            SelectedThirdAdvancedField is null)
+        {
+            throw new InvalidOperationException(
+                "Choose an Advanced Field before adding a third field to the third education.");
         }
         var language = LanguagePicker.SelectedItem as string ??
             throw new InvalidOperationException("Choose a primary language.");
@@ -2387,6 +2518,17 @@ public partial class CharacterWizardWindow : Window
         character.BasicSchool = throughStep >= 4 ? SelectedBasicField?.Name ?? "" : "";
         character.AdvancedSchool = throughStep >= 4 ? SelectedAdvancedField?.Name ?? "" : "";
         character.SpecialSchool = throughStep >= 4 ? SelectedSpecialistField?.Name ?? "" : "";
+        if (throughStep >= 4)
+        {
+            foreach (var educationSchool in SelectedEducationSchools())
+            {
+                character.EducationHistory.Add(educationSchool.Name);
+            }
+            foreach (var educationField in SelectedEducationFields())
+            {
+                character.EducationFields.Add(educationField.Name);
+            }
+        }
         character.RealLife =
             throughStep >= 5
                 ? SelectedSecondRealLife?.Name ?? SelectedRealLife?.Name ?? ""
@@ -2425,9 +2567,12 @@ public partial class CharacterWizardWindow : Window
         {
             LifePathEngine.ApplyAffiliationContext(character, affiliation, lateChildhood, language);
         }
-        if (school is not null)
+        foreach (var educationSchool in throughStep >= 4
+                     ? SelectedEducationSchools()
+                     : Enumerable.Empty<LifePathModule>())
         {
-            LifePathEngine.ApplyAffiliationContext(character, affiliation, school, language);
+            LifePathEngine.ApplyAffiliationContext(character, affiliation,
+                educationSchool, language);
         }
         foreach (var field in modules.Where(module =>
                      module.Id.StartsWith("field-", StringComparison.Ordinal)))
@@ -2448,10 +2593,8 @@ public partial class CharacterWizardWindow : Window
             $"\nClan caste: {character.ClanCaste}" +
             $"\nEarly Childhood: {character.EarlyChildhood}" +
             $"\nLate Childhood: {character.LateChildhood}" +
-            $"\nSchool: {character.School}" +
-            $"\nBasic Field: {character.BasicSchool}" +
-            $"\nAdvanced Field: {character.AdvancedSchool}" +
-            $"\nSpecialist Field: {character.SpecialSchool}" +
+            $"\nEducation: {string.Join(" -> ", character.EducationHistory)}" +
+            $"\nEducation Fields: {string.Join(" / ", character.EducationFields)}" +
             $"\nCareers: {string.Join(" -> ", character.RealLifeHistory)}";
         return character;
     }
@@ -2547,6 +2690,54 @@ public partial class CharacterWizardWindow : Window
             .Select(entry => entry.Module);
     }
 
+    private IEnumerable<LifePathModule> SelectedEducationModules()
+    {
+        foreach (var module in new[]
+                 {
+                     SelectedSchool,
+                     SelectedBasicField,
+                     SelectedAdvancedField,
+                     SelectedSpecialistField,
+                     SelectedSecondSchool,
+                     SelectedSecondBasicField,
+                     SelectedSecondAdvancedField,
+                     SelectedSecondSpecialistField,
+                     SelectedThirdSchool,
+                     SelectedThirdBasicField,
+                     SelectedThirdAdvancedField,
+                     SelectedThirdSpecialistField
+                 })
+        {
+            if (module is not null) yield return module;
+        }
+    }
+
+    private IEnumerable<LifePathModule> SelectedEducationSchools()
+    {
+        if (SelectedSchool is not null) yield return SelectedSchool;
+        if (SelectedSecondSchool is not null) yield return SelectedSecondSchool;
+        if (SelectedThirdSchool is not null) yield return SelectedThirdSchool;
+    }
+
+    private IEnumerable<LifePathModule> SelectedEducationFields()
+    {
+        foreach (var module in new[]
+                 {
+                     SelectedBasicField,
+                     SelectedAdvancedField,
+                     SelectedSpecialistField,
+                     SelectedSecondBasicField,
+                     SelectedSecondAdvancedField,
+                     SelectedSecondSpecialistField,
+                     SelectedThirdBasicField,
+                     SelectedThirdAdvancedField,
+                     SelectedThirdSpecialistField
+                 })
+        {
+            if (module is not null) yield return module;
+        }
+    }
+
     private IEnumerable<SelectedModule> SelectedModuleEntries()
     {
         var occurrences = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -2562,6 +2753,14 @@ public partial class CharacterWizardWindow : Window
                      (SelectedBasicField, false),
                      (SelectedAdvancedField, false),
                      (SelectedSpecialistField, false),
+                     (SelectedSecondSchool, false),
+                     (SelectedSecondBasicField, false),
+                     (SelectedSecondAdvancedField, false),
+                     (SelectedSecondSpecialistField, false),
+                     (SelectedThirdSchool, false),
+                     (SelectedThirdBasicField, false),
+                     (SelectedThirdAdvancedField, false),
+                     (SelectedThirdSpecialistField, false),
                      (SelectedRealLife, true),
                      (SelectedSecondRealLife, true)
                  })
