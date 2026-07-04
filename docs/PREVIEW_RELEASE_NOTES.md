@@ -76,6 +76,8 @@ release.
 - Installer smoke validates diagnostic metadata from the installed app
 - Installer smoke validates character-sheet PDF export from the installed app
 - Per-user Windows installer and release package manifest/checksum output
+- Beta installer uses `%LOCALAPPDATA%\A Time of War Character Creator Beta`
+  with separate beta Start Menu and uninstall entries
 - Release packaging guard against stale installers when release checks are skipped
 - Release package filenames include the packaged build commit
 - GitHub release validation cross-checks manifest installer metadata

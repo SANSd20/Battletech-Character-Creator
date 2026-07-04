@@ -18,6 +18,11 @@ Attach these files from `artifacts\release\0.1.1-preview`:
 - Windows
 - .NET 10 Desktop Runtime
 
+## Install Location
+
+This beta installs under `%LOCALAPPDATA%\A Time of War Character Creator Beta`
+and registers a separate beta uninstaller.
+
 ## Verification
 
 See `release-manifest.txt` for the exact packaged commit.

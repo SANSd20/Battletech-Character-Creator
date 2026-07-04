@@ -7,15 +7,16 @@
 !endif
 
 !define APP_NAME "A Time of War Character Creator"
+!define INSTALL_NAME "A Time of War Character Creator Beta"
 !define APP_EXE "BattletechCharacterCreator.App.exe"
-!define REG_KEY "Software\A Time of War Character Creator"
-!define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\A Time of War Character Creator"
+!define REG_KEY "Software\A Time of War Character Creator Beta"
+!define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\A Time of War Character Creator Beta"
 
 Name "${APP_NAME} ${VERSION}"
 OutFile "atow-character-creator-${VERSION}-setup.exe"
 Icon "..\ico1.ico"
 UninstallIcon "..\ico1.ico"
-InstallDir "$LOCALAPPDATA\A Time of War Character Creator"
+InstallDir "$LOCALAPPDATA\${INSTALL_NAME}"
 RequestExecutionLevel user
 
 Page directory
@@ -31,7 +32,7 @@ Section "${APP_NAME}" Required
   File /r "${PUBLISH_DIR}\*.*"
 
   WriteRegStr HKCU "${REG_KEY}" "Install_Dir" "$INSTDIR"
-  WriteRegStr HKCU "${UNINSTALL_KEY}" "DisplayName" "${APP_NAME}"
+  WriteRegStr HKCU "${UNINSTALL_KEY}" "DisplayName" "${INSTALL_NAME}"
   WriteRegStr HKCU "${UNINSTALL_KEY}" "DisplayVersion" "${VERSION}"
   WriteRegStr HKCU "${UNINSTALL_KEY}" "Publisher" "SANSd20"
   WriteRegStr HKCU "${UNINSTALL_KEY}" "InstallLocation" "$INSTDIR"
@@ -39,9 +40,9 @@ Section "${APP_NAME}" Required
   WriteRegDWORD HKCU "${UNINSTALL_KEY}" "NoModify" 1
   WriteRegDWORD HKCU "${UNINSTALL_KEY}" "NoRepair" 1
 
-  CreateDirectory "$SMPROGRAMS\A Time of War Character Creator"
-  CreateShortCut "$SMPROGRAMS\A Time of War Character Creator\A Time of War Character Creator.lnk" "$INSTDIR\${APP_EXE}"
-  CreateShortCut "$SMPROGRAMS\A Time of War Character Creator\Uninstall.lnk" "$INSTDIR\uninstall.exe"
+  CreateDirectory "$SMPROGRAMS\${INSTALL_NAME}"
+  CreateShortCut "$SMPROGRAMS\${INSTALL_NAME}\A Time of War Character Creator Beta.lnk" "$INSTDIR\${APP_EXE}"
+  CreateShortCut "$SMPROGRAMS\${INSTALL_NAME}\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
   WriteUninstaller "$INSTDIR\uninstall.exe"
 SectionEnd
@@ -49,9 +50,9 @@ SectionEnd
 Section "Uninstall"
   SetOutPath "$TEMP"
 
-  Delete "$SMPROGRAMS\A Time of War Character Creator\A Time of War Character Creator.lnk"
-  Delete "$SMPROGRAMS\A Time of War Character Creator\Uninstall.lnk"
-  RMDir "$SMPROGRAMS\A Time of War Character Creator"
+  Delete "$SMPROGRAMS\${INSTALL_NAME}\A Time of War Character Creator Beta.lnk"
+  Delete "$SMPROGRAMS\${INSTALL_NAME}\Uninstall.lnk"
+  RMDir "$SMPROGRAMS\${INSTALL_NAME}"
 
   Delete "$INSTDIR\${APP_EXE}"
   RMDir /r "$INSTDIR"

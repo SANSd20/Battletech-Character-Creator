@@ -31,10 +31,10 @@ directly:
 & 'C:\Program Files (x86)\NSIS\makensis.exe' /DVERSION=0.1.1-preview niss\atow_setup.nsi
 ```
 
-The installer uses the published folder as input, installs under the user's
-local app data folder, creates Start Menu shortcuts for
-`BattletechCharacterCreator.App.exe`, and registers an uninstaller under the
-current user.
+The beta installer uses the published folder as input, installs under
+`%LOCALAPPDATA%\A Time of War Character Creator Beta`, creates Start Menu
+shortcuts under `A Time of War Character Creator Beta`, and registers a
+per-user beta uninstaller.
 
 To smoke-test the built installer on a normal Windows session:
 
