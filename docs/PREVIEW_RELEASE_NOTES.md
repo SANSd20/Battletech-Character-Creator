@@ -1,11 +1,17 @@
-# A Time of War Character Creator 0.1.0-preview Beta
+# A Time of War Character Creator 0.1.1-preview Beta
 
-This is the first packaged beta of the .NET/WPF migration. It is intended for
-manual testing, feedback, and continued rule audit work, not as the final stable
+This is a beta refresh of the .NET/WPF migration. It is intended for manual
+testing, feedback, and continued rule audit work, not as the final stable
 release.
 
 ## Highlights
 
+- Stage 3 now supports repeated education selections, including second and
+  third education entries for paths such as University plus Officer Candidate
+  School
+- Education prerequisite checks now account for all selected education fields
+- Equipment and weapon catalogs now include category filters in addition to
+  text search
 - Life Module character wizard from basic information through Stage 4
 - First-launch choice window for opening the Character Wizard or Character Editor
 - Basic information uses campaign year, with age calculated from life-path choices

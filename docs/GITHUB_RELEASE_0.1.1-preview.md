@@ -1,15 +1,15 @@
-# A Time of War Character Creator 0.1.0-preview Beta
+# A Time of War Character Creator 0.1.1-preview Beta
 
-This is the first packaged beta of the .NET/WPF migration of the original
-BattleTech Character Creator. It is ready for broader manual testing and
-feedback, but it is not the final stable release.
+This is a beta refresh of the .NET/WPF migration of the original BattleTech
+Character Creator. It is ready for broader manual testing and feedback, but it
+is not the final stable release.
 
 ## Download
 
-Attach these files from `artifacts\release\0.1.0-preview`:
+Attach these files from `artifacts\release\0.1.1-preview`:
 
-- `atow-character-creator-0.1.0-preview-<commit>-setup.exe`
-- `atow-character-creator-0.1.0-preview-<commit>-setup.exe.sha256`
+- `atow-character-creator-0.1.1-preview-<commit>-setup.exe`
+- `atow-character-creator-0.1.1-preview-<commit>-setup.exe.sha256`
 - `PREVIEW_RELEASE_NOTES.md`
 - `release-manifest.txt`
 
@@ -51,6 +51,12 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 
 ## Highlights
 
+- Stage 3 now supports repeated education selections, including second and
+  third education entries for paths such as University plus Officer Candidate
+  School
+- Education prerequisite checks now account for all selected education fields
+- Equipment and weapon catalogs now include category filters in addition to
+  text search
 - Life Module character wizard from basic information through Stage 4
 - First-launch choice window for opening the Character Wizard or Character Editor
 - Basic information uses campaign year, with age calculated from life-path choices
