@@ -160,6 +160,8 @@ the next gate is manual beta testing with `docs/MANUAL_TEST_PLAN.md`.
   image, and font are compiled resources instead of loose files
 - Inventory smoke runs headlessly against catalog and inventory-rule checks so
   automation does not hang on editor window construction
+- Character-sheet export smoke runs headlessly against a representative
+  character so automation does not need to construct wizard/editor windows
 - Windows x64 folder publish profile documented in `docs/RELEASE.md`
 - Locally compile-verified per-user NSIS installer script for the .NET publish
   output

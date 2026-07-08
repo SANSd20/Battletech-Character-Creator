@@ -72,6 +72,8 @@ published app rather than copied as loose files.
 The wizard smoke is headless and intentionally focused on era-aware behavior and a
 representative character path; broader path coverage is handled by the
 representative life paths smoke.
+The character-sheet export smoke is also headless and exports from a
+representative character without constructing wizard or editor windows.
 
 Then, outside restricted sandboxes, run the full installer install/uninstall
 smoke:
@@ -80,7 +82,7 @@ smoke:
 .\scripts\Test-Installer.ps1
 ```
 
-Status note: the full installer smoke test passed on June 18, 2026. Repeat it
+Status note: the full installer smoke test passed on July 7, 2026. Repeat it
 before each packaged release after rebuilding the installer. The smoke test
 also checks that the installed app can validate the start window assets, write
 diagnostic metadata to its launch report, and export a nonempty character-sheet
@@ -125,8 +127,8 @@ The packaged installer and checksum include the current short Git commit in
 their filenames, for example:
 
 ```text
-atow-character-creator-0.1.1-preview-935d889-setup.exe
-atow-character-creator-0.1.1-preview-935d889-setup.exe.sha256
+atow-character-creator-0.1.1-preview-806410e-setup.exe
+atow-character-creator-0.1.1-preview-806410e-setup.exe.sha256
 ```
 
 Validate the prepared GitHub release without publishing it:
