@@ -67,8 +67,9 @@ release.
   smoke launches
 - Wizard smoke headlessly validates era-aware wizard behavior and a representative
   character path without the slower exhaustive UI selection sweep
-- Affiliation-filtered childhood and Clan round-trip smokes now run headlessly
-  to avoid local WPF window/font-cache startup failures during release checks
+- Affiliation-filtered childhood, Clan round-trip, and editor allocation smokes
+  now run headlessly to avoid local WPF window/font-cache startup failures
+  during release checks
 - Start-window smoke runs headlessly before WPF startup so release automation
   validates launch choices without hanging on window construction
 - Start-window smoke validates compiled WPF start-screen resources in installed

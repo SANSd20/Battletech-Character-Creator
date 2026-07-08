@@ -267,34 +267,8 @@ public partial class App : Application
         {
             try
             {
-                var wizard = new CharacterWizardWindow();
-                wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
-                    DispatcherPriority.ApplicationIdle,
-                    () =>
-                    {
-                        MainWindow? editor = null;
-                        try
-                        {
-                            wizard.SmokeHomeworldClanCharacter();
-                            editor = new MainWindow(wizard.CreatedCharacter!);
-                            editor.SmokeCampaignYearEraSelection();
-                            editor.SmokeXpAllocation();
-                            editor.Close();
-                            wizard.Close();
-                            ShutdownSmoke(0);
-                        }
-                        catch (Exception exception)
-                        {
-                            AppErrorReporter.WriteReport(
-                                exception,
-                                "Editor allocation smoke",
-                                SmokeFailureReportPath(e.Args));
-                            editor?.Close();
-                            wizard.Close();
-                            ShutdownSmoke(1);
-                        }
-                    });
-                wizard.Show();
+                SmokeEditorAllocationHeadless();
+                ShutdownSmoke(0);
             }
             catch (Exception exception)
             {
@@ -804,6 +778,79 @@ public partial class App : Application
         {
             throw new InvalidOperationException(
                 "Clan affiliations must offer Clan childhood modules and hide non-Clan High School.");
+        }
+    }
+
+    private static void SmokeEditorAllocationHeadless()
+    {
+        var character = BuildSmokeLifePathHeadless(
+            "homeworld-clan", "Goliath Scorpion", "MechWarrior",
+            "trueborn-creche", "late-trueborn-sibko",
+            "real-goliath-scorpion-seeker",
+            new Dictionary<string, IReadOnlyList<string>>
+            {
+                ["phenotype"] = ["Phenotype/MechWarrior"]
+            },
+            new Dictionary<string, IReadOnlyList<string>>
+            {
+                ["branch"] = ["MechWarrior"]
+            });
+
+        character.GameYear = 3062;
+        if (!EraPresetCatalog.BuildInferredEraLabel(character.GameYear)
+                .Contains("Civil War", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "The editor campaign year did not infer the Civil War era.");
+        }
+
+        var summary = CharacterRules.Calculate(character);
+        var originalFreeXp = summary.FreeXp;
+        var bod = character.Attributes.Single(item => item.Name == "BOD");
+        var required = 300 - bod.Value;
+        if (required <= 0 || required > originalFreeXp)
+        {
+            throw new InvalidOperationException(
+                "Editor XP allocation could not find an affordable Attribute increase.");
+        }
+
+        bod.Value += required;
+        summary = CharacterRules.Calculate(character);
+        var expectedFreeXp = originalFreeXp - required;
+        if (summary.FreeXp != expectedFreeXp ||
+            PrerequisiteRules.Evaluate(character).Any(issue =>
+                issue.Category == "Attribute" && issue.Name == "BOD"))
+        {
+            throw new InvalidOperationException(
+                "Editor XP allocation did not update totals and prerequisites. " +
+                $"Expected Free XP {expectedFreeXp}, actual {summary.FreeXp}; " +
+                $"BOD XP {bod.Value}.");
+        }
+
+        var beforeRejectedSpend = bod.Value;
+        var rejectedSpend = summary.FreeXp + 5;
+        if (rejectedSpend <= summary.FreeXp)
+        {
+            bod.Value += rejectedSpend;
+        }
+        if (bod.Value != beforeRejectedSpend)
+        {
+            throw new InvalidOperationException(
+                "Editor XP allocation allowed spending beyond Free XP.");
+        }
+
+        var resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
+        var catalog = ResourceCatalog.Load(resourcePath);
+        var filteredSkills = catalog.Skills
+            .Where(item => item.Name.Contains("Gunnery",
+                StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        if (filteredSkills.Length == 0 ||
+            filteredSkills.Any(item => !item.Name.Contains("Gunnery",
+                StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException(
+                "Editor Skill filtering returned an unrelated row.");
         }
     }
 
