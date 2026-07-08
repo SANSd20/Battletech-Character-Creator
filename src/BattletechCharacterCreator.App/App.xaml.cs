@@ -309,28 +309,16 @@ public partial class App : Application
         {
             var outputPath = Path.GetFullPath(
                 sheetExportArgument["--smoke-sheet-export=".Length..]);
-            var wizard = new CharacterWizardWindow();
-            wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
-                DispatcherPriority.ApplicationIdle,
-                () =>
-                {
-                    try
-                    {
-                        wizard.SmokeHomeworldClanCharacter();
-                        var editor = new MainWindow(wizard.CreatedCharacter!);
-                        editor.SmokeExportCharacterSheet(outputPath);
-                        editor.Close();
-                        wizard.Close();
-                        ShutdownSmoke(0);
-                    }
-                    catch (Exception ex)
-                    {
-                        File.WriteAllText(outputPath + ".error.txt", ex.ToString());
-                        wizard.Close();
-                        ShutdownSmoke(1);
-                    }
-                });
-            wizard.Show();
+            try
+            {
+                SmokeExportCharacterSheetHeadless(outputPath);
+                ShutdownSmoke(0);
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(outputPath + ".error.txt", ex.ToString());
+                ShutdownSmoke(1);
+            }
             return;
         }
 
@@ -781,6 +769,65 @@ public partial class App : Application
         }
     }
 
+    private static void SmokeExportCharacterSheetHeadless(string path)
+    {
+        var character = BuildSmokeLifePathHeadless(
+            "homeworld-clan", "Goliath Scorpion", "MechWarrior",
+            "trueborn-creche", "late-trueborn-sibko",
+            "real-goliath-scorpion-seeker",
+            new Dictionary<string, IReadOnlyList<string>>
+            {
+                ["phenotype"] = ["Phenotype/MechWarrior"]
+            },
+            new Dictionary<string, IReadOnlyList<string>>
+            {
+                ["branch"] = ["MechWarrior"]
+            });
+        character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Smoke Patch Armor",
+            Cost = "500/100",
+            Mass = "3.1",
+            Armor = "1/4/0/2",
+            PatchCount = "2",
+            Count = "1"
+        });
+        character.Weapons.Add(new WeaponItem
+        {
+            Skill = "Small Arms",
+            Name = "Smoke Ammo Weapon",
+            Damage = "2B/3",
+            Range = "8/18/40/90",
+            Cost = "500",
+            Mass = "0.5",
+            Shots = "9",
+            AmmoCost = "12",
+            AmmoMass = "0.06",
+            AmmoCount = "3",
+            Count = "1"
+        });
+
+        var resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
+        var catalog = ResourceCatalog.Load(resourcePath);
+        CharacterSheetExporter.Export(character, catalog, path);
+
+        var bytes = File.ReadAllBytes(path);
+        var text = System.Text.Encoding.ASCII.GetString(bytes);
+        var expectedPages =
+            character.Traits.Count > 8 || character.Skills.Count > 30 ? 3 : 2;
+        if (bytes.Length < 100_000 ||
+            !text.StartsWith("%PDF-1.4", StringComparison.Ordinal) ||
+            !text.Contains($"/Count {expectedPages}", StringComparison.Ordinal) ||
+            !text.Contains(EscapeSmokeText(character.Name),
+                StringComparison.Ordinal) ||
+            !text.Contains("Patches: 2", StringComparison.Ordinal) ||
+            !text.Contains("Ammo packs: 3", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Character sheet PDF export did not produce a complete document.");
+        }
+    }
+
     private static void SmokeEditorAllocationHeadless()
     {
         var character = BuildSmokeLifePathHeadless(
@@ -1078,6 +1125,11 @@ public partial class App : Application
                 $"{source} did not apply expected {name} effect.");
         }
     }
+
+    private static string EscapeSmokeText(string value) =>
+        value.Replace("\\", "\\\\", StringComparison.Ordinal)
+            .Replace("(", "\\(", StringComparison.Ordinal)
+            .Replace(")", "\\)", StringComparison.Ordinal);
 
     private static void VerifySmokeRoundTrip(Character expected, Character loaded)
     {

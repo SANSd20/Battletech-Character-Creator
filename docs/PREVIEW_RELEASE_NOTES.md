@@ -46,6 +46,8 @@ release.
   trait support
 - Headless inventory smoke checks catalog and inventory-rule behavior without
   constructing the editor window
+- Headless character-sheet export smoke checks PDF output without constructing
+  wizard/editor windows
 - Opt-in *A Time of War Companion* equipment and weapon catalog content
 - Opt-in *A Time of War Companion* expanded trait reference entries
 - Skill and Trait editor reference panels with source labels and rule notes
