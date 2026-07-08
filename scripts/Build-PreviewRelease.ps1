@@ -27,6 +27,9 @@ if (!$SkipReleaseChecks) {
     powershell -NoProfile -ExecutionPolicy Bypass `
         -File scripts\Run-ReleaseChecks.ps1 `
         -Version $Version
+    if ($LASTEXITCODE -ne 0) {
+        throw "Release checks failed with exit code $LASTEXITCODE."
+    }
 }
 
 $gitStatus = git status --porcelain

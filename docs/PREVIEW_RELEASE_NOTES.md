@@ -59,6 +59,7 @@ release.
 - Release checks validate diagnostic report versions against the requested version
 - Release checks verify the app project version matches the requested version
 - Release checks verify Windows assembly/file versions match the release version
+- Preview packaging now stops immediately if release checks fail
 - Release checks verify the installer dry-run still covers installed start,
   diagnostic, sheet export, and uninstall checks
 - Release checks close repo-launched app instances around app smoke, build, and
