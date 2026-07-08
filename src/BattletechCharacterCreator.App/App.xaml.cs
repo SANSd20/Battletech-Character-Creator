@@ -170,28 +170,8 @@ public partial class App : Application
         {
             try
             {
-                var wizard = new CharacterWizardWindow();
-                wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
-                    DispatcherPriority.ApplicationIdle,
-                    () =>
-                    {
-                        try
-                        {
-                            wizard.SmokeAffiliationFilteredChildhoods();
-                            wizard.Close();
-                            ShutdownSmoke(0);
-                        }
-                        catch (Exception exception)
-                        {
-                            AppErrorReporter.WriteReport(
-                                exception,
-                                "Affiliation-filtered childhood smoke",
-                                SmokeFailureReportPath(e.Args));
-                            wizard.Close();
-                            ShutdownSmoke(1);
-                        }
-                    });
-                wizard.Show();
+                SmokeAffiliationFilteredChildhoodsHeadless();
+                ShutdownSmoke(0);
             }
             catch (Exception exception)
             {
@@ -206,39 +186,28 @@ public partial class App : Application
 
         if (e.Args.Contains("--smoke-clan-roundtrip", StringComparer.Ordinal))
         {
+            var path = Path.Combine(
+                Path.GetTempPath(), $"atow-clan-{Guid.NewGuid():N}.btcc");
             try
             {
-                var wizard = new CharacterWizardWindow();
-                wizard.Loaded += (_, _) => wizard.Dispatcher.BeginInvoke(
-                    DispatcherPriority.ApplicationIdle,
-                    () =>
+                var character = BuildSmokeLifePathHeadless(
+                    "homeworld-clan", "Goliath Scorpion", "MechWarrior",
+                    "trueborn-creche", "late-trueborn-sibko",
+                    "real-goliath-scorpion-seeker",
+                    new Dictionary<string, IReadOnlyList<string>>
                     {
-                        var path = Path.Combine(
-                            Path.GetTempPath(), $"atow-clan-{Guid.NewGuid():N}.btcc");
-                        try
-                        {
-                            wizard.SmokeHomeworldClanCharacter();
-                            var editor = new MainWindow(wizard.CreatedCharacter!);
-                            editor.SmokeSaveAndReload(path);
-                            editor.Close();
-                            wizard.Close();
-                            ShutdownSmoke(0);
-                        }
-                        catch (Exception exception)
-                        {
-                            AppErrorReporter.WriteReport(
-                                exception,
-                                "Clan round-trip smoke",
-                                SmokeFailureReportPath(e.Args));
-                            wizard.Close();
-                            ShutdownSmoke(1);
-                        }
-                        finally
-                        {
-                            File.Delete(path);
-                        }
+                        ["phenotype"] = ["Phenotype/MechWarrior"]
+                    },
+                    new Dictionary<string, IReadOnlyList<string>>
+                    {
+                        ["branch"] = ["MechWarrior"]
                     });
-                wizard.Show();
+                BattletechCharacterCreator.Core.Persistence
+                    .LegacyCharacterSerializer.Save(character, path);
+                var loaded = BattletechCharacterCreator.Core.Persistence
+                    .LegacyCharacterSerializer.Load(path);
+                VerifySmokeRoundTrip(character, loaded);
+                ShutdownSmoke(0);
             }
             catch (Exception exception)
             {
@@ -247,6 +216,10 @@ public partial class App : Application
                     "Clan round-trip smoke",
                     SmokeFailureReportPath(e.Args));
                 ShutdownSmoke(1);
+            }
+            finally
+            {
+                File.Delete(path);
             }
             return;
         }
@@ -271,15 +244,7 @@ public partial class App : Application
                         .LegacyCharacterSerializer.Save(character, path);
                     var loaded = BattletechCharacterCreator.Core.Persistence
                         .LegacyCharacterSerializer.Load(path);
-                    if (loaded.Affiliation != character.Affiliation ||
-                        !loaded.RealLifeHistory.SequenceEqual(
-                            character.RealLifeHistory) ||
-                        CharacterRules.Calculate(loaded).FreeXp !=
-                        CharacterRules.Calculate(character).FreeXp)
-                    {
-                        throw new InvalidOperationException(
-                            $"{character.Name} did not round-trip correctly.");
-                    }
+                    VerifySmokeRoundTrip(character, loaded);
                 }
                 ShutdownSmoke(0);
             }
@@ -801,6 +766,47 @@ public partial class App : Application
             : Path.GetFullPath(argument[SmokeFailureReportPrefix.Length..]);
     }
 
+    private static void SmokeAffiliationFilteredChildhoodsHeadless()
+    {
+        var innerSphereChildhoods = LifePathAvailability.FilterChildhoods(
+                LifePathCatalog.Childhoods,
+                false)
+            .Select(module => module.Id)
+            .ToArray();
+        var innerSphereLateChildhoods = LifePathAvailability.FilterLateChildhoods(
+                LifePathCatalog.LateChildhoods,
+                false)
+            .Select(module => module.Id)
+            .ToArray();
+        if (innerSphereChildhoods.Contains("trueborn-creche") ||
+            innerSphereLateChildhoods.Contains("late-clan-apprenticeship") ||
+            innerSphereLateChildhoods.Contains("late-freeborn-sibko") ||
+            innerSphereLateChildhoods.Contains("late-trueborn-sibko"))
+        {
+            throw new InvalidOperationException(
+                "Inner Sphere affiliations must not offer Clan-only childhood modules.");
+        }
+
+        var clanChildhoods = LifePathAvailability.FilterChildhoods(
+                LifePathCatalog.Childhoods,
+                true)
+            .Select(module => module.Id)
+            .ToArray();
+        var clanLateChildhoods = LifePathAvailability.FilterLateChildhoods(
+                LifePathCatalog.LateChildhoods,
+                true)
+            .Select(module => module.Id)
+            .ToArray();
+        if (!clanChildhoods.Contains("trueborn-creche") ||
+            !clanLateChildhoods.Contains("late-freeborn-sibko") ||
+            !clanLateChildhoods.Contains("late-trueborn-sibko") ||
+            clanLateChildhoods.Contains("late-high-school"))
+        {
+            throw new InvalidOperationException(
+                "Clan affiliations must offer Clan childhood modules and hide non-Clan High School.");
+        }
+    }
+
     private static void SmokeWizardHeadless()
     {
         if (EraAvailabilityCatalog.EarliestAffiliationYear("invading-clan") is not { } clanYear ||
@@ -1023,6 +1029,22 @@ public partial class App : Application
         {
             throw new InvalidOperationException(
                 $"{source} did not apply expected {name} effect.");
+        }
+    }
+
+    private static void VerifySmokeRoundTrip(Character expected, Character loaded)
+    {
+        if (loaded.Affiliation != expected.Affiliation ||
+            loaded.SubAffiliation != expected.SubAffiliation ||
+            loaded.ClanCaste != expected.ClanCaste ||
+            loaded.Phenotype != expected.Phenotype ||
+            loaded.ClanTrainingField != expected.ClanTrainingField ||
+            !loaded.RealLifeHistory.SequenceEqual(expected.RealLifeHistory) ||
+            CharacterRules.Calculate(loaded).FreeXp !=
+            CharacterRules.Calculate(expected).FreeXp)
+        {
+            throw new InvalidOperationException(
+                $"{expected.Name} did not round-trip correctly.");
         }
     }
 
