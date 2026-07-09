@@ -4,6 +4,8 @@ namespace BattletechCharacterCreator.Core.LifePath;
 
 public static class LifePathCatalog
 {
+    private const int InnerSphereClanKnowledgeYear = 3050;
+
     private static readonly string[] Attributes =
         ["STR", "BOD", "RFL", "DEX", "INT", "WIL", "CHA", "EDG"];
 
@@ -1220,7 +1222,9 @@ public static class LifePathCatalog
             {
                 skills.Add(effect.Name);
             }
-            foreach (var option in field.Choices.SelectMany(choice => choice.Options))
+            foreach (var option in FilterEraAvailableSkillOptions(
+                         character,
+                         field.Choices.SelectMany(choice => choice.Options)))
             {
                 skills.Add(option);
             }
@@ -1238,6 +1242,27 @@ public static class LifePathCatalog
         }
         return skills.OrderBy(name => name).ToArray();
     }
+
+    public static IReadOnlyList<string> FilterEraAvailableSkillOptions(
+        Character character,
+        IEnumerable<string> options) =>
+        options
+            .Where(option => IsSkillOptionAvailable(character, option))
+            .ToArray();
+
+    private static bool IsSkillOptionAvailable(Character character, string option)
+    {
+        if (option != "Interests/History (Clan)")
+        {
+            return true;
+        }
+
+        return IsClanAffiliation(character.Affiliation) ||
+            character.GameYear >= InnerSphereClanKnowledgeYear;
+    }
+
+    private static bool IsClanAffiliation(string affiliation) =>
+        affiliation is "Invading Clan" or "Homeworld Clan";
 
     public static IReadOnlyList<string> ResolveClanWarriorFieldSkills(Character character) =>
         character.ClanTrainingField switch

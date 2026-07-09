@@ -2157,14 +2157,23 @@ public partial class CharacterWizardWindow : Window
         }
         if (choice.SelectedEducationFieldSkillsOnly)
         {
+            var educationContext = BuildEducationContextCharacter();
             var selectedFieldSkills =
                 LifePathCatalog.ResolveSelectedEducationFieldSkills(
-                    BuildEducationContextCharacter());
+                    educationContext);
             return selectedFieldSkills.Count == 0
-                ? SortChoiceOptions(choice, choice.Options)
+                ? SortChoiceOptions(
+                    choice,
+                    LifePathCatalog.FilterEraAvailableSkillOptions(
+                        educationContext,
+                        choice.Options))
                 : SortChoiceOptions(choice, selectedFieldSkills);
         }
-        var options = choice.Options.AsEnumerable();
+        var context = BuildEducationContextCharacter();
+        var options = LifePathCatalog.FilterEraAvailableSkillOptions(
+                context,
+                choice.Options)
+            .AsEnumerable();
         if (choice.EducationFieldNames is not null)
         {
             options = options.Concat(ResolveEducationFieldOptions(choice));
@@ -2237,7 +2246,8 @@ public partial class CharacterWizardWindow : Window
             Affiliation = SelectedAffiliation?.Name ?? "",
             BasicSchool = SelectedBasicField?.Name ?? "",
             AdvancedSchool = SelectedAdvancedField?.Name ?? "",
-            SpecialSchool = SelectedSpecialistField?.Name ?? ""
+            SpecialSchool = SelectedSpecialistField?.Name ?? "",
+            GameYear = CurrentGameYear
         };
         foreach (var school in SelectedEducationSchools())
         {

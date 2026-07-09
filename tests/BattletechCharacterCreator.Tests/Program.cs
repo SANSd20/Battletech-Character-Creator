@@ -2548,4 +2548,61 @@ static void CheckRealLifeModules()
         LifePathEngine.UniversalModuleCost + field.Effects.Count * 24 +
         field.Choices.Sum(choice => choice.Count) * 24,
         "Fast Learner must reduce education Field costs to 24 XP per Skill.");
+
+    var generalStudies = LifePathCatalog.EducationSchools
+        .Single(module => module.Name == "University")
+        .BasicFields!.Single(module => module.Name == "General Studies");
+    var generalInterest = generalStudies.Choices.Single(choice =>
+        choice.Id == "specialty-interests-any");
+    var preInvasionHouse = new Character
+    {
+        Affiliation = "Federated Suns",
+        GameYear = 3025,
+        School = "University",
+        BasicSchool = "General Studies"
+    };
+    var preInvasionGeneralSkills = LifePathCatalog.ResolveEducationFieldSkills(
+        preInvasionHouse,
+        ["General Studies"]);
+    Assert(!preInvasionGeneralSkills.Contains("Interests/History (Clan)"),
+        "Pre-invasion House education interests must hide Clan history.");
+    var rejectedClanInterest = false;
+    try
+    {
+        LifePathEngine.Apply(preInvasionHouse, new ModuleSelection(
+            generalStudies,
+            new Dictionary<string, IReadOnlyList<string>>
+            {
+                [generalInterest.Id] = ["Interests/History (Clan)"]
+            }));
+    }
+    catch (InvalidOperationException)
+    {
+        rejectedClanInterest = true;
+    }
+    Assert(rejectedClanInterest,
+        "Pre-invasion House education must reject Clan history if selected.");
+
+    var postInvasionHouse = new Character
+    {
+        Affiliation = "Federated Suns",
+        GameYear = 3050,
+        School = "University",
+        BasicSchool = "General Studies"
+    };
+    Assert(LifePathCatalog.ResolveEducationFieldSkills(
+            postInvasionHouse,
+            ["General Studies"]).Contains("Interests/History (Clan)"),
+        "Post-invasion House education interests may include Clan history.");
+    var preInvasionClan = new Character
+    {
+        Affiliation = "Homeworld Clan",
+        GameYear = 3025,
+        School = "University",
+        BasicSchool = "General Studies"
+    };
+    Assert(LifePathCatalog.ResolveEducationFieldSkills(
+            preInvasionClan,
+            ["General Studies"]).Contains("Interests/History (Clan)"),
+        "Clan education interests may include Clan history regardless of Inner Sphere era.");
 }

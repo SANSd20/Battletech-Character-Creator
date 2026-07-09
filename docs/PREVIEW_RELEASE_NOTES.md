@@ -17,6 +17,8 @@ release.
 - Basic information uses campaign year, with age calculated from life-path choices
 - Campaign year infers the matching era from the imported `Eras.xlsx` chronology
 - Era-aware affiliation availability filters with visible source notes
+- Stage 3 education interest choices hide Clan-history options from pre-invasion
+  Inner Sphere characters
 - Era-aware Rasalhague sub-affiliation filters with visible source notes
 - Pre-invasion eras after the Golden Century show both Invading Clan and
   Homeworld Clan origins for Clan characters

@@ -201,7 +201,9 @@ public static class LifePathEngine
 
             foreach (var name in selected)
             {
-                var validOptions = choice.Options
+                var validOptions = LifePathCatalog.FilterEraAvailableSkillOptions(
+                        character,
+                        choice.Options)
                     .Concat(choice.EducationFieldNames is null
                         ? []
                         : LifePathCatalog.ResolveEducationFieldSkills(
@@ -216,7 +218,9 @@ public static class LifePathEngine
                     var selectedFieldSkills =
                         LifePathCatalog.ResolveSelectedEducationFieldSkills(character);
                     validOptions = selectedFieldSkills.Count == 0
-                        ? choice.Options.ToArray()
+                        ? LifePathCatalog.FilterEraAvailableSkillOptions(
+                            character,
+                            choice.Options).ToArray()
                         : selectedFieldSkills.ToArray();
                 }
                 if (choice.SolarisInternshipFieldSkillsOnly)
@@ -224,7 +228,9 @@ public static class LifePathEngine
                     var internshipSkills =
                         LifePathCatalog.ResolveSolarisInternshipFieldSkills(character);
                     validOptions = internshipSkills.Count == 0
-                        ? choice.Options.ToArray()
+                        ? LifePathCatalog.FilterEraAvailableSkillOptions(
+                            character,
+                            choice.Options).ToArray()
                         : internshipSkills.ToArray();
                 }
                 if (!validOptions.Contains(name, StringComparer.Ordinal))
