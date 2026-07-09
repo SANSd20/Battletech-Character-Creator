@@ -1,4 +1,4 @@
-# A Time of War Character Creator 0.1.3-preview Beta
+# A Time of War Character Creator 0.1.4-preview Beta
 
 This is a beta refresh of the .NET/WPF migration. It is intended for manual
 testing, feedback, and continued rule audit work, not as the final stable

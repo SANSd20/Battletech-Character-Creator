@@ -1,4 +1,4 @@
-# A Time of War Character Creator 0.1.3-preview Beta
+# A Time of War Character Creator 0.1.4-preview Beta
 
 This is a beta refresh of the .NET/WPF migration of the original BattleTech
 Character Creator. It is ready for broader manual testing and feedback, but it
@@ -6,10 +6,10 @@ is not the final stable release.
 
 ## Download
 
-Attach these files from `artifacts\release\0.1.3-preview`:
+Attach these files from `artifacts\release\0.1.4-preview`:
 
-- `atow-character-creator-0.1.3-preview-<commit>-setup.exe`
-- `atow-character-creator-0.1.3-preview-<commit>-setup.exe.sha256`
+- `atow-character-creator-0.1.4-preview-<commit>-setup.exe`
+- `atow-character-creator-0.1.4-preview-<commit>-setup.exe.sha256`
 - `PREVIEW_RELEASE_NOTES.md`
 - `release-manifest.txt`
 
