@@ -29,6 +29,7 @@ release.
 - Stage 2, Stage 3, and Stage 4 flexible XP pools preserve user allocations
   while navigating between wizard pages
 - Flexible XP target dropdowns group Attributes first, then Traits, then Skills
+- Flexible XP target dropdowns hide targets already selected in the same pool
 - Stage 1 flexible XP target lists include cataloged Compulsion traits
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP

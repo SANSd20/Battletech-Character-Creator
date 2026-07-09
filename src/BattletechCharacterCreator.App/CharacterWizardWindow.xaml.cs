@@ -32,7 +32,8 @@ public partial class CharacterWizardWindow : Window
         string ModuleName = "",
         int Step = -1,
         TextBlock? Remaining = null,
-        TextBlock? Status = null);
+        TextBlock? Status = null,
+        IReadOnlyList<string>? Options = null);
 
     private sealed record XpAdjustment(TextBox Input, int Delta);
 
@@ -1723,8 +1724,10 @@ public partial class CharacterWizardWindow : Window
                         modulePanel.Children.Add(allocator);
                         var input = new ChoiceInput(
                             controls, amounts, choice, module.Name,
-                            ChoiceStep(selectedModule), remaining, status);
+                            ChoiceStep(selectedModule), remaining, status,
+                            options);
                         choiceControls[key] = input;
+                        RefreshFlexiblePickerOptions(input);
                         UpdateFlexibleChoiceStatus(input);
                         continue;
                     }
@@ -1914,7 +1917,45 @@ public partial class CharacterWizardWindow : Window
         foreach (var input in choiceControls.Values.Where(
                      input => input.Choice is not null))
         {
+            RefreshFlexiblePickerOptions(input);
             UpdateFlexibleChoiceStatus(input);
+        }
+    }
+
+    private void RefreshFlexiblePickerOptions(ChoiceInput input)
+    {
+        if (input.Choice?.Target != EffectTarget.Flexible ||
+            input.Choice.FixedFlexibleSelections ||
+            input.Options is null)
+        {
+            return;
+        }
+
+        var selectedTargets = input.Pickers
+            .Select(picker => picker.SelectedItem as string ?? "")
+            .Where(name => name.Length > 0)
+            .ToArray();
+        var wasRefreshing = refreshing;
+        refreshing = true;
+        try
+        {
+            foreach (var picker in input.Pickers)
+            {
+                var current = picker.SelectedItem as string ?? "";
+                var available = input.Options
+                    .Where(option => option == current ||
+                        !selectedTargets.Contains(option, StringComparer.Ordinal))
+                    .ToArray();
+                picker.ItemsSource = available;
+                picker.SelectedItem = current.Length > 0 &&
+                    available.Contains(current, StringComparer.Ordinal)
+                        ? current
+                        : null;
+            }
+        }
+        finally
+        {
+            refreshing = wasRefreshing;
         }
     }
 
@@ -1966,6 +2007,15 @@ public partial class CharacterWizardWindow : Window
         }
 
         var active = allocations.Where(item => item.Xp > 0).ToArray();
+        var duplicateTarget = active
+            .GroupBy(item => item.Name, StringComparer.Ordinal)
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicateTarget is not null)
+        {
+            return new FlexibleChoiceResult(false, requiredXp,
+                $"{input.ModuleName}: choose each flexible XP target only once.");
+        }
+
         var spent = active.Sum(item => item.Xp);
         var remaining = requiredXp - spent;
         if (remaining != 0)

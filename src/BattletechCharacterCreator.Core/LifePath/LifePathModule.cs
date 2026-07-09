@@ -271,6 +271,16 @@ public static class LifePathEngine
             throw new InvalidOperationException(
                 $"{module.Name}: '{choice.Label}' must allocate exactly {requiredXp} XP.");
         }
+        var duplicateTarget = choice.FixedFlexibleSelections
+            ? null
+            : active
+            .GroupBy(allocation => allocation.Name, StringComparer.Ordinal)
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicateTarget is not null)
+        {
+            throw new InvalidOperationException(
+                $"{module.Name}: '{choice.Label}' may allocate each target only once.");
+        }
         var attributeOrTraitXp = active
             .Where(allocation =>
                 ClassifyFlexibleTarget(allocation.Name) is

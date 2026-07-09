@@ -1255,6 +1255,24 @@ static void CheckFlexibleAllocations()
     }
     Assert(invalidRejected, "Flexible allocations must spend their exact XP pool.");
 
+    var duplicateRejected = false;
+    try
+    {
+        LifePathEngine.Apply(new Character(), new ModuleSelection(
+            module,
+            regularChoices,
+            new Dictionary<string, IReadOnlyList<ChoiceAllocation>>
+            {
+                [flex.Id] = [new("DEX", 50), new("DEX", flex.Xp * flex.Count - 50)]
+            }));
+    }
+    catch (InvalidOperationException)
+    {
+        duplicateRejected = true;
+    }
+    Assert(duplicateRejected,
+        "Flexible allocations must reject duplicate targets in the same pool.");
+
     var skillCapRejected = false;
     try
     {
