@@ -669,10 +669,16 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="190"/>
                                 <ColumnDefinition Width="260"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <CheckBox Content="Companion"
                                       IsChecked="{Binding IncludeCompanionContent}"
                                       VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding EquipmentCatalogResultSummary}"
+                                       Foreground="#55524A"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0"/>
                             <ComboBox Grid.Column="2"
                                       ItemsSource="{Binding EquipmentCatalogCategories}"
                                       SelectedItem="{Binding EquipmentCatalogCategory}"
@@ -805,10 +811,16 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="190"/>
                                 <ColumnDefinition Width="260"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <CheckBox Content="Companion"
                                       IsChecked="{Binding IncludeCompanionContent}"
                                       VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding WeaponCatalogResultSummary}"
+                                       Foreground="#55524A"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0"/>
                             <ComboBox Grid.Column="2"
                                       ItemsSource="{Binding WeaponCatalogCategories}"
                                       SelectedItem="{Binding WeaponCatalogCategory}"

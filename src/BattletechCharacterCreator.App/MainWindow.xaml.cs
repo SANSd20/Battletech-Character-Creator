@@ -388,6 +388,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             equipmentCatalogFilter = value ?? "";
             OnPropertyChanged();
             EquipmentCatalogView.Refresh();
+            OnPropertyChanged(nameof(EquipmentCatalogResultSummary));
         }
     }
     public string EquipmentCatalogCategory
@@ -402,8 +403,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 : value ?? "";
             OnPropertyChanged();
             EquipmentCatalogView.Refresh();
+            OnPropertyChanged(nameof(EquipmentCatalogResultSummary));
         }
     }
+    public string EquipmentCatalogResultSummary =>
+        BuildCatalogResultSummary(
+            EquipmentCatalogView,
+            Catalog.Equipment.Count,
+            "equipment item",
+            "equipment items");
     public string WeaponCatalogFilter
     {
         get => weaponCatalogFilter;
@@ -412,6 +420,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             weaponCatalogFilter = value ?? "";
             OnPropertyChanged();
             WeaponCatalogView.Refresh();
+            OnPropertyChanged(nameof(WeaponCatalogResultSummary));
         }
     }
     public string WeaponCatalogCategory
@@ -426,8 +435,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 : value ?? "";
             OnPropertyChanged();
             WeaponCatalogView.Refresh();
+            OnPropertyChanged(nameof(WeaponCatalogResultSummary));
         }
     }
+    public string WeaponCatalogResultSummary =>
+        BuildCatalogResultSummary(
+            WeaponCatalogView,
+            Catalog.Weapons.Count,
+            "weapon",
+            "weapons");
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -587,6 +603,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Recalculate();
 
         EquipmentCatalogFilter = "Flak";
+        var filteredEquipmentCount = EquipmentCatalogView
+            .Cast<EquipmentCatalogItem>()
+            .Count();
         if (EquipmentCatalogView.Cast<EquipmentCatalogItem>()
             .Any(item => !MatchesCatalogText(
                 EquipmentCatalogFilter,
@@ -598,15 +617,32 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             throw new InvalidOperationException(
                 "Editor equipment catalog filtering returned an unrelated row.");
         }
+        if (!EquipmentCatalogResultSummary.StartsWith(
+                $"{filteredEquipmentCount} of {Catalog.Equipment.Count} ",
+                StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Editor equipment catalog result count did not update after filtering.");
+        }
         EquipmentCatalogFilter = "";
 
         EquipmentCatalogCategory = Catalog.Equipment
             .First(item => item.Name == "Flak/Jacket").Category;
+        var categoryEquipmentCount = EquipmentCatalogView
+            .Cast<EquipmentCatalogItem>()
+            .Count();
         if (EquipmentCatalogView.Cast<EquipmentCatalogItem>()
             .Any(item => item.Category != EquipmentCatalogCategory))
         {
             throw new InvalidOperationException(
                 "Editor equipment category filtering returned an unrelated row.");
+        }
+        if (!EquipmentCatalogResultSummary.StartsWith(
+                $"{categoryEquipmentCount} of {Catalog.Equipment.Count} ",
+                StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Editor equipment catalog result count did not update after category filtering.");
         }
         EquipmentCatalogCategory = "All equipment";
 
@@ -635,11 +671,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         WeaponCatalogCategory = Catalog.Weapons
             .First(item => item.Name == "Shock Staff").Category;
+        var categoryWeaponCount = WeaponCatalogView
+            .Cast<WeaponCatalogItem>()
+            .Count();
         if (WeaponCatalogView.Cast<WeaponCatalogItem>()
             .Any(item => item.Category != WeaponCatalogCategory))
         {
             throw new InvalidOperationException(
                 "Editor weapon category filtering returned an unrelated row.");
+        }
+        if (!WeaponCatalogResultSummary.StartsWith(
+                $"{categoryWeaponCount} of {Catalog.Weapons.Count} ",
+                StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Editor weapon catalog result count did not update after category filtering.");
         }
         WeaponCatalogCategory = "All weapons";
         GameYear = 3045;
@@ -1367,6 +1413,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         OnPropertyChanged(nameof(WeaponCatalogCategories));
         OnPropertyChanged(nameof(EquipmentCatalogView));
         OnPropertyChanged(nameof(WeaponCatalogView));
+        OnPropertyChanged(nameof(EquipmentCatalogResultSummary));
+        OnPropertyChanged(nameof(WeaponCatalogResultSummary));
+    }
+
+    private static string BuildCatalogResultSummary(
+        ICollectionView view,
+        int total,
+        string singular,
+        string plural)
+    {
+        var visible = view.Cast<object>().Count();
+        var label = visible == 1 ? singular : plural;
+        return visible == total
+            ? $"{visible} {label}"
+            : $"{visible} of {total} {plural}";
     }
 
     private string BuildEraAvailabilitySummary()
