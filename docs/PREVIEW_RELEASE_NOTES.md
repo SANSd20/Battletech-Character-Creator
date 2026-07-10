@@ -1,4 +1,4 @@
-# A Time of War Character Creator 0.1.9-preview Beta
+# A Time of War Character Creator 0.1.10-preview Beta
 
 This is a beta refresh of the .NET/WPF migration. It is intended for manual
 testing, feedback, and continued rule audit work, not as the final stable
@@ -34,6 +34,7 @@ release.
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
 - Review Character keeps the last valid totals during temporary wizard refreshes
+- Review Character can spend remaining Free XP to fix Attribute, Trait, and Skill prerequisite gaps
 - Character editor with XP controls for attributes, skills, and traits, including
   5 XP and 10 XP adjustment buttons
 - Legacy `.btcc` save/load compatibility

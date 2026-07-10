@@ -734,12 +734,21 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="7"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="7"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock x:Name="ReviewRuleStatus"
                                        FontWeight="SemiBold"
                                        TextWrapping="Wrap"/>
-                            <DataGrid Grid.Row="2"
+                            <Button Grid.Row="2"
+                                    x:Name="ResetReviewXpButton"
+                                    Content="Reset Review XP"
+                                    HorizontalAlignment="Left"
+                                    Padding="10,3"
+                                    Click="ResetReviewXp_Click"
+                                    Visibility="Collapsed"/>
+                            <DataGrid Grid.Row="4"
                                       x:Name="ReviewIssues"
                                       AutoGenerateColumns="False"
                                       CanUserAddRows="False"
@@ -750,6 +759,18 @@
                                     <DataGridTextColumn Header="Requirement" Binding="{Binding Name}" Width="135"/>
                                     <DataGridTextColumn Header="Need" Binding="{Binding RequiredXp}" Width="40"/>
                                     <DataGridTextColumn Header="Have" Binding="{Binding ActualXp}" Width="40"/>
+                                    <DataGridTextColumn Header="Gap" Binding="{Binding MissingXp}" Width="40"/>
+                                    <DataGridTemplateColumn Header="Fix" Width="90">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="{Binding ActionText}"
+                                                        Tag="{Binding}"
+                                                        Click="SpendReviewFreeXp_Click"
+                                                        IsEnabled="{Binding CanSpendFreeXp}"
+                                                        Padding="7,2"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>

@@ -1,7 +1,7 @@
 param(
-    [string]$InstallerPath = "niss\atow-character-creator-0.1.9-preview-setup.exe",
+    [string]$InstallerPath = "niss\atow-character-creator-0.1.10-preview-setup.exe",
     [string]$InstallDir = (Join-Path $env:TEMP "A-Time-of-War-Installer-Smoke"),
-    [string]$ExpectedVersion = "0.1.9-preview",
+    [string]$ExpectedVersion = "0.1.10-preview",
     [switch]$DryRun
 )
 

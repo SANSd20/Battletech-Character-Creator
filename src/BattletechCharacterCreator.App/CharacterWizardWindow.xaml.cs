@@ -24,6 +24,7 @@ public partial class CharacterWizardWindow : Window
     private string lastRunningFreeXp = "";
     private int currentStep;
     private bool refreshing;
+    private readonly Dictionary<string, int> reviewFreeXpAllocations = [];
 
     private sealed record ChoiceInput(
         IReadOnlyList<ComboBox> Pickers,
@@ -55,6 +56,18 @@ public partial class CharacterWizardWindow : Window
     private sealed record CareerAvailability(
         LifePathModule Module,
         IReadOnlyList<PrerequisiteIssue> Issues);
+
+    private sealed record ReviewIssueRow(
+        PrerequisiteIssue Issue,
+        int MissingXp,
+        bool CanSpendFreeXp,
+        string ActionText)
+    {
+        public string Category => Issue.Category;
+        public string Name => Issue.Name;
+        public int RequiredXp => Issue.RequiredXp;
+        public int ActualXp => Issue.ActualXp;
+    }
 
     private static string IssueKey(PrerequisiteIssue issue) =>
         $"{issue.Category}|{issue.Name}|{issue.RequiredXp}|{issue.ActualXp}";
@@ -665,6 +678,42 @@ public partial class CharacterWizardWindow : Window
                 "The default wizard path has a blocking affiliation conflict.");
         }
         CreatedCharacter = character;
+    }
+
+    public void SmokeReviewFreeXpFix()
+    {
+        reviewFreeXpAllocations.Clear();
+        var character = BuildCharacter();
+        var bod = character.Attributes.Single(item => item.Name == "BOD");
+        var issue = new PrerequisiteIssue("Attribute", "BOD", bod.Value + 100, bod.Value);
+        var row = BuildReviewIssueRows(
+                [issue],
+                CharacterRules.Calculate(character).FreeXp)
+            .Single();
+        if (!row.CanSpendFreeXp || row.MissingXp != 100)
+        {
+            throw new InvalidOperationException(
+                "Review rule-check XP fix was not available for an affordable Attribute gap.");
+        }
+
+        SpendReviewFreeXp_Click(new Button { Tag = row }, new RoutedEventArgs());
+        var fixedCharacter = BuildCharacter();
+        var fixedBod = fixedCharacter.Attributes.Single(item => item.Name == "BOD");
+        if (fixedBod.Value != issue.RequiredXp)
+        {
+            throw new InvalidOperationException(
+                "Review rule-check XP fix did not spend Free XP on the target Attribute.");
+        }
+
+        ResetReviewXp_Click(this, new RoutedEventArgs());
+        var resetBod = BuildCharacter()
+            .Attributes
+            .Single(item => item.Name == "BOD");
+        if (resetBod.Value != bod.Value)
+        {
+            throw new InvalidOperationException(
+                "Reset Review XP did not remove Review-screen XP allocations.");
+        }
     }
 
     public IReadOnlyList<Character> SmokeRepresentativeLifePaths()
@@ -2443,6 +2492,7 @@ public partial class CharacterWizardWindow : Window
                 ReviewCharacterSummary.Text = "";
                 ReviewLifePath.Text = "";
                 ReviewRuleStatus.Text = "Complete the earlier stages to review this character.";
+                ResetReviewXpButton.Visibility = Visibility.Collapsed;
             }
             if (TotalsHost.Visibility != Visibility.Visible)
             {
@@ -2454,19 +2504,28 @@ public partial class CharacterWizardWindow : Window
     private void UpdateReview(Character character)
     {
         var issues = PrerequisiteRules.Evaluate(character);
+        var summary = CharacterRules.Calculate(character);
         var blockingCount = issues.Count(issue => issue.Category == "Affiliation");
-        ReviewIssues.ItemsSource = issues;
+        ReviewIssues.ItemsSource = BuildReviewIssueRows(issues, summary.FreeXp);
+        var reviewXp = reviewFreeXpAllocations.Values.Sum();
         ReviewRuleStatus.Text = blockingCount > 0
             ? $"{blockingCount} blocking conflict(s) must be corrected."
             : issues.Count > 0
                 ? $"{issues.Count} prerequisite warning(s) remain."
                 : "Ready to create. No unmet prerequisites found.";
+        if (reviewXp > 0)
+        {
+            ReviewRuleStatus.Text += $" Review Free XP spent: {reviewXp}.";
+        }
         ReviewRuleStatus.Foreground = blockingCount > 0
             ? System.Windows.Media.Brushes.Firebrick
             : issues.Count > 0
                 ? System.Windows.Media.Brushes.DarkGoldenrod
                 : System.Windows.Media.Brushes.DarkGreen;
         CreateButton.IsEnabled = blockingCount == 0;
+        ResetReviewXpButton.Visibility = reviewXp > 0
+            ? Visibility.Visible
+            : Visibility.Collapsed;
 
         ReviewCharacterSummary.Text =
             $"{character.Name}{Environment.NewLine}" +
@@ -2490,6 +2549,68 @@ public partial class CharacterWizardWindow : Window
             $"Late childhood: {character.LateChildhood}{Environment.NewLine}" +
             $"Education: {education}{Environment.NewLine}" +
             $"Careers: {(character.RealLifeHistory.Count == 0 ? "None" : string.Join(" -> ", character.RealLifeHistory))}";
+    }
+
+    private IReadOnlyList<ReviewIssueRow> BuildReviewIssueRows(
+        IReadOnlyList<PrerequisiteIssue> issues,
+        int freeXp)
+    {
+        return issues
+            .Select(issue =>
+            {
+                var missing = Math.Max(0, issue.RequiredXp - issue.ActualXp);
+                var canSpend = IsReviewFreeXpIssue(issue) &&
+                    missing > 0 &&
+                    missing <= freeXp;
+                var action = IsReviewFreeXpIssue(issue)
+                    ? canSpend
+                        ? $"Spend {missing}"
+                        : missing > 0
+                            ? "Need XP"
+                            : "Fixed"
+                    : "Edit stage";
+                return new ReviewIssueRow(issue, missing, canSpend, action);
+            })
+            .ToArray();
+    }
+
+    private static bool IsReviewFreeXpIssue(PrerequisiteIssue issue) =>
+        issue.Category is "Attribute" or "Skill" or "Trait";
+
+    private static string ReviewAllocationKey(string category, string name) =>
+        $"{category}|{name}";
+
+    private void SpendReviewFreeXp_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is not ReviewIssueRow row ||
+            !row.CanSpendFreeXp)
+        {
+            return;
+        }
+
+        var character = BuildCharacter();
+        var freeXp = CharacterRules.Calculate(character).FreeXp;
+        if (row.MissingXp > freeXp)
+        {
+            MessageBox.Show(
+                $"This fix needs {row.MissingXp} XP, but only {freeXp} Free XP remains.",
+                "Not enough Free XP",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            UpdatePreview();
+            return;
+        }
+
+        var key = ReviewAllocationKey(row.Category, row.Name);
+        reviewFreeXpAllocations[key] =
+            reviewFreeXpAllocations.GetValueOrDefault(key) + row.MissingXp;
+        UpdatePreview();
+    }
+
+    private void ResetReviewXp_Click(object sender, RoutedEventArgs e)
+    {
+        reviewFreeXpAllocations.Clear();
+        UpdatePreview();
     }
 
     private static string ValueOrDash(string value) =>
@@ -2645,6 +2766,10 @@ public partial class CharacterWizardWindow : Window
                 character, affiliation, career.Module, language);
         }
         LifePathEngine.ApplyModuleAccounting(character, modules);
+        if (throughStep >= pages.Length - 1)
+        {
+            ApplyReviewFreeXp(character);
+        }
         character.Notes =
             $"-----Life Path-----\nAffiliation: {affiliation.Name}" +
             $"\nSub-affiliation: {character.SubAffiliation}" +
@@ -2657,6 +2782,41 @@ public partial class CharacterWizardWindow : Window
             $"\nEducation Fields: {string.Join(" / ", character.EducationFields)}" +
             $"\nCareers: {string.Join(" -> ", character.RealLifeHistory)}";
         return character;
+    }
+
+    private void ApplyReviewFreeXp(Character character)
+    {
+        foreach (var allocation in reviewFreeXpAllocations)
+        {
+            var parts = allocation.Key.Split('|', 2);
+            if (parts.Length != 2 || allocation.Value <= 0) continue;
+            var (category, name) = (parts[0], parts[1]);
+            var values = category switch
+            {
+                "Attribute" => character.Attributes,
+                "Skill" => character.Skills,
+                "Trait" => character.Traits,
+                _ => null
+            };
+            if (values is null) continue;
+            AddReviewXp(values, name, allocation.Value);
+        }
+    }
+
+    private static void AddReviewXp(
+        ICollection<NamedValue> values,
+        string name,
+        int xp)
+    {
+        var existing = values.FirstOrDefault(item => item.Name == name);
+        if (existing is null)
+        {
+            values.Add(new NamedValue(name, xp));
+        }
+        else
+        {
+            existing.Value += xp;
+        }
     }
 
     private static int CalculateLifePathAge(
