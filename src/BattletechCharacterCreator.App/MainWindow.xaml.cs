@@ -1341,8 +1341,28 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         EquipmentCatalogView = CollectionViewSource.GetDefaultView(Catalog.Equipment);
         EquipmentCatalogView.Filter = MatchesEquipmentCatalogFilter;
+        EquipmentCatalogView.SortDescriptions.Clear();
+        EquipmentCatalogView.SortDescriptions.Add(new SortDescription(
+            nameof(EquipmentCatalogItem.Category),
+            ListSortDirection.Ascending));
+        EquipmentCatalogView.SortDescriptions.Add(new SortDescription(
+            nameof(EquipmentCatalogItem.Name),
+            ListSortDirection.Ascending));
+        EquipmentCatalogView.GroupDescriptions?.Clear();
+        EquipmentCatalogView.GroupDescriptions?.Add(
+            new PropertyGroupDescription(nameof(EquipmentCatalogItem.Category)));
         WeaponCatalogView = CollectionViewSource.GetDefaultView(Catalog.Weapons);
         WeaponCatalogView.Filter = MatchesWeaponCatalogFilter;
+        WeaponCatalogView.SortDescriptions.Clear();
+        WeaponCatalogView.SortDescriptions.Add(new SortDescription(
+            nameof(WeaponCatalogItem.Category),
+            ListSortDirection.Ascending));
+        WeaponCatalogView.SortDescriptions.Add(new SortDescription(
+            nameof(WeaponCatalogItem.Name),
+            ListSortDirection.Ascending));
+        WeaponCatalogView.GroupDescriptions?.Clear();
+        WeaponCatalogView.GroupDescriptions?.Add(
+            new PropertyGroupDescription(nameof(WeaponCatalogItem.Category)));
         OnPropertyChanged(nameof(EquipmentCatalogCategories));
         OnPropertyChanged(nameof(WeaponCatalogCategories));
         OnPropertyChanged(nameof(EquipmentCatalogView));

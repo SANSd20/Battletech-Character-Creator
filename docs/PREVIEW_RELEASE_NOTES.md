@@ -1,4 +1,4 @@
-# A Time of War Character Creator 0.1.7-preview Beta
+# A Time of War Character Creator 0.1.8-preview Beta
 
 This is a beta refresh of the .NET/WPF migration. It is intended for manual
 testing, feedback, and continued rule audit work, not as the final stable
@@ -39,6 +39,7 @@ release.
 - Legacy `.btcc` save/load compatibility
 - Searchable equipment and weapon catalogs with C-Bill and mass summaries
 - Equipment and weapon catalog filters for faster inventory selection
+- Equipment and weapon catalog dropdowns group results by category for easier scanning
 - Selected equipment and weapon detail panels for source and rules context
 - Selected equipment and weapon detail panels show campaign-year era warnings
 - Inventory status warnings for over-budget, overloaded, manually priced wildcard items,

@@ -695,7 +695,22 @@
                                       DisplayMemberPath="Name"
                                       IsEditable="True"
                                       IsTextSearchEnabled="True"
-                                      Margin="0,0,8,8"/>
+                                      Margin="0,0,8,8">
+                                <ComboBox.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.HeaderTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#4D4B45"
+                                                           Background="#E9E6DD"
+                                                           Padding="6,3"
+                                                           Margin="0,4,0,2"/>
+                                            </DataTemplate>
+                                        </GroupStyle.HeaderTemplate>
+                                    </GroupStyle>
+                                </ComboBox.GroupStyle>
+                            </ComboBox>
                             <TextBlock Grid.Column="1"
                                        Text="{Binding SelectedEquipmentSourceLabel}"
                                        VerticalAlignment="Center"
@@ -816,7 +831,22 @@
                                       DisplayMemberPath="Name"
                                       IsEditable="True"
                                       IsTextSearchEnabled="True"
-                                      Margin="0,0,8,8"/>
+                                      Margin="0,0,8,8">
+                                <ComboBox.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.HeaderTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#4D4B45"
+                                                           Background="#E9E6DD"
+                                                           Padding="6,3"
+                                                           Margin="0,4,0,2"/>
+                                            </DataTemplate>
+                                        </GroupStyle.HeaderTemplate>
+                                    </GroupStyle>
+                                </ComboBox.GroupStyle>
+                            </ComboBox>
                             <TextBlock Grid.Column="1"
                                        Text="{Binding SelectedWeaponSourceLabel}"
                                        VerticalAlignment="Center"
