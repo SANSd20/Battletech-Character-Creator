@@ -1,4 +1,4 @@
-# A Time of War Character Creator 0.1.11-preview Beta
+# A Time of War Character Creator 0.1.12-preview Beta
 
 This is a beta refresh of the .NET/WPF migration of the original BattleTech
 Character Creator. It is ready for broader manual testing and feedback, but it
@@ -6,10 +6,10 @@ is not the final stable release.
 
 ## Download
 
-Attach these files from `artifacts\release\0.1.11-preview`:
+Attach these files from `artifacts\release\0.1.12-preview`:
 
-- `atow-character-creator-0.1.11-preview-<commit>-setup.exe`
-- `atow-character-creator-0.1.11-preview-<commit>-setup.exe.sha256`
+- `atow-character-creator-0.1.12-preview-<commit>-setup.exe`
+- `atow-character-creator-0.1.12-preview-<commit>-setup.exe.sha256`
 - `PREVIEW_RELEASE_NOTES.md`
 - `release-manifest.txt`
 
@@ -83,6 +83,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Review Character keeps the last valid totals during temporary wizard refreshes
 - Review Character can spend remaining Free XP to fix Attribute, Trait, and Skill prerequisite gaps
 - Wizard now has a dedicated Free XP step before final Review, with rule-check fixes moved there
+- Free XP step can manually spend remaining XP on selected Traits and Skills
 - Character editor with XP controls for attributes, skills, and traits, including
   5 XP and 10 XP adjustment buttons
 - Legacy `.btcc` save/load compatibility
