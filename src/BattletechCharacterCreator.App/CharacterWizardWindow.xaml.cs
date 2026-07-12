@@ -375,6 +375,18 @@ public partial class CharacterWizardWindow : Window
             throw new InvalidOperationException(
                 "Stage 1 preview must add early-childhood attributes after Stage 0.");
         }
+
+        ShowStep(3);
+        var stage2Character = BuildCharacter(3);
+        var stage2ModuleCost = LifePathEngine.CalculateModuleCost(
+            stage2Character, SelectedModules(3));
+        var expectedStage2FreeXp = LifePathEngine.StartingXp - stage2ModuleCost;
+        if (LateChildhoodModuleCost.Text != SelectedLateChildhood!.ModuleCost.ToString() ||
+            RunningFreeXp.Text != expectedStage2FreeXp.ToString())
+        {
+            throw new InvalidOperationException(
+                "Stage 2 preview must show the late-childhood module cost and remove it from running Free XP.");
+        }
     }
 
     public void SmokeAffiliationFilteredChildhoods()
@@ -2480,6 +2492,9 @@ public partial class CharacterWizardWindow : Window
         {
             var character = BuildCharacter(currentStep);
             var summary = CharacterRules.Calculate(character);
+            var moduleCost = LifePathEngine.CalculateModuleCost(
+                character, SelectedModules(currentStep));
+            var moduleRemainingXp = LifePathEngine.StartingXp - moduleCost;
             PreviewAttributes.ItemsSource = character.Attributes;
             PreviewSkills.ItemsSource = character.Skills.OrderBy(item => item.Name);
             PreviewTraits.ItemsSource = character.Traits.OrderBy(item => item.Name);
@@ -2489,15 +2504,13 @@ public partial class CharacterWizardWindow : Window
             ReviewAttributes.ItemsSource = character.Attributes;
             ReviewSkills.ItemsSource = character.Skills.OrderBy(item => item.Name);
             ReviewTraits.ItemsSource = character.Traits.OrderBy(item => item.Name);
-            ModuleCost.Text =
-                LifePathEngine.CalculateModuleCost(
-                    character, SelectedModules(currentStep)).ToString();
+            ModuleCost.Text = moduleCost.ToString();
             SpentXp.Text = summary.SpentXp.ToString();
             FreeXp.Text = summary.FreeXp.ToString();
             FreeXpModuleCost.Text = ModuleCost.Text;
             FreeXpSpentXp.Text = SpentXp.Text;
             FreeXpRemainingXp.Text = FreeXp.Text;
-            RunningFreeXp.Text = summary.FreeXp.ToString();
+            RunningFreeXp.Text = moduleRemainingXp.ToString();
             if (TotalsHost.Visibility == Visibility.Visible)
             {
                 lastTotalsCharacter = character;
