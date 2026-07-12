@@ -14,7 +14,6 @@ public partial class CharacterWizardWindow : Window
     private const int Stage4Step = 5;
     private const int FreeXpStep = 6;
     private const int LateChildhoodCompletionAge = 16;
-    private const int AdultNoEducationAge = 18;
 
     private readonly Dictionary<string, ChoiceInput> choiceControls = [];
     private readonly Dictionary<string, IReadOnlyList<ChoiceAllocation>>
@@ -381,11 +380,27 @@ public partial class CharacterWizardWindow : Window
         var stage2ModuleCost = LifePathEngine.CalculateModuleCost(
             stage2Character, SelectedModules(3));
         var expectedStage2FreeXp = LifePathEngine.StartingXp - stage2ModuleCost;
+        if (stage2Character.Age != LateChildhoodCompletionAge)
+        {
+            throw new InvalidOperationException(
+                "Stage 2 preview must leave the character at age 16 after late childhood.");
+        }
         if (LateChildhoodModuleCost.Text != SelectedLateChildhood!.ModuleCost.ToString() ||
             RunningFreeXp.Text != expectedStage2FreeXp.ToString())
         {
             throw new InvalidOperationException(
                 "Stage 2 preview must show the late-childhood module cost and remove it from running Free XP.");
+        }
+
+        SelectEducationForCapture("trade-school");
+        ShowStep(4);
+        var stage3Character = BuildCharacter(4);
+        var expectedStage3Age = LateChildhoodCompletionAge +
+            SelectedEducationFields().Sum(module => module.TimeYears);
+        if (stage3Character.Age != expectedStage3Age)
+        {
+            throw new InvalidOperationException(
+                "Stage 3 preview must add only selected education time to the age 16 baseline.");
         }
     }
 
@@ -845,13 +860,15 @@ public partial class CharacterWizardWindow : Window
             throw new InvalidOperationException(
                 $"{affiliation} / {career} has incorrect XP accounting.");
         }
-        var expectedAge = AdultNoEducationAge + new[]
-            {
-                SelectedRealLife,
-                SelectedSecondRealLife
-            }
-            .Where(module => module is not null)
-            .Sum(module => module!.TimeYears);
+        var expectedAge = LateChildhoodCompletionAge +
+            SelectedEducationFields().Sum(module => module.TimeYears) +
+            new[]
+                {
+                    SelectedRealLife,
+                    SelectedSecondRealLife
+                }
+                .Where(module => module is not null)
+                .Sum(module => module!.TimeYears);
         if (character.Age != expectedAge ||
             character.BirthYear != character.GameYear - expectedAge)
         {
@@ -2984,17 +3001,12 @@ public partial class CharacterWizardWindow : Window
         }
 
         var age = LateChildhoodCompletionAge;
-        var educationYears = throughStep >= 4
-            ? selectedModules
-                .Where(entry => !entry.IsStage4 &&
-                    entry.Module.Id.StartsWith("field-", StringComparison.Ordinal))
-                .Sum(entry => entry.Module.TimeYears)
-            : 0;
         if (throughStep >= 4)
         {
-            age = educationYears > 0
-                ? age + educationYears
-                : AdultNoEducationAge;
+            age += selectedModules
+                .Where(entry => !entry.IsStage4 &&
+                    entry.Module.Id.StartsWith("field-", StringComparison.Ordinal))
+                .Sum(entry => entry.Module.TimeYears);
         }
         if (throughStep >= 5)
         {
