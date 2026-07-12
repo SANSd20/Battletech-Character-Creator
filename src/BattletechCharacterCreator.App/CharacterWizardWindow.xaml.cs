@@ -1816,7 +1816,14 @@ public partial class CharacterWizardWindow : Window
                         modulePanel.Children.Add(picker);
                     }
                     choiceControls[Key(selectedModule, choice)] =
-                        new ChoiceInput(controls);
+                        choice.Target == EffectTarget.Flexible &&
+                        choice.FixedFlexibleSelections
+                            ? new ChoiceInput(
+                                controls,
+                                Choice: choice,
+                                ModuleName: module.Name,
+                                Step: ChoiceStep(selectedModule))
+                            : new ChoiceInput(controls);
                 }
             }
         }
@@ -2056,6 +2063,33 @@ public partial class CharacterWizardWindow : Window
     {
         var choice = input.Choice!;
         var requiredXp = choice.Xp * choice.Count;
+        if (choice.FixedFlexibleSelections)
+        {
+            var selected = input.Pickers
+                .Select(picker => picker.SelectedItem as string ?? "")
+                .Where(name => name.Length > 0)
+                .ToArray();
+            var duplicateFixedTarget = selected
+                .GroupBy(name => name, StringComparer.Ordinal)
+                .FirstOrDefault(group => group.Count() > 1);
+            if (duplicateFixedTarget is not null)
+            {
+                return new FlexibleChoiceResult(false, requiredXp,
+                    $"{input.ModuleName}: choose each flexible XP target only once.");
+            }
+
+            var missing = choice.Count - selected.Length;
+            if (missing > 0)
+            {
+                var targetWord = missing == 1 ? "target" : "targets";
+                return new FlexibleChoiceResult(false, missing * choice.Xp,
+                    $"{input.ModuleName}: choose {missing} more flexible XP " +
+                    $"{targetWord} before continuing.");
+            }
+
+            return new FlexibleChoiceResult(true, 0, "");
+        }
+
         var allocations = input.Pickers.Zip(input.Amounts ?? [])
             .Select(pair => new
             {
