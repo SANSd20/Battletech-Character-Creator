@@ -6,7 +6,7 @@ pass.
 
 ## Install and Launch
 
-- Install the packaged `atow-character-creator-0.1.10-preview-<commit>-setup.exe`.
+- Install the packaged `atow-character-creator-0.1.11-preview-<commit>-setup.exe`.
 - Launch the app from the Start Menu shortcut.
 - Confirm the first window offers Character Wizard and Character Editor.
 - Open the Character Editor directly and confirm it starts without an error.

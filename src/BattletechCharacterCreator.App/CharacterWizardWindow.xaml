@@ -65,7 +65,8 @@
                     <TextBlock x:Name="Step3Label" Text="04  Stage 2 · Late Childhood" Style="{StaticResource StepLabel}"/>
                     <TextBlock x:Name="Step4Label" Text="05  Stage 3 · Education" Style="{StaticResource StepLabel}"/>
                     <TextBlock x:Name="Step5Label" Text="06  Stage 4 · Careers" Style="{StaticResource StepLabel}"/>
-                    <TextBlock x:Name="Step6Label" Text="07  Review" Style="{StaticResource StepLabel}"/>
+                    <TextBlock x:Name="Step6Label" Text="07  Free XP" Style="{StaticResource StepLabel}"/>
+                    <TextBlock x:Name="Step7Label" Text="08  Review" Style="{StaticResource StepLabel}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -665,6 +666,94 @@
                 </Grid>
             </Grid>
 
+            <Grid x:Name="FreeXpPage" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="102"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="102"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="102"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="FREE XP" Style="{StaticResource SectionTitle}" Margin="0"/>
+                    <Border Grid.Column="2" BorderBrush="#A7A7A2" BorderThickness="1" Padding="7,5">
+                        <StackPanel>
+                            <TextBlock Text="MODULE XP" FontSize="11" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="FreeXpModuleCost" FontFamily="{StaticResource MontserratBlack}"
+                                       FontSize="20" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="4" BorderBrush="#A7A7A2" BorderThickness="1" Padding="7,5">
+                        <StackPanel>
+                            <TextBlock Text="ALLOCATED XP" FontSize="11" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="FreeXpSpentXp" FontFamily="{StaticResource MontserratBlack}"
+                                       FontSize="20" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="6" BorderBrush="#A7A7A2" BorderThickness="1" Padding="7,5">
+                        <StackPanel>
+                            <TextBlock Text="FREE XP" FontSize="11" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="FreeXpRemainingXp" FontFamily="{StaticResource MontserratBlack}"
+                                       FontSize="20" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <GroupBox Grid.Row="2" Header="Rule Check">
+                    <Grid Margin="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock x:Name="ReviewRuleStatus"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap"/>
+                        <Button Grid.Row="2"
+                                x:Name="ResetReviewXpButton"
+                                Content="Reset Review XP"
+                                HorizontalAlignment="Left"
+                                Padding="10,3"
+                                Click="ResetReviewXp_Click"
+                                Visibility="Collapsed"/>
+                        <DataGrid Grid.Row="4"
+                                  x:Name="ReviewIssues"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Type" Binding="{Binding Category}" Width="90"/>
+                                <DataGridTextColumn Header="Requirement" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTextColumn Header="Need" Binding="{Binding RequiredXp}" Width="70"/>
+                                <DataGridTextColumn Header="Have" Binding="{Binding ActualXp}" Width="70"/>
+                                <DataGridTextColumn Header="Gap" Binding="{Binding MissingXp}" Width="70"/>
+                                <DataGridTemplateColumn Header="Fix" Width="110">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="{Binding ActionText}"
+                                                    Tag="{Binding}"
+                                                    Click="SpendReviewFreeXp_Click"
+                                                    IsEnabled="{Binding CanSpendFreeXp}"
+                                                    Padding="7,2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+
             <Grid x:Name="ReviewPage" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -729,51 +818,13 @@
                                        LineHeight="19"/>
                         </ScrollViewer>
                     </GroupBox>
-                    <GroupBox Grid.Column="4" Header="Rule Check">
-                        <Grid Margin="7,4">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="7"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="7"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock x:Name="ReviewRuleStatus"
+                    <GroupBox Grid.Column="4" Header="Final Check">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="9,5">
+                            <TextBlock x:Name="ReviewFinalStatus"
+                                       TextWrapping="Wrap"
                                        FontWeight="SemiBold"
-                                       TextWrapping="Wrap"/>
-                            <Button Grid.Row="2"
-                                    x:Name="ResetReviewXpButton"
-                                    Content="Reset Review XP"
-                                    HorizontalAlignment="Left"
-                                    Padding="10,3"
-                                    Click="ResetReviewXp_Click"
-                                    Visibility="Collapsed"/>
-                            <DataGrid Grid.Row="4"
-                                      x:Name="ReviewIssues"
-                                      AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
-                                      IsReadOnly="True"
-                                      HeadersVisibility="Column">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Type" Binding="{Binding Category}" Width="70"/>
-                                    <DataGridTextColumn Header="Requirement" Binding="{Binding Name}" Width="135"/>
-                                    <DataGridTextColumn Header="Need" Binding="{Binding RequiredXp}" Width="40"/>
-                                    <DataGridTextColumn Header="Have" Binding="{Binding ActualXp}" Width="40"/>
-                                    <DataGridTextColumn Header="Gap" Binding="{Binding MissingXp}" Width="40"/>
-                                    <DataGridTemplateColumn Header="Fix" Width="90">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Button Content="{Binding ActionText}"
-                                                        Tag="{Binding}"
-                                                        Click="SpendReviewFreeXp_Click"
-                                                        IsEnabled="{Binding CanSpendFreeXp}"
-                                                        Padding="7,2"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Grid>
+                                       LineHeight="19"/>
+                        </ScrollViewer>
                     </GroupBox>
                 </Grid>
 

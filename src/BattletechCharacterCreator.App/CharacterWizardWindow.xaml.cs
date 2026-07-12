@@ -11,6 +11,8 @@ namespace BattletechCharacterCreator.App;
 
 public partial class CharacterWizardWindow : Window
 {
+    private const int Stage4Step = 5;
+    private const int FreeXpStep = 6;
     private const int LateChildhoodCompletionAge = 16;
     private const int AdultNoEducationAge = 18;
 
@@ -78,12 +80,12 @@ public partial class CharacterWizardWindow : Window
         pages =
         [
             BasicInfoPage, Stage0Page, Stage1Page, Stage2Page,
-            Stage3Page, Stage4Page, ReviewPage
+            Stage3Page, Stage4Page, FreeXpPage, ReviewPage
         ];
         stepLabels =
         [
             Step0Label, Step1Label, Step2Label, Step3Label,
-            Step4Label, Step5Label, Step6Label
+            Step4Label, Step5Label, Step6Label, Step7Label
         ];
 
         var resourcePath = Path.Combine(AppContext.BaseDirectory, "Resources");
@@ -524,7 +526,7 @@ public partial class CharacterWizardWindow : Window
         NextButton.IsDefault = currentStep < pages.Length - 1;
         CreateButton.IsDefault = currentStep == pages.Length - 1;
 
-        if (currentStep == 5)
+        if (currentStep == Stage4Step)
         {
             refreshing = true;
             RefreshCareerOptions();
@@ -2439,6 +2441,9 @@ public partial class CharacterWizardWindow : Window
                     character, SelectedModules(currentStep)).ToString();
             SpentXp.Text = summary.SpentXp.ToString();
             FreeXp.Text = summary.FreeXp.ToString();
+            FreeXpModuleCost.Text = ModuleCost.Text;
+            FreeXpSpentXp.Text = SpentXp.Text;
+            FreeXpRemainingXp.Text = FreeXp.Text;
             RunningFreeXp.Text = summary.FreeXp.ToString();
             if (TotalsHost.Visibility == Visibility.Visible)
             {
@@ -2492,6 +2497,10 @@ public partial class CharacterWizardWindow : Window
                 ReviewCharacterSummary.Text = "";
                 ReviewLifePath.Text = "";
                 ReviewRuleStatus.Text = "Complete the earlier stages to review this character.";
+                ReviewFinalStatus.Text = "";
+                FreeXpModuleCost.Text = "";
+                FreeXpSpentXp.Text = "";
+                FreeXpRemainingXp.Text = "";
                 ResetReviewXpButton.Visibility = Visibility.Collapsed;
             }
             if (TotalsHost.Visibility != Visibility.Visible)
@@ -2522,6 +2531,8 @@ public partial class CharacterWizardWindow : Window
             : issues.Count > 0
                 ? System.Windows.Media.Brushes.DarkGoldenrod
                 : System.Windows.Media.Brushes.DarkGreen;
+        ReviewFinalStatus.Text = ReviewRuleStatus.Text;
+        ReviewFinalStatus.Foreground = ReviewRuleStatus.Foreground;
         CreateButton.IsEnabled = blockingCount == 0;
         ResetReviewXpButton.Visibility = reviewXp > 0
             ? Visibility.Visible
@@ -2766,7 +2777,7 @@ public partial class CharacterWizardWindow : Window
                 character, affiliation, career.Module, language);
         }
         LifePathEngine.ApplyModuleAccounting(character, modules);
-        if (throughStep >= pages.Length - 1)
+        if (throughStep >= FreeXpStep)
         {
             ApplyReviewFreeXp(character);
         }
