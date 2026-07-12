@@ -706,52 +706,135 @@
                     </Border>
                 </Grid>
 
-                <GroupBox Grid.Row="2" Header="Rule Check">
-                    <Grid Margin="8">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="8"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="8"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock x:Name="ReviewRuleStatus"
-                                   FontWeight="SemiBold"
-                                   TextWrapping="Wrap"/>
-                        <Button Grid.Row="2"
-                                x:Name="ResetReviewXpButton"
-                                Content="Reset Review XP"
-                                HorizontalAlignment="Left"
-                                Padding="10,3"
-                                Click="ResetReviewXp_Click"
-                                Visibility="Collapsed"/>
-                        <DataGrid Grid.Row="4"
-                                  x:Name="ReviewIssues"
-                                  AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  IsReadOnly="True"
-                                  HeadersVisibility="Column">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Type" Binding="{Binding Category}" Width="90"/>
-                                <DataGridTextColumn Header="Requirement" Binding="{Binding Name}" Width="*"/>
-                                <DataGridTextColumn Header="Need" Binding="{Binding RequiredXp}" Width="70"/>
-                                <DataGridTextColumn Header="Have" Binding="{Binding ActualXp}" Width="70"/>
-                                <DataGridTextColumn Header="Gap" Binding="{Binding MissingXp}" Width="70"/>
-                                <DataGridTemplateColumn Header="Fix" Width="110">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button Content="{Binding ActionText}"
-                                                    Tag="{Binding}"
-                                                    Click="SpendReviewFreeXp_Click"
-                                                    IsEnabled="{Binding CanSpendFreeXp}"
-                                                    Padding="7,2"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
-                </GroupBox>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.05*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="1.25*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="Spend Free XP">
+                        <Grid Margin="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="58"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="70"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <ComboBox x:Name="FreeXpTraitPicker"
+                                          IsEditable="True"
+                                          IsTextSearchEnabled="True"/>
+                                <TextBox Grid.Column="2"
+                                         x:Name="FreeXpTraitAmount"
+                                         Text="0"
+                                         HorizontalContentAlignment="Right"
+                                         VerticalContentAlignment="Center"/>
+                                <Button Grid.Column="4"
+                                        Content="Add"
+                                        Click="AddFreeXpTrait_Click"/>
+                                <ComboBox Grid.Row="2"
+                                          x:Name="FreeXpSkillPicker"
+                                          IsEditable="True"
+                                          IsTextSearchEnabled="True"/>
+                                <TextBox Grid.Row="2"
+                                         Grid.Column="2"
+                                         x:Name="FreeXpSkillAmount"
+                                         Text="0"
+                                         HorizontalContentAlignment="Right"
+                                         VerticalContentAlignment="Center"/>
+                                <Button Grid.Row="2"
+                                        Grid.Column="4"
+                                        Content="Add"
+                                        Click="AddFreeXpSkill_Click"/>
+                            </Grid>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <DataGrid x:Name="FreeXpTraitAllocations"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          IsReadOnly="True"
+                                          HeadersVisibility="Column">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Traits" Binding="{Binding Name}" Width="*"/>
+                                        <DataGridTextColumn Header="XP" Binding="{Binding Xp}" Width="55"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <DataGrid Grid.Column="2"
+                                          x:Name="FreeXpSkillAllocations"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          IsReadOnly="True"
+                                          HeadersVisibility="Column">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Skills" Binding="{Binding Name}" Width="*"/>
+                                        <DataGridTextColumn Header="XP" Binding="{Binding Xp}" Width="55"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Column="2" Header="Rule Check">
+                        <Grid Margin="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="ReviewRuleStatus"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"/>
+                            <Button Grid.Row="2"
+                                    x:Name="ResetReviewXpButton"
+                                    Content="Reset Free XP"
+                                    HorizontalAlignment="Left"
+                                    Padding="10,3"
+                                    Click="ResetReviewXp_Click"
+                                    Visibility="Collapsed"/>
+                            <DataGrid Grid.Row="4"
+                                      x:Name="ReviewIssues"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Type" Binding="{Binding Category}" Width="78"/>
+                                    <DataGridTextColumn Header="Requirement" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTextColumn Header="Need" Binding="{Binding RequiredXp}" Width="54"/>
+                                    <DataGridTextColumn Header="Have" Binding="{Binding ActualXp}" Width="54"/>
+                                    <DataGridTextColumn Header="Gap" Binding="{Binding MissingXp}" Width="48"/>
+                                    <DataGridTemplateColumn Header="Fix" Width="92">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="{Binding ActionText}"
+                                                        Tag="{Binding}"
+                                                        Click="SpendReviewFreeXp_Click"
+                                                        IsEnabled="{Binding CanSpendFreeXp}"
+                                                        Padding="7,2"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
             </Grid>
 
             <Grid x:Name="ReviewPage" Visibility="Collapsed">

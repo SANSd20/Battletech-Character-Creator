@@ -71,6 +71,8 @@ public partial class CharacterWizardWindow : Window
         public int ActualXp => Issue.ActualXp;
     }
 
+    private sealed record FreeXpAllocationRow(string Name, int Xp);
+
     private static string IssueKey(PrerequisiteIssue issue) =>
         $"{issue.Category}|{issue.Name}|{issue.RequiredXp}|{issue.ActualXp}";
 
@@ -94,6 +96,8 @@ public partial class CharacterWizardWindow : Window
         EyeColorPicker.ItemsSource = resources.EyeColors;
         SexPicker.ItemsSource = new[] { "Male", "Female" };
         SexPicker.SelectedIndex = 0;
+        FreeXpTraitPicker.ItemsSource = resources.TraitNames;
+        FreeXpSkillPicker.ItemsSource = resources.SkillNames;
 
         RefreshEraAvailability();
         AffiliationPicker.ItemsSource = BirthAffiliations;
@@ -716,6 +720,21 @@ public partial class CharacterWizardWindow : Window
             throw new InvalidOperationException(
                 "Reset Review XP did not remove Review-screen XP allocations.");
         }
+
+        FreeXpSkillPicker.Text = "Acrobatics";
+        FreeXpSkillAmount.Text = "25";
+        AddFreeXpSkill_Click(this, new RoutedEventArgs());
+        var manualCharacter = BuildCharacter();
+        if (!manualCharacter.Skills.Any(item =>
+                item.Name == "Acrobatics" && item.Value >= 25) ||
+            CharacterRules.Calculate(manualCharacter).FreeXp !=
+            CharacterRules.Calculate(character).FreeXp - 25)
+        {
+            throw new InvalidOperationException(
+                "Manual Free XP spending did not apply to the selected Skill.");
+        }
+
+        ResetReviewXp_Click(this, new RoutedEventArgs());
     }
 
     public IReadOnlyList<Character> SmokeRepresentativeLifePaths()
@@ -2501,6 +2520,7 @@ public partial class CharacterWizardWindow : Window
                 FreeXpModuleCost.Text = "";
                 FreeXpSpentXp.Text = "";
                 FreeXpRemainingXp.Text = "";
+                RefreshFreeXpAllocationLists();
                 ResetReviewXpButton.Visibility = Visibility.Collapsed;
             }
             if (TotalsHost.Visibility != Visibility.Visible)
@@ -2537,6 +2557,7 @@ public partial class CharacterWizardWindow : Window
         ResetReviewXpButton.Visibility = reviewXp > 0
             ? Visibility.Visible
             : Visibility.Collapsed;
+        RefreshFreeXpAllocationLists();
 
         ReviewCharacterSummary.Text =
             $"{character.Name}{Environment.NewLine}" +
@@ -2618,11 +2639,87 @@ public partial class CharacterWizardWindow : Window
         UpdatePreview();
     }
 
+    private void AddFreeXpTrait_Click(object sender, RoutedEventArgs e) =>
+        AddManualFreeXp("Trait", FreeXpTraitPicker.Text, FreeXpTraitAmount);
+
+    private void AddFreeXpSkill_Click(object sender, RoutedEventArgs e) =>
+        AddManualFreeXp("Skill", FreeXpSkillPicker.Text, FreeXpSkillAmount);
+
+    private void AddManualFreeXp(
+        string category,
+        string target,
+        TextBox amountBox)
+    {
+        target = target.Trim();
+        if (target.Length == 0)
+        {
+            MessageBox.Show(
+                "Choose a target before spending Free XP.",
+                "Choose a target",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
+
+        if (!int.TryParse(amountBox.Text, out var xp) || xp <= 0)
+        {
+            MessageBox.Show(
+                "Enter a positive XP amount.",
+                "Invalid XP",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
+
+        var freeXp = CharacterRules.Calculate(BuildCharacter()).FreeXp;
+        if (xp > freeXp)
+        {
+            MessageBox.Show(
+                $"This spend needs {xp} XP, but only {freeXp} Free XP remains.",
+                "Not enough Free XP",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            UpdatePreview();
+            return;
+        }
+
+        var key = ReviewAllocationKey(category, target);
+        reviewFreeXpAllocations[key] =
+            reviewFreeXpAllocations.GetValueOrDefault(key) + xp;
+        amountBox.Text = "0";
+        UpdatePreview();
+    }
+
     private void ResetReviewXp_Click(object sender, RoutedEventArgs e)
     {
         reviewFreeXpAllocations.Clear();
         UpdatePreview();
     }
+
+    private void RefreshFreeXpAllocationLists()
+    {
+        FreeXpTraitAllocations.ItemsSource =
+            BuildFreeXpAllocationRows("Trait");
+        FreeXpSkillAllocations.ItemsSource =
+            BuildFreeXpAllocationRows("Skill");
+    }
+
+    private IReadOnlyList<FreeXpAllocationRow> BuildFreeXpAllocationRows(
+        string category) =>
+        reviewFreeXpAllocations
+            .Select(allocation => new
+            {
+                Parts = allocation.Key.Split('|', 2),
+                allocation.Value
+            })
+            .Where(allocation => allocation.Parts.Length == 2 &&
+                allocation.Parts[0] == category &&
+                allocation.Value != 0)
+            .Select(allocation => new FreeXpAllocationRow(
+                allocation.Parts[1],
+                allocation.Value))
+            .OrderBy(row => row.Name)
+            .ToArray();
 
     private static string ValueOrDash(string value) =>
         string.IsNullOrWhiteSpace(value) ? "-" : value;
