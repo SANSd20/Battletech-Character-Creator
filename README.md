@@ -60,7 +60,7 @@ character editor for *A Time of War*.
 
 The current Windows beta is available from the
 [GitHub Releases page](https://github.com/SANSd20/Battletech-Character-Creator/releases).
-The current preview line is `0.1.21-preview`. This beta is intended for
+The current preview line is `0.1.22-preview`. This beta is intended for
 manual testing and feedback while the final rulebook audit, optional Companion
 coverage, and interface polish continue.
 
@@ -153,6 +153,8 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
   and weapon category survives save/load
 - Specialty ammunition filtering now honors rifle-only, shotgun-only,
   and support-Gauss restrictions from the modifier table
+- Guided Rifle Modules and Radioactive Tracker Scanner are imported as core
+  equipment catalog entries for specialty ammunition support
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
   cosmetic adaptation kits, plus advanced combat practice equipment, light

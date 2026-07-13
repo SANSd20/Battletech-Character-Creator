@@ -216,6 +216,10 @@ nocombat;Leatherwear/Apron;25;1.2;T;1/1/0/1;Apron only covers front
  
 # Remote Sensors - remsens 
  
+# Weapon Accessories - weapacc
+weapacc;Guided Rifle Modules;2000;0.25;Weapon Accessory;-;Attach to weapons using Guided Gyrojet or Air-Burst rifle ammunition; requires power pack, p.286
+weapacc;Radioactive Tracker Scanner;2250;0.1;Weapon Accessory;-;Detects targets painted by Radioactive Tracker rounds; max range 35m; requires power pack, p.286
+
 # Power Pack - cptpower 
  
 # RecHANrgers - recHANr 

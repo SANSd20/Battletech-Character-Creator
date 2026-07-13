@@ -351,8 +351,17 @@ static void CheckResourceCatalog()
     var companionCatalog = ResourceCatalog.Load(
         resources,
         new ResourceCatalogOptions(IncludeCompanion: true));
-    Assert(catalog.Equipment.Count == 187,
-        "All 187 legacy equipment entries must be imported.");
+    Assert(catalog.Equipment.Count == 189,
+        "All 189 core equipment entries must be imported.");
+    Assert(catalog.Equipment.Single(item =>
+            item.Name == "Guided Rifle Modules").Cost == "2000" &&
+        catalog.Equipment.Single(item =>
+            item.Name == "Guided Rifle Modules").Mass == "0.25" &&
+        catalog.Equipment.Single(item =>
+            item.Name == "Radioactive Tracker Scanner").Cost == "2250" &&
+        catalog.Equipment.Single(item =>
+            item.Name == "Radioactive Tracker Scanner").Mass == "0.1",
+        "Specialty ammunition support accessories must be imported as equipment.");
     Assert(catalog.Weapons.Count == 209,
         "All 209 legacy weapon entries must be imported.");
     Assert(catalog.AmmoModifiers.Count == 15,
@@ -380,7 +389,7 @@ Assert(catalog.AmmoModifiers.Single(item =>
         catalog.AmmoModifiers.Single(item =>
             item.Name == "GDPC Rounds").ExcludedNameTerms.SequenceEqual(["Pistol", "Submaschine"]),
         "Specialty ammunition modifier table values and compatibility rules must be imported.");
-    Assert(companionCatalog.Equipment.Count == 286,
+    Assert(companionCatalog.Equipment.Count == 288,
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,
         "Companion-enabled weapons must include the starter Companion import.");
