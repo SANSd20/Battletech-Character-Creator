@@ -17,7 +17,23 @@ if (!(Test-Path -LiteralPath $planPath)) {
 
 $commit = git rev-parse --short HEAD
 if ([string]::IsNullOrWhiteSpace($InstallerPath)) {
-    $InstallerPath = "artifacts\release\$Version\atow-character-creator-$Version-$commit-setup.exe"
+    $releaseDirectory = Join-Path $repoRoot "artifacts\release\$Version"
+    $exactInstallerPath = Join-Path $releaseDirectory "atow-character-creator-$Version-$commit-setup.exe"
+    if (Test-Path -LiteralPath $exactInstallerPath) {
+        $InstallerPath = $exactInstallerPath
+    } else {
+        $latestInstaller = Get-ChildItem `
+                -LiteralPath $releaseDirectory `
+                -Filter "atow-character-creator-$Version-*-setup.exe" `
+                -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTimeUtc -Descending |
+            Select-Object -First 1
+        $InstallerPath = if ($null -ne $latestInstaller) {
+            $latestInstaller.FullName
+        } else {
+            $exactInstallerPath
+        }
+    }
 }
 $created = Get-Date -Format "yyyy-MM-dd HH:mm:ss K"
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -36,12 +52,30 @@ $installerFullPath = if ([System.IO.Path]::IsPathRooted($InstallerPath)) {
     Join-Path $repoRoot $InstallerPath
 }
 $installerStatus = if (Test-Path -LiteralPath $installerFullPath) {
-    "Present"
+    $installerFile = Split-Path -Leaf $installerFullPath
+    $escapedVersion = [regex]::Escape($Version)
+    $packagedCommit = if ($installerFile -match "^atow-character-creator-$escapedVersion-([0-9a-f]+)-setup\.exe$") {
+        $Matches[1]
+    } else {
+        ""
+    }
+    if (![string]::IsNullOrWhiteSpace($packagedCommit) -and
+        $packagedCommit -ne $commit) {
+        "Present; packaged commit $packagedCommit differs from current commit $commit"
+    } else {
+        "Present"
+    }
 } else {
     "Not found yet"
 }
 
 $plan = Get-Content -LiteralPath $planPath -Raw
+$issueAuditPath = Join-Path $repoRoot "docs\ISSUE_AUDIT.md"
+$issueAudit = if (Test-Path -LiteralPath $issueAuditPath) {
+    Get-Content -LiteralPath $issueAuditPath -Raw
+} else {
+    "No imported issue audit was found at docs\ISSUE_AUDIT.md."
+}
 $body = @(
     "# Manual Preview Test Run",
     "",
@@ -58,7 +92,11 @@ $body = @(
     "",
     "- ",
     "",
-    $plan
+    $plan,
+    "",
+    "---",
+    "",
+    $issueAudit
 ) -join "`n"
 
 $body | Set-Content -LiteralPath $outputPath

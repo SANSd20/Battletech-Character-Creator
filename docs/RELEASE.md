@@ -102,6 +102,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\New-ManualTestRun.ps
 
 The run log is written under `artifacts\manual-tests` with the current commit,
 version, tester, installer path, and checklist copied in for notes and results.
+If no installer path is supplied, the script uses the exact current-commit
+package when present; otherwise it falls back to the newest packaged installer
+for that version and records the packaged commit in the run log.
 
 Package the preview release with:
 

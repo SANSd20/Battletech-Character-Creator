@@ -23,6 +23,11 @@ pass.
 - Create one Homeworld Clan character through Stage 4.
 - Confirm free XP, attribute totals, trait totals, and skill totals update on
   each stage screen except Basic Information.
+- Confirm Stage 3 can add a second or third education entry.
+- Confirm Officer Candidate School can be selected after another education path
+  when the required basic and advanced fields are present.
+- Confirm the Free XP page uses one target dropdown for Attributes, Traits, and
+  Skills.
 
 ## Editor Workflows
 
@@ -36,6 +41,8 @@ pass.
 
 - Add and remove one core equipment item and one core weapon.
 - Filter the equipment and weapon catalogs and confirm unrelated rows are hidden.
+- Confirm the equipment and weapon category filters make the catalog lists easier
+  to browse.
 - Select one equipment item and one weapon and confirm their detail panels show
   source, cost, mass, and notes before adding them.
 - Confirm C-Bill, mass, and remaining carrying-capacity totals update.
@@ -57,3 +64,11 @@ pass.
 - If an error appears, save the generated report with the app version and
   command-line diagnostics intact.
 - Uninstall the app and confirm the installed executable is removed.
+
+## Imported GitHub Issues
+
+- Review `docs\ISSUE_AUDIT.md`.
+- Confirm every issue marked "Implemented locally" has a matching manual-test
+  result.
+- Close or update the corresponding GitHub issue after the installed-app test
+  confirms the workflow.
