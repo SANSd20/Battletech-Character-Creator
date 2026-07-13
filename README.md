@@ -88,6 +88,8 @@ the next gate is manual beta testing with `docs/MANUAL_TEST_PLAN.md`.
 
 ### Completed
 
+- Free XP spending uses one unified target dropdown for Attributes, Traits, and Skills
+- Free XP allocations show whether each spend targets an Attribute, Trait, or Skill
 - Life Module flexible XP pools must be fully assigned before advancing to the next module
 - Stage 2 running Free XP visibly subtracts the selected late-childhood module cost
 - Minimum age starts at 16 after late childhood and adds selected Stage 3 education time plus Stage 4 career time
