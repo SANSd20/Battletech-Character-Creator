@@ -70,7 +70,12 @@ public partial class CharacterWizardWindow : Window
         public int ActualXp => Issue.ActualXp;
     }
 
-    private sealed record FreeXpAllocationRow(string Name, int Xp);
+    private sealed record FreeXpTargetOption(string Category, string Name)
+    {
+        public string DisplayName => $"{Category} / {Name}";
+    }
+
+    private sealed record FreeXpAllocationRow(string Category, string Name, int Xp);
 
     private static string IssueKey(PrerequisiteIssue issue) =>
         $"{issue.Category}|{issue.Name}|{issue.RequiredXp}|{issue.ActualXp}";
@@ -95,8 +100,9 @@ public partial class CharacterWizardWindow : Window
         EyeColorPicker.ItemsSource = resources.EyeColors;
         SexPicker.ItemsSource = new[] { "Male", "Female" };
         SexPicker.SelectedIndex = 0;
-        FreeXpTraitPicker.ItemsSource = resources.TraitNames;
-        FreeXpSkillPicker.ItemsSource = resources.SkillNames;
+        FreeXpTargetPicker.ItemsSource = BuildFreeXpTargetOptions(
+            resources.TraitNames,
+            resources.SkillNames);
 
         RefreshEraAvailability();
         AffiliationPicker.ItemsSource = BirthAffiliations;
@@ -748,9 +754,11 @@ public partial class CharacterWizardWindow : Window
                 "Reset Review XP did not remove Review-screen XP allocations.");
         }
 
-        FreeXpSkillPicker.Text = "Acrobatics";
-        FreeXpSkillAmount.Text = "25";
-        AddFreeXpSkill_Click(this, new RoutedEventArgs());
+        FreeXpTargetPicker.SelectedItem = FreeXpTargetPicker.Items
+            .Cast<FreeXpTargetOption>()
+            .First(item => item.Category == "Skill" && item.Name == "Acrobatics");
+        FreeXpAmount.Text = "25";
+        AddFreeXp_Click(this, new RoutedEventArgs());
         var manualCharacter = BuildCharacter();
         if (!manualCharacter.Skills.Any(item =>
                 item.Name == "Acrobatics" && item.Value >= 25) ||
@@ -759,6 +767,23 @@ public partial class CharacterWizardWindow : Window
         {
             throw new InvalidOperationException(
                 "Manual Free XP spending did not apply to the selected Skill.");
+        }
+
+        FreeXpTargetPicker.SelectedItem = FreeXpTargetPicker.Items
+            .Cast<FreeXpTargetOption>()
+            .First(item => item.Category == "Attribute" && item.Name == "STR");
+        FreeXpAmount.Text = "10";
+        AddFreeXp_Click(this, new RoutedEventArgs());
+        var attributeCharacter = BuildCharacter();
+        if (!attributeCharacter.Attributes.Any(item =>
+                item.Name == "STR" &&
+                item.Value == manualCharacter.Attributes
+                    .Single(attribute => attribute.Name == "STR").Value + 10) ||
+            CharacterRules.Calculate(attributeCharacter).FreeXp !=
+            CharacterRules.Calculate(manualCharacter).FreeXp - 10)
+        {
+            throw new InvalidOperationException(
+                "Manual Free XP spending did not apply to the selected Attribute.");
         }
 
         ResetReviewXp_Click(this, new RoutedEventArgs());
@@ -2703,11 +2728,20 @@ public partial class CharacterWizardWindow : Window
         UpdatePreview();
     }
 
-    private void AddFreeXpTrait_Click(object sender, RoutedEventArgs e) =>
-        AddManualFreeXp("Trait", FreeXpTraitPicker.Text, FreeXpTraitAmount);
+    private void AddFreeXp_Click(object sender, RoutedEventArgs e)
+    {
+        if (FreeXpTargetPicker.SelectedItem is not FreeXpTargetOption target)
+        {
+            MessageBox.Show(
+                "Choose a target before spending Free XP.",
+                "Choose a target",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
 
-    private void AddFreeXpSkill_Click(object sender, RoutedEventArgs e) =>
-        AddManualFreeXp("Skill", FreeXpSkillPicker.Text, FreeXpSkillAmount);
+        AddManualFreeXp(target.Category, target.Name, FreeXpAmount);
+    }
 
     private void AddManualFreeXp(
         string category,
@@ -2762,14 +2796,20 @@ public partial class CharacterWizardWindow : Window
 
     private void RefreshFreeXpAllocationLists()
     {
-        FreeXpTraitAllocations.ItemsSource =
-            BuildFreeXpAllocationRows("Trait");
-        FreeXpSkillAllocations.ItemsSource =
-            BuildFreeXpAllocationRows("Skill");
+        FreeXpAllocations.ItemsSource = BuildFreeXpAllocationRows();
     }
 
-    private IReadOnlyList<FreeXpAllocationRow> BuildFreeXpAllocationRows(
-        string category) =>
+    private static IReadOnlyList<FreeXpTargetOption> BuildFreeXpTargetOptions(
+        IReadOnlyList<string> traitNames,
+        IReadOnlyList<string> skillNames) =>
+    [
+        .. new[] { "STR", "BOD", "RFL", "DEX", "INT", "WIL", "CHA", "EDG" }
+            .Select(name => new FreeXpTargetOption("Attribute", name)),
+        .. traitNames.Select(name => new FreeXpTargetOption("Trait", name)),
+        .. skillNames.Select(name => new FreeXpTargetOption("Skill", name))
+    ];
+
+    private IReadOnlyList<FreeXpAllocationRow> BuildFreeXpAllocationRows() =>
         reviewFreeXpAllocations
             .Select(allocation => new
             {
@@ -2777,12 +2817,19 @@ public partial class CharacterWizardWindow : Window
                 allocation.Value
             })
             .Where(allocation => allocation.Parts.Length == 2 &&
-                allocation.Parts[0] == category &&
                 allocation.Value != 0)
             .Select(allocation => new FreeXpAllocationRow(
+                allocation.Parts[0],
                 allocation.Parts[1],
                 allocation.Value))
-            .OrderBy(row => row.Name)
+            .OrderBy(row => row.Category switch
+            {
+                "Attribute" => 0,
+                "Trait" => 1,
+                "Skill" => 2,
+                _ => 3
+            })
+            .ThenBy(row => row.Name)
             .ToArray();
 
     private static string ValueOrDash(string value) =>

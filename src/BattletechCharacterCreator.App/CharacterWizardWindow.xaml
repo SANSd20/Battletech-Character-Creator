@@ -727,61 +727,27 @@
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="70"/>
                                 </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="8"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <ComboBox x:Name="FreeXpTraitPicker"
-                                          IsEditable="True"
+                                <ComboBox x:Name="FreeXpTargetPicker"
+                                          DisplayMemberPath="DisplayName"
                                           IsTextSearchEnabled="True"/>
                                 <TextBox Grid.Column="2"
-                                         x:Name="FreeXpTraitAmount"
+                                         x:Name="FreeXpAmount"
                                          Text="0"
                                          HorizontalContentAlignment="Right"
                                          VerticalContentAlignment="Center"/>
                                 <Button Grid.Column="4"
                                         Content="Add"
-                                        Click="AddFreeXpTrait_Click"/>
-                                <ComboBox Grid.Row="2"
-                                          x:Name="FreeXpSkillPicker"
-                                          IsEditable="True"
-                                          IsTextSearchEnabled="True"/>
-                                <TextBox Grid.Row="2"
-                                         Grid.Column="2"
-                                         x:Name="FreeXpSkillAmount"
-                                         Text="0"
-                                         HorizontalContentAlignment="Right"
-                                         VerticalContentAlignment="Center"/>
-                                <Button Grid.Row="2"
-                                        Grid.Column="4"
-                                        Content="Add"
-                                        Click="AddFreeXpSkill_Click"/>
+                                        Click="AddFreeXp_Click"/>
                             </Grid>
                             <Grid Grid.Row="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="12"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <DataGrid x:Name="FreeXpTraitAllocations"
+                                <DataGrid x:Name="FreeXpAllocations"
                                           AutoGenerateColumns="False"
                                           CanUserAddRows="False"
                                           IsReadOnly="True"
                                           HeadersVisibility="Column">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Traits" Binding="{Binding Name}" Width="*"/>
-                                        <DataGridTextColumn Header="XP" Binding="{Binding Xp}" Width="55"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <DataGrid Grid.Column="2"
-                                          x:Name="FreeXpSkillAllocations"
-                                          AutoGenerateColumns="False"
-                                          CanUserAddRows="False"
-                                          IsReadOnly="True"
-                                          HeadersVisibility="Column">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Skills" Binding="{Binding Name}" Width="*"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding Category}" Width="82"/>
+                                        <DataGridTextColumn Header="Target" Binding="{Binding Name}" Width="*"/>
                                         <DataGridTextColumn Header="XP" Binding="{Binding Xp}" Width="55"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
