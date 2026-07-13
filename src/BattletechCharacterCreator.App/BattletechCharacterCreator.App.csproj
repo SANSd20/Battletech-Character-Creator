@@ -6,9 +6,9 @@
     <StartupObject>BattletechCharacterCreator.App.Program</StartupObject>
     <ApplicationIcon>..\..\ico1.ico</ApplicationIcon>
     <AssemblyTitle>A Time of War Character Creator</AssemblyTitle>
-    <AssemblyVersion>0.1.15.0</AssemblyVersion>
-    <FileVersion>0.1.15.0</FileVersion>
-    <InformationalVersion>0.1.15-preview</InformationalVersion>
+    <AssemblyVersion>0.1.16.0</AssemblyVersion>
+    <FileVersion>0.1.16.0</FileVersion>
+    <InformationalVersion>0.1.16-preview</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\BattletechCharacterCreator.Core\BattletechCharacterCreator.Core.csproj" />

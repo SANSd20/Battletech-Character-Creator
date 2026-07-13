@@ -85,12 +85,16 @@ public static class CharacterRules
                 SecondaryPurchaseCost(item.Cost) * OptionalItemCount(item.PatchCount)) +
             character.Weapons.Sum(item =>
                 BasePurchaseCost(item.Cost) * ItemCount(item.Count) +
-                BasePurchaseCost(item.AmmoCost) * OptionalItemCount(item.AmmoCount));
+                (BasePurchaseCost(item.AmmoCost) +
+                 BasePurchaseCost(item.AmmoCostModifier)) *
+                OptionalItemCount(item.AmmoCount));
         var inventoryMass = character.Equipment.Sum(item =>
                 CatalogMass(item.Mass) * ItemCount(item.Count)) +
             character.Weapons.Sum(item =>
                 CatalogMass(item.Mass) * ItemCount(item.Count) +
-                CatalogMass(item.AmmoMass) * OptionalItemCount(item.AmmoCount));
+                (CatalogMass(item.AmmoMass) +
+                 CatalogMass(item.AmmoMassModifier)) *
+                OptionalItemCount(item.AmmoCount));
         var unresolvedInventoryPrices = character.Equipment.Sum(item =>
                 (HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0) +
                 (HasUnresolvedPatchCost(item.Cost)
@@ -99,6 +103,9 @@ public static class CharacterRules
             character.Weapons.Sum(item =>
                 (HasUnresolvedPurchaseCost(item.Cost) ? ItemCount(item.Count) : 0) +
                 (HasUnresolvedPurchaseCost(item.AmmoCost)
+                    ? OptionalItemCount(item.AmmoCount)
+                    : 0) +
+                (HasUnresolvedPurchaseCost(item.AmmoCostModifier)
                     ? OptionalItemCount(item.AmmoCount)
                     : 0));
         var capacity = CarryingCapacity(strength);

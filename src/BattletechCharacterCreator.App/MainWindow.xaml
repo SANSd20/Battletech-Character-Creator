@@ -921,6 +921,9 @@
                                 <DataGridTextColumn Header="Ammo cost" Binding="{Binding AmmoCost}" Width="90"/>
                                 <DataGridTextColumn Header="Ammo mass" Binding="{Binding AmmoMass}" Width="90"/>
                                 <DataGridTextColumn Header="Ammo qty" Binding="{Binding AmmoCount}" Width="80"/>
+                                <DataGridTextColumn Header="Ammo mod" Binding="{Binding AmmoModifier}" Width="120"/>
+                                <DataGridTextColumn Header="Ammo mod cost" Binding="{Binding AmmoCostModifier}" Width="105"/>
+                                <DataGridTextColumn Header="Ammo mod mass" Binding="{Binding AmmoMassModifier}" Width="105"/>
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="180"/>
                             </DataGrid.Columns>
                         </DataGrid>

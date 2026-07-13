@@ -19,7 +19,9 @@ character.Weapons.Add(new WeaponItem
 {
     Skill = "Small Arms", Name = "Laser Pistol", Damage = "3E/3B",
     Range = "15/35/80/200", Cost = "1500", Mass = "1", Shots = "3 PPS",
-    AmmoCost = "5", AmmoMass = "0.25", AmmoCount = "4", Notes = "Burst 5", Count = "1"
+    AmmoCost = "5", AmmoMass = "0.25", AmmoCount = "4",
+    AmmoModifier = "Caseless", AmmoCostModifier = "2",
+    AmmoMassModifier = "0.05", Notes = "Burst 5", Count = "1"
 });
 character.RealLife = "Solaris VII Games";
 character.BirthAffiliation = "Federated Suns";
@@ -49,13 +51,17 @@ Assert(legacyEquipment.Equipment.Single().PatchCount == "0" &&
     legacyEquipment.Equipment.Single().Notes == "legacy notes",
     "Older seven-field equipment rows must load with no purchased patches.");
 Assert(loaded.Weapons.Single().AmmoCount == "4" &&
+    loaded.Weapons.Single().AmmoModifier == "Caseless" &&
+    loaded.Weapons.Single().AmmoCostModifier == "2" &&
+    loaded.Weapons.Single().AmmoMassModifier == "0.05" &&
     loaded.Weapons.Single().Notes == "Burst 5",
-    "All twelve weapon fields must round-trip.");
+    "All fifteen weapon fields must round-trip.");
 var legacyWeapon = LegacyCharacterSerializer.Read(new StringReader(
     "weapon:Small Arms;Hold-Out Pistol;1B/2;3/6/12/25;75;0.2;1;10;0.1;legacy notes;2"));
 Assert(legacyWeapon.Weapons.Single().AmmoCount == "0" &&
+    legacyWeapon.Weapons.Single().AmmoModifier == "" &&
     legacyWeapon.Weapons.Single().Notes == "legacy notes",
-    "Older eleven-field weapon rows must load with no purchased ammo.");
+    "Older eleven-field weapon rows must load with no purchased ammo or ammo modifier.");
 Assert(loaded.RealLifeHistory.SequenceEqual(character.RealLifeHistory),
     "Stage 4 career history must round-trip in order.");
 Assert(loaded.BirthAffiliation == character.BirthAffiliation &&
@@ -118,15 +124,17 @@ inventoryCharacter.Equipment.Add(new EquipmentItem
 inventoryCharacter.Weapons.Add(new WeaponItem
 {
     Name = "Test weapon", Cost = "200", Mass = "1.5", Count = "2",
-    AmmoCost = "10", AmmoMass = "0.25", AmmoCount = "4"
+    AmmoCost = "10", AmmoMass = "0.25", AmmoCount = "4",
+    AmmoModifier = "Precision", AmmoCostModifier = "5",
+    AmmoMassModifier = "0.05"
 });
 var inventorySummary = CharacterRules.Calculate(inventoryCharacter);
-Assert(inventorySummary.InventoryBaseCost == 775,
-    "Inventory base cost must total equipment, weapons, purchased patches, and purchased ammo.");
-Assert(inventorySummary.RemainingCBills == 225,
-    "Inventory cost must multiply each item, patch, and ammo pack cost by quantity.");
-Assert(inventorySummary.InventoryMass == 10m,
-    "Inventory mass must multiply each item's and ammo pack's mass by quantity.");
+Assert(inventorySummary.InventoryBaseCost == 795,
+    "Inventory base cost must total equipment, weapons, purchased patches, purchased ammo, and ammo modifiers.");
+Assert(inventorySummary.RemainingCBills == 205,
+    "Inventory cost must multiply each item, patch, ammo pack, and ammo modifier cost by quantity.");
+Assert(inventorySummary.InventoryMass == 10.2m,
+    "Inventory mass must multiply each item's, ammo pack's, and ammo modifier's mass by quantity.");
 var companionInventoryCharacter = new Character();
 companionInventoryCharacter.Equipment.Add(new EquipmentItem
 {
@@ -139,7 +147,7 @@ companionInventoryCharacter.Equipment.Add(new EquipmentItem
 companionInventoryCharacter.Weapons.Add(new WeaponItem
 {
     Name = "Expensive support weapon", Cost = "1,400,000*", Mass = "1,600", Count = "1",
-    AmmoCost = "*", AmmoCount = "2"
+    AmmoCost = "*", AmmoCount = "2", AmmoCostModifier = "*"
 });
 var companionInventorySummary = CharacterRules.Calculate(companionInventoryCharacter);
 Assert(companionInventorySummary.InventoryBaseCost == 1_401_000,
@@ -148,7 +156,7 @@ Assert(companionInventorySummary.RemainingCBills == -1_400_000,
     "Inventory cost must use base prices from slash, comma, and wildcard formats.");
 Assert(companionInventorySummary.InventoryMass == 1606.2m,
     "Inventory mass must continue parsing comma and decimal quantities.");
-Assert(companionInventorySummary.UnresolvedInventoryPrices == 6,
+Assert(companionInventorySummary.UnresolvedInventoryPrices == 8,
     "Inventory summaries must count unresolved wildcard purchase prices by quantity.");
 var patchPriceWarningCharacter = new Character();
 patchPriceWarningCharacter.Equipment.Add(new EquipmentItem

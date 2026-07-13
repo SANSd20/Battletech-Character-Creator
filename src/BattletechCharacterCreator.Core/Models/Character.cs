@@ -92,6 +92,9 @@ public sealed class WeaponItem
     public string AmmoCost { get; set; } = "";
     public string AmmoMass { get; set; } = "";
     public string AmmoCount { get; set; } = "0";
+    public string AmmoModifier { get; set; } = "";
+    public string AmmoCostModifier { get; set; } = "";
+    public string AmmoMassModifier { get; set; } = "";
     public string Notes { get; set; } = "";
     public string Count { get; set; } = "1";
 }

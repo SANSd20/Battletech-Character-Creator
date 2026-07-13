@@ -128,7 +128,8 @@ public static class LegacyCharacterSerializer
         {
             WriteValue(writer, "weapon", string.Join(';', item.Skill, item.Name, item.Damage,
                 item.Range, item.Cost, item.Mass, item.Shots, item.AmmoCost, item.AmmoMass,
-                item.AmmoCount, item.Notes, item.Count));
+                item.AmmoCount, item.AmmoModifier, item.AmmoCostModifier,
+                item.AmmoMassModifier, item.Notes, item.Count));
         }
 
         foreach (var weapon in c.EquippedWeapons)
@@ -202,15 +203,29 @@ public static class LegacyCharacterSerializer
     private static void AddWeapon(Character c, string value)
     {
         var f = value.Split(';');
-        if (f.Length is not (11 or 12)) return;
-        c.Weapons.Add(new WeaponItem
+        if (f.Length is not (11 or 12 or 15)) return;
+        var item = new WeaponItem
         {
             Skill = f[0], Name = f[1], Damage = f[2], Range = f[3], Cost = f[4],
             Mass = f[5], Shots = f[6], AmmoCost = f[7], AmmoMass = f[8],
-            AmmoCount = f.Length == 12 ? f[9] : "0",
-            Notes = f.Length == 12 ? f[10] : f[9],
-            Count = f.Length == 12 ? f[11] : f[10]
-        });
+            AmmoCount = f.Length == 11 ? "0" : f[9]
+        };
+
+        if (f.Length == 15)
+        {
+            item.AmmoModifier = f[10];
+            item.AmmoCostModifier = f[11];
+            item.AmmoMassModifier = f[12];
+            item.Notes = f[13];
+            item.Count = f[14];
+        }
+        else
+        {
+            item.Notes = f.Length == 12 ? f[10] : f[9];
+            item.Count = f.Length == 12 ? f[11] : f[10];
+        }
+
+        c.Weapons.Add(item);
     }
 
     private static void AddLocation(Character c, string value)

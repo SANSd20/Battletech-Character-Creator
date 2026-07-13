@@ -301,9 +301,15 @@ public static class CharacterSheetExporter
         var details =
             $"Dmg: {weapon.Damage}, Ammo: {weapon.Shots}, Range: {weapon.Range}, Weight: {weapon.Mass}";
         var ammoCount = CharacterRules.OptionalItemCount(weapon.AmmoCount);
-        return ammoCount > 0
-            ? $"{details}, Ammo packs: {ammoCount}"
-            : details;
+        if (ammoCount <= 0)
+        {
+            return details;
+        }
+
+        var modifier = string.IsNullOrWhiteSpace(weapon.AmmoModifier)
+            ? ""
+            : $" ({weapon.AmmoModifier})";
+        return $"{details}, Ammo packs: {ammoCount}{modifier}";
     }
 
     private static string EquipmentInventoryDetails(EquipmentItem item)

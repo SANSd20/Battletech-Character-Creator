@@ -671,6 +671,18 @@ public partial class App : Application
                 "Ammo warnings did not clear with complete ammo details.");
         }
 
+        character.Weapons.Single().AmmoModifier = "Precision";
+        character.Weapons.Single().AmmoCostModifier = "7";
+        character.Weapons.Single().AmmoMassModifier = "0.2";
+        character.Equipment.Clear();
+        var modifiedAmmoSummary = CharacterRules.Calculate(character);
+        if (modifiedAmmoSummary.InventoryBaseCost != 124 ||
+            modifiedAmmoSummary.InventoryMass != 1.6m)
+        {
+            throw new InvalidOperationException(
+                "Ammo modifier cost and mass were not included in inventory totals.");
+        }
+
         character.Equipment.Clear();
         character.Weapons.Clear();
         character.Equipment.Add(new EquipmentItem
