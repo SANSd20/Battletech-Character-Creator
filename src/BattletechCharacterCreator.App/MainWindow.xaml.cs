@@ -39,6 +39,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool includeCompanionContent;
     private EquipmentCatalogItem? selectedEquipmentCatalogItem;
     private WeaponCatalogItem? selectedWeaponCatalogItem;
+    private AmmoModifierCatalogItem? selectedAmmoModifier;
     private EraCharacterTemplate? selectedEraTemplate;
 
     public ObservableCollection<XpEditorRow> AttributeRows { get; } = [];
@@ -64,6 +65,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 .Where(category => category.Length > 0)
                 .Distinct(StringComparer.Ordinal)
                 .OrderBy(category => category)];
+    public IReadOnlyList<AmmoModifierCatalogItem> AmmoModifiers =>
+        Catalog.AmmoModifiers;
 
     public MainWindow() : this(new Character())
     {
@@ -350,6 +353,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 item,
                 Character.GameYear)
             : "";
+    public AmmoModifierCatalogItem? SelectedAmmoModifier
+    {
+        get => selectedAmmoModifier;
+        set
+        {
+            selectedAmmoModifier = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SelectedAmmoModifierSummary));
+        }
+    }
+    public string SelectedAmmoModifierSummary =>
+        SelectedAmmoModifier is { } item
+            ? $"{item.Category} | AP/BD {item.ApBdModifier} | Range {item.RangeModifier} | Cost x{item.CostMultiplier:0.##} | {item.Notes}"
+            : "No specialty ammunition selected.";
     public string? SelectedSkillName
     {
         get => selectedSkillName;
@@ -1192,6 +1209,58 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
+    private void ApplyAmmoModifier_Click(object sender, RoutedEventArgs e)
+    {
+        if (WeaponsGrid.SelectedItem is not WeaponItem weapon ||
+            SelectedAmmoModifier is not { } modifier)
+        {
+            return;
+        }
+
+        weapon.AmmoModifier = modifier.Name;
+        weapon.AmmoCostModifier = CalculateAmmoModifierCost(weapon, modifier);
+        weapon.AmmoMassModifier = "";
+        if (!weapon.Notes.Contains(modifier.Notes, StringComparison.OrdinalIgnoreCase))
+        {
+            weapon.Notes = string.IsNullOrWhiteSpace(weapon.Notes)
+                ? modifier.Notes
+                : $"{weapon.Notes}; {modifier.Notes}";
+        }
+        WeaponsGrid.Items.Refresh();
+        Recalculate();
+    }
+
+    private void ClearAmmoModifier_Click(object sender, RoutedEventArgs e)
+    {
+        if (WeaponsGrid.SelectedItem is not WeaponItem weapon)
+        {
+            return;
+        }
+
+        weapon.AmmoModifier = "";
+        weapon.AmmoCostModifier = "";
+        weapon.AmmoMassModifier = "";
+        WeaponsGrid.Items.Refresh();
+        Recalculate();
+    }
+
+    private static string CalculateAmmoModifierCost(
+        WeaponItem weapon,
+        AmmoModifierCatalogItem modifier)
+    {
+        var baseCost = CharacterRules.BasePurchaseCost(weapon.AmmoCost);
+        if (baseCost <= 0)
+        {
+            return "";
+        }
+
+        var adjustedCost = (int)Math.Round(
+            baseCost * modifier.CostMultiplier,
+            MidpointRounding.AwayFromZero);
+        return Math.Max(0, adjustedCost - baseCost).ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+    }
+
     private void ReloadCatalog()
     {
         Catalog = ResourceCatalog.Load(
@@ -1199,6 +1268,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             new ResourceCatalogOptions(includeCompanionContent));
         SelectedEquipmentCatalogItem = null;
         SelectedWeaponCatalogItem = null;
+        SelectedAmmoModifier = null;
         SelectedSkillName = null;
         SelectedTraitName = null;
         RebuildCatalogViews();
@@ -1437,6 +1507,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             new PropertyGroupDescription(nameof(WeaponCatalogItem.Category)));
         OnPropertyChanged(nameof(EquipmentCatalogCategories));
         OnPropertyChanged(nameof(WeaponCatalogCategories));
+        OnPropertyChanged(nameof(AmmoModifiers));
         OnPropertyChanged(nameof(EquipmentCatalogView));
         OnPropertyChanged(nameof(WeaponCatalogView));
         OnPropertyChanged(nameof(EquipmentCatalogResultSummary));

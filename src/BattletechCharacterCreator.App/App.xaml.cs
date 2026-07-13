@@ -519,6 +519,12 @@ public partial class App : Application
 
         var flak = catalog.Equipment.Single(item => item.Name == "Flak/Jacket");
         var katana = catalog.Weapons.Single(item => item.Name == "Katana");
+        if (catalog.AmmoModifiers.Single(item =>
+                item.Name == "Armor-Piercing").CostMultiplier != 3m)
+        {
+            throw new InvalidOperationException(
+                "Specialty ammunition modifier catalog was not loaded.");
+        }
         var character = new Character();
         character.Equipment.Add(new EquipmentItem
         {

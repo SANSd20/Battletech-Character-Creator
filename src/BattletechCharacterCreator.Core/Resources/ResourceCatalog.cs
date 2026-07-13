@@ -48,6 +48,20 @@ public sealed record WeaponCatalogItem(
     public string SourceLabel => Source.DisplayName();
 }
 
+public sealed record AmmoModifierCatalogItem(
+    string Category,
+    string Name,
+    string ApBdModifier,
+    string RangeModifier,
+    decimal CostMultiplier,
+    string Availability,
+    string Notes,
+    RulebookSource Source = RulebookSource.CoreRulebook) : ISourceCatalogItem
+{
+    public string SourceLabel => Source.DisplayName();
+    public string DisplayName => $"{Name} (x{CostMultiplier:0.##})";
+}
+
 public sealed record SkillCatalogItem(
     string Name,
     string Rules,
@@ -79,6 +93,7 @@ public sealed class ResourceCatalog
     public IReadOnlyList<string> Careers { get; private init; } = [];
     public IReadOnlyList<EquipmentCatalogItem> Equipment { get; private init; } = [];
     public IReadOnlyList<WeaponCatalogItem> Weapons { get; private init; } = [];
+    public IReadOnlyList<AmmoModifierCatalogItem> AmmoModifiers { get; private init; } = [];
     public IReadOnlyList<SkillCatalogItem> Skills { get; private init; } = [];
     public IReadOnlyList<TraitCatalogItem> Traits { get; private init; } = [];
     public IReadOnlyDictionary<string, string> SkillDescriptions { get; private init; } =
@@ -107,6 +122,7 @@ public sealed class ResourceCatalog
         var traits = ReadTraits(directory, options, traitDescriptions);
         var equipment = ReadEquipment(directory, options);
         var weapons = ReadWeapons(directory, options);
+        var ammoModifiers = ReadAmmoModifiers(directory, options);
         var filteredSkills = FilterBySource(skills, options).ToArray();
         var filteredTraits = FilterBySource(traits, options).ToArray();
 
@@ -123,6 +139,7 @@ public sealed class ResourceCatalog
             Careers = ReadLines(directory, "career.dat"),
             Equipment = equipment,
             Weapons = weapons,
+            AmmoModifiers = ammoModifiers,
             Skills = filteredSkills,
             Traits = filteredTraits,
             SkillDescriptions = skillDescriptions,
@@ -163,7 +180,7 @@ public sealed class ResourceCatalog
         string name,
         RulebookSource source) =>
         ReadDataLines(directory, name)
-            .Select(line => line.Split(';'))
+            .Select(line => line.Split(';', 7))
             .Where(fields => fields.Length == 7)
             .Select(fields => new EquipmentCatalogItem(
                 fields[0], fields[1], fields[2], fields[3], fields[4],
@@ -192,12 +209,35 @@ public sealed class ResourceCatalog
         string name,
         RulebookSource source) =>
         ReadDataLines(directory, name)
-            .Select(line => line.Split(';'))
+            .Select(line => line.Split(';', 11))
             .Where(fields => fields.Length == 11)
             .Select(fields => new WeaponCatalogItem(
                 fields[0], fields[1], fields[2], fields[3], fields[4],
                 fields[5], fields[6], fields[7], fields[8], fields[9],
                 fields[10], source))
+            .ToArray();
+
+    private static AmmoModifierCatalogItem[] ReadAmmoModifiers(
+        string directory,
+        ResourceCatalogOptions options) =>
+        FilterBySource(
+                ReadAmmoModifiersFile(
+                    directory,
+                    "ammo_modifiers.dat",
+                    RulebookSource.CoreRulebook),
+                options)
+            .ToArray();
+
+    private static AmmoModifierCatalogItem[] ReadAmmoModifiersFile(
+        string directory,
+        string name,
+        RulebookSource source) =>
+        ReadDataLines(directory, name)
+            .Select(line => line.Split(';', 7))
+            .Where(fields => fields.Length == 7)
+            .Select(fields => new AmmoModifierCatalogItem(
+                fields[0], fields[1], fields[2], fields[3],
+                ParseDecimal(fields[4]), fields[5], fields[6], source))
             .ToArray();
 
     private static IReadOnlyDictionary<string, IReadOnlyList<string>> ReadSubskills(
@@ -298,6 +338,15 @@ public sealed class ResourceCatalog
 
     private static string[] ReadLines(string directory, string name) =>
         ReadDataLines(directory, name).ToArray();
+
+    private static decimal ParseDecimal(string value) =>
+        decimal.TryParse(
+            value,
+            System.Globalization.NumberStyles.Number,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var parsed)
+            ? parsed
+            : 1m;
 
     private static IEnumerable<string> ReadDataLines(
         string directory,

@@ -660,6 +660,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
@@ -903,7 +904,39 @@
                                            FontWeight="SemiBold"/>
                             </Grid>
                         </Border>
-                        <DataGrid Grid.Row="3" x:Name="WeaponsGrid"
+                        <Grid Grid.Row="3" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="220"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Specialty ammo"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0"/>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{Binding AmmoModifiers}"
+                                      SelectedItem="{Binding SelectedAmmoModifier}"
+                                      DisplayMemberPath="DisplayName"
+                                      VerticalContentAlignment="Center"
+                                      Margin="0,0,8,0"/>
+                            <Button Grid.Column="2"
+                                    Content="Apply to selected weapon"
+                                    Click="ApplyAmmoModifier_Click"
+                                    Margin="0,0,8,0"/>
+                            <Button Grid.Column="3"
+                                    Content="Clear modifier"
+                                    Click="ClearAmmoModifier_Click"
+                                    Margin="0,0,8,0"/>
+                            <TextBlock Grid.Column="4"
+                                       Text="{Binding SelectedAmmoModifierSummary}"
+                                       TextTrimming="CharacterEllipsis"
+                                       VerticalAlignment="Center"
+                                       Foreground="#55524A"/>
+                        </Grid>
+                        <DataGrid Grid.Row="4" x:Name="WeaponsGrid"
                                   ItemsSource="{Binding Weapons}"
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
@@ -927,7 +960,7 @@
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="180"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <DockPanel Grid.Row="4" Margin="0,8,4,0">
+                        <DockPanel Grid.Row="5" Margin="0,8,4,0">
                             <TextBlock Text="{Binding InventoryStatus}"
                                        Foreground="{Binding InventoryStatusBrush}"
                                        FontWeight="SemiBold"

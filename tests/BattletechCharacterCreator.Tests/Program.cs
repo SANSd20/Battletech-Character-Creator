@@ -310,6 +310,13 @@ static void CheckResourceCatalog()
         "All 187 legacy equipment entries must be imported.");
     Assert(catalog.Weapons.Count == 209,
         "All 209 legacy weapon entries must be imported.");
+    Assert(catalog.AmmoModifiers.Count == 15,
+        "All 15 core specialty ammunition modifiers must be imported.");
+    Assert(catalog.AmmoModifiers.Single(item =>
+            item.Name == "Radioactive Tracker").CostMultiplier == 3.5m &&
+        catalog.AmmoModifiers.Single(item =>
+            item.Name == "Flechette").ApBdModifier == "-3B/+1S",
+        "Specialty ammunition modifier table values must be imported.");
     Assert(companionCatalog.Equipment.Count == 286,
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,

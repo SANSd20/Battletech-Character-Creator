@@ -146,6 +146,8 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
   reload, prosthetic host, or vehicle trait attention
 - Weapon inventory rows now support purchased ammo modifier names plus per-pack
   modifier cost and mass adjustments
+- Specialty ammunition modifiers from the core rulebook can now be selected
+  and applied to weapon inventory rows
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
   cosmetic adaptation kits, plus advanced combat practice equipment, light
@@ -206,8 +208,8 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
 - Continue importing and modeling selected optional mechanics from
   *A Time of War Companion*
 - Expand era template coverage after manual preview feedback
-- Expand deeper reload behavior, deeper patch repair rules, named ammunition
-  modifier tables, and deeper vehicle purchasing details
+- Expand deeper reload behavior, deeper patch repair rules, specialty ammo
+  compatibility details, and deeper vehicle purchasing details
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery
 - Complete the final rulebook audit
