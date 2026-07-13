@@ -85,6 +85,8 @@ Layouts and details may continue to change before the first stable release.
 The .NET migration is approximately **99% complete**. The project is now in
 beta testing. Automated release checks and installer smoke tests are passing;
 the next gate is manual beta testing with `docs/MANUAL_TEST_PLAN.md`.
+Imported GitHub issues are summarized in `docs/ISSUE_AUDIT.md`; regenerate that
+summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.json`.
 
 ### Completed
 
