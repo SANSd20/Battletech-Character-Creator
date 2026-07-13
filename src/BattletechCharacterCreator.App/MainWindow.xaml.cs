@@ -216,31 +216,41 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var unpricedPatches = CharacterRules.PatchPurchasesNeedingPrice(Character);
             if (unpricedPatches > 0)
             {
-                return $"{unpricedPatches} armor patch purchase(s) need patch pricing.";
+                return $"{unpricedPatches} armor patch purchase(s) need patch pricing: " +
+                    FormatInventoryWarningItems(
+                        CharacterRules.PatchPurchasesNeedingPriceItems(Character));
             }
 
             var ammoNeedingDetails = CharacterRules.AmmoPurchasesNeedingDetails(Character);
             if (ammoNeedingDetails > 0)
             {
-                return $"{ammoNeedingDetails} ammo purchase(s) need ammo cost and mass details.";
+                return $"{ammoNeedingDetails} ammo purchase(s) need ammo cost and mass details: " +
+                    FormatInventoryWarningItems(
+                        CharacterRules.AmmoPurchasesNeedingDetailsItems(Character));
             }
 
             var ammoNeedingReloadReview =
                 CharacterRules.AmmoPurchasesNeedingReloadReview(Character);
             if (ammoNeedingReloadReview > 0)
             {
-                return $"{ammoNeedingReloadReview} ammo purchase(s) need reload or power-pack review.";
+                return $"{ammoNeedingReloadReview} ammo purchase(s) need reload or power-pack review: " +
+                    FormatInventoryWarningItems(
+                        CharacterRules.AmmoPurchasesNeedingReloadReviewItems(Character));
             }
 
             var unmountedEnhancements = CharacterRules.UnmountedProstheticEnhancements(Character);
             if (unmountedEnhancements > 0)
             {
-                return $"{unmountedEnhancements} prosthetic enhancement(s) need a prosthetic or implant host.";
+                return $"{unmountedEnhancements} prosthetic enhancement(s) need a prosthetic or implant host: " +
+                    FormatInventoryWarningItems(
+                        CharacterRules.UnmountedProstheticEnhancementItems(Character));
             }
 
             var unbackedVehicles = CharacterRules.UnbackedVehiclePurchases(Character);
             return unbackedVehicles > 0
-                ? $"{unbackedVehicles} vehicle purchase(s) need Vehicle or Custom Vehicle trait support."
+                ? $"{unbackedVehicles} vehicle purchase(s) need Vehicle or Custom Vehicle trait support: " +
+                  FormatInventoryWarningItems(
+                      CharacterRules.UnbackedVehiclePurchaseItems(Character))
                 : $"Inventory has {Summary.RemainingCBills} C-Bills and {Summary.RemainingCapacity:0.##} kg capacity remaining.";
         }
     }
@@ -256,6 +266,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                   CharacterRules.UnbackedVehiclePurchases(Character) > 0
                     ? Brushes.DarkGoldenrod
                     : Brushes.DarkGreen;
+
+    private static string FormatInventoryWarningItems(IReadOnlyCollection<string> itemNames)
+    {
+        const int visibleItemCount = 3;
+        var visibleItems = itemNames
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Take(visibleItemCount)
+            .ToArray();
+        var suffix = itemNames.Count > visibleItems.Length
+            ? $", +{itemNames.Count - visibleItems.Length} more"
+            : "";
+        return visibleItems.Length == 0
+            ? "check selected rows"
+            : string.Join(", ", visibleItems) + suffix;
+    }
+
     public bool IncludeCompanionContent
     {
         get => includeCompanionContent;

@@ -246,15 +246,36 @@ public static class CharacterRules
             .Where(item => PatchPurchaseNeedsPrice(item.Cost))
             .Sum(item => OptionalItemCount(item.PatchCount));
 
+    public static IReadOnlyList<string> PatchPurchasesNeedingPriceItems(Character character) =>
+        character.Equipment
+            .Where(item => OptionalItemCount(item.PatchCount) > 0)
+            .Where(item => PatchPurchaseNeedsPrice(item.Cost))
+            .Select(item => item.Name)
+            .ToArray();
+
     public static int AmmoPurchasesNeedingDetails(Character character) =>
         character.Weapons
             .Where(item => AmmoPurchaseNeedsDetails(item.AmmoCost, item.AmmoMass))
             .Sum(item => OptionalItemCount(item.AmmoCount));
 
+    public static IReadOnlyList<string> AmmoPurchasesNeedingDetailsItems(Character character) =>
+        character.Weapons
+            .Where(item => OptionalItemCount(item.AmmoCount) > 0)
+            .Where(item => AmmoPurchaseNeedsDetails(item.AmmoCost, item.AmmoMass))
+            .Select(item => item.Name)
+            .ToArray();
+
     public static int AmmoPurchasesNeedingReloadReview(Character character) =>
         character.Weapons
             .Where(item => AmmoPurchaseNeedsReloadReview(item.Shots))
             .Sum(item => OptionalItemCount(item.AmmoCount));
+
+    public static IReadOnlyList<string> AmmoPurchasesNeedingReloadReviewItems(Character character) =>
+        character.Weapons
+            .Where(item => OptionalItemCount(item.AmmoCount) > 0)
+            .Where(item => AmmoPurchaseNeedsReloadReview(item.Shots))
+            .Select(item => item.Name)
+            .ToArray();
 
     public static int UnmountedProstheticEnhancements(Character character)
     {
@@ -267,6 +288,20 @@ public static class CharacterRules
             .Where(item => !IsProstheticEnhancement(item.Name) && IsProstheticOrImplantHost(item))
             .Sum(item => ItemCount(item.Count));
         return hostCount == 0 ? enhancementCount : 0;
+    }
+
+    public static IReadOnlyList<string> UnmountedProstheticEnhancementItems(Character character)
+    {
+        if (character.Equipment.Any(item =>
+                !IsProstheticEnhancement(item.Name) && IsProstheticOrImplantHost(item)))
+        {
+            return [];
+        }
+
+        return character.Equipment
+            .Where(item => IsProstheticEnhancement(item.Name))
+            .Select(item => item.Name)
+            .ToArray();
     }
 
     public static int UnbackedVehiclePurchases(Character character)
@@ -283,6 +318,25 @@ public static class CharacterRules
              item.Name.StartsWith("Vehicle/", StringComparison.Ordinal) ||
              item.Name.StartsWith("Custom Vehicle/", StringComparison.Ordinal)));
         return hasVehicleTrait ? 0 : vehicleCount;
+    }
+
+    public static IReadOnlyList<string> UnbackedVehiclePurchaseItems(Character character)
+    {
+        var hasVehicleTrait = character.Traits.Any(item =>
+            item.Value > 0 &&
+            (item.Name == "Vehicle" ||
+             item.Name == "Custom Vehicle" ||
+             item.Name.StartsWith("Vehicle/", StringComparison.Ordinal) ||
+             item.Name.StartsWith("Custom Vehicle/", StringComparison.Ordinal)));
+        if (hasVehicleTrait)
+        {
+            return [];
+        }
+
+        return character.Equipment
+            .Where(IsVehiclePurchase)
+            .Select(item => item.Name)
+            .ToArray();
     }
 
     private static string CostPart(string value, int index)

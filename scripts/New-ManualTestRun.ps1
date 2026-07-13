@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.1.14-preview",
+    [string]$Version = "0.1.15-preview",
     [string]$Tester = $env:USERNAME,
     [string]$InstallerPath = "",
     [string]$OutputDirectory = "artifacts\manual-tests"

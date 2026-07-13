@@ -142,6 +142,8 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
 - Inventory status warnings for ammo purchases that need reload or power-pack review
 - Inventory status warnings for vehicle purchases that need Vehicle or Custom Vehicle
   trait support
+- Inventory status warnings now name the inventory rows that need pricing, ammo,
+  reload, prosthetic host, or vehicle trait attention
 - Optional Companion catalog toggle with source-tagged imported equipment,
   weapons, implants, cybernetics, prosthetics, prosthetic enhancements, and
   cosmetic adaptation kits, plus advanced combat practice equipment, light

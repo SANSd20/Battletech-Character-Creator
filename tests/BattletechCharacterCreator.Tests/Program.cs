@@ -157,6 +157,9 @@ patchPriceWarningCharacter.Equipment.Add(new EquipmentItem
 });
 Assert(CharacterRules.PatchPurchasesNeedingPrice(patchPriceWarningCharacter) == 3,
     "Patch purchases must warn when no patch price is present.");
+Assert(CharacterRules.PatchPurchasesNeedingPriceItems(patchPriceWarningCharacter)
+        .SequenceEqual(["Patch warning armor"]),
+    "Patch purchase warnings must identify the equipment row that needs patch pricing.");
 patchPriceWarningCharacter.Equipment.Clear();
 patchPriceWarningCharacter.Equipment.Add(new EquipmentItem
 {
@@ -179,6 +182,9 @@ ammoDetailWarningCharacter.Weapons.Add(new WeaponItem
 });
 Assert(CharacterRules.AmmoPurchasesNeedingDetails(ammoDetailWarningCharacter) == 3,
     "Ammo purchases must warn when ammo cost is missing.");
+Assert(CharacterRules.AmmoPurchasesNeedingDetailsItems(ammoDetailWarningCharacter)
+        .SequenceEqual(["Missing ammo cost"]),
+    "Ammo detail warnings must identify the weapon row that needs ammo details.");
 ammoDetailWarningCharacter.Weapons.Clear();
 ammoDetailWarningCharacter.Weapons.Add(new WeaponItem
 {
@@ -203,6 +209,9 @@ reloadReviewCharacter.Weapons.Add(new WeaponItem
 });
 Assert(CharacterRules.AmmoPurchasesNeedingReloadReview(reloadReviewCharacter) == 2,
     "Ammo purchases must warn when weapon shot capacity is missing.");
+Assert(CharacterRules.AmmoPurchasesNeedingReloadReviewItems(reloadReviewCharacter)
+        .SequenceEqual(["Missing shot capacity"]),
+    "Ammo reload warnings must identify the weapon row that needs review.");
 reloadReviewCharacter.Weapons.Clear();
 reloadReviewCharacter.Weapons.Add(new WeaponItem
 {
@@ -235,6 +244,9 @@ prostheticWarningCharacter.Equipment.Add(new EquipmentItem
 });
 Assert(CharacterRules.UnmountedProstheticEnhancements(prostheticWarningCharacter) == 2,
     "Prosthetic enhancements must warn when no prosthetic or implant host is present.");
+Assert(CharacterRules.UnmountedProstheticEnhancementItems(prostheticWarningCharacter)
+        .SequenceEqual(["Prosthetic Enhancement - Vibroblade"]),
+    "Prosthetic enhancement warnings must identify the equipment row that needs a host.");
 prostheticWarningCharacter.Equipment.Add(new EquipmentItem
 {
     Name = "Gill Implant", Cost = "8000", Mass = "0", Locations = "Implant", Count = "1"
@@ -249,6 +261,9 @@ vehicleWarningCharacter.Equipment.Add(new EquipmentItem
 });
 Assert(CharacterRules.UnbackedVehiclePurchases(vehicleWarningCharacter) == 2,
     "Vehicle purchases must warn when no Vehicle or Custom Vehicle trait is present.");
+Assert(CharacterRules.UnbackedVehiclePurchaseItems(vehicleWarningCharacter)
+        .SequenceEqual(["Hoodling Sensor HoverJeep"]),
+    "Vehicle warnings must identify the equipment row that needs trait support.");
 vehicleWarningCharacter.Traits.Add(new NamedValue("Vehicle", 100));
 Assert(CharacterRules.UnbackedVehiclePurchases(vehicleWarningCharacter) == 0,
     "Vehicle purchase warnings must clear when the Vehicle trait is present.");
