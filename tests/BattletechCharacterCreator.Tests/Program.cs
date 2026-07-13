@@ -318,12 +318,18 @@ Assert(catalog.AmmoModifiers.Single(item =>
         catalog.AmmoModifiers.Single(item =>
             item.Name == "Flechette").ApBdModifier == "-3B/+1S" &&
         catalog.AmmoModifiers.Single(item =>
-            item.Name == "GDPC Rounds").CompatibleCategories.SequenceEqual(["gaus"]) &&
+            item.Name == "GDPC Rounds").CompatibleCategories.SequenceEqual(["gaus", "supenergy"]) &&
         catalog.AmmoModifiers.Single(item =>
             item.Name == "Explosive" &&
             item.Category == "Bow and Arrow Specialty Ammo")
-            .CompatibleCategories.SequenceEqual(["archrange"]),
-        "Specialty ammunition modifier table values must be imported.");
+            .CompatibleCategories.SequenceEqual(["archrange"]) &&
+        catalog.AmmoModifiers.Single(item =>
+            item.Name == "Air-Burst").RequiredNameTerms.SequenceEqual(["Rifle"]) &&
+        catalog.AmmoModifiers.Single(item =>
+            item.Name == "Shotgun Solid Slugs").RequiredNameTerms.SequenceEqual(["Shotgun"]) &&
+        catalog.AmmoModifiers.Single(item =>
+            item.Name == "GDPC Rounds").ExcludedNameTerms.SequenceEqual(["Pistol", "Submaschine"]),
+        "Specialty ammunition modifier table values and compatibility rules must be imported.");
     Assert(companionCatalog.Equipment.Count == 286,
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,

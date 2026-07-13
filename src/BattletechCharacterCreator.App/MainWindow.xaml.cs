@@ -372,7 +372,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
     public string SelectedAmmoModifierSummary =>
         SelectedAmmoModifier is { } item
-            ? $"{item.Category} | AP/BD {item.ApBdModifier} | Range {item.RangeModifier} | Cost x{item.CostMultiplier:0.##} | {item.Notes}"
+            ? $"{item.Category} | AP/BD {item.ApBdModifier} | Range {item.RangeModifier} | Cost x{item.CostMultiplier:0.##}{FormatAmmoModifierRestrictions(item)} | {item.Notes}"
             : "No specialty ammunition selected.";
     public WeaponItem? SelectedWeaponInventoryItem
     {
@@ -1285,8 +1285,38 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var category = FindWeaponCategory(weapon);
-        return category.Length == 0 ||
-            modifier.CompatibleCategories.Contains(category, StringComparer.Ordinal);
+        if (category.Length > 0 &&
+            !modifier.CompatibleCategories.Contains(category, StringComparer.Ordinal))
+        {
+            return false;
+        }
+
+        return TermsMatch(weapon.Name, modifier.RequiredNameTerms, true) &&
+            TermsMatch(weapon.Name, modifier.ExcludedNameTerms, false);
+    }
+
+    private static bool TermsMatch(
+        string value,
+        IReadOnlyList<string> terms,
+        bool requireAny) =>
+        terms.Count == 0 ||
+        (requireAny
+            ? terms.Any(term => value.Contains(term, StringComparison.OrdinalIgnoreCase))
+            : terms.All(term => !value.Contains(term, StringComparison.OrdinalIgnoreCase)));
+
+    private static string FormatAmmoModifierRestrictions(
+        AmmoModifierCatalogItem item)
+    {
+        var pieces = new List<string>();
+        if (item.RequiredNameTerms.Count > 0)
+        {
+            pieces.Add("requires " + string.Join("/", item.RequiredNameTerms));
+        }
+        if (item.ExcludedNameTerms.Count > 0)
+        {
+            pieces.Add("excludes " + string.Join("/", item.ExcludedNameTerms));
+        }
+        return pieces.Count == 0 ? "" : $" | {string.Join("; ", pieces)}";
     }
 
     private static string FindWeaponCategory(WeaponItem weapon)
