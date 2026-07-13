@@ -88,6 +88,9 @@ the next gate is manual beta testing with `docs/MANUAL_TEST_PLAN.md`.
 
 ### Completed
 
+- Life Module flexible XP pools must be fully assigned before advancing to the next module
+- Stage 2 running Free XP visibly subtracts the selected late-childhood module cost
+- Minimum age starts at 16 after late childhood and adds selected Stage 3 education time plus Stage 4 career time
 - .NET 10 and WPF application foundation
 - A Time of War app icon applied to the executable and installer
 - First-launch choice window for opening the Character Wizard or Character
