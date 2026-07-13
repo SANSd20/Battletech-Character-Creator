@@ -284,6 +284,24 @@ public static class CharacterRules
             .Select(item => item.Name)
             .ToArray();
 
+    public static int AmmoModifierPurchasesNeedingAccessories(Character character) =>
+        character.Weapons
+            .Where(item => OptionalItemCount(item.AmmoCount) > 0)
+            .Where(item => AmmoModifierNeedsAccessories(character, item))
+            .Sum(item => OptionalItemCount(item.AmmoCount));
+
+    public static IReadOnlyList<string> AmmoModifierPurchasesNeedingAccessoryItems(Character character) =>
+        character.Weapons
+            .Where(item => OptionalItemCount(item.AmmoCount) > 0)
+            .Select(item => new
+            {
+                item.Name,
+                Missing = MissingAmmoModifierAccessories(character, item)
+            })
+            .Where(item => item.Missing.Count > 0)
+            .Select(item => $"{item.Name}: {string.Join(", ", item.Missing)}")
+            .ToArray();
+
     public static int UnmountedProstheticEnhancements(Character character)
     {
         var enhancementCount = character.Equipment
@@ -391,6 +409,35 @@ public static class CharacterRules
             trimmedShots.Contains(',', StringComparison.Ordinal) ||
             trimmedShots.Contains("PPS", StringComparison.OrdinalIgnoreCase);
     }
+
+    private static bool AmmoModifierNeedsAccessories(Character character, WeaponItem item) =>
+        MissingAmmoModifierAccessories(character, item).Count > 0;
+
+    private static IReadOnlyList<string> MissingAmmoModifierAccessories(
+        Character character,
+        WeaponItem item)
+    {
+        var requirements = ParseAccessoryList(item.AmmoRequiredAccessories);
+        if (requirements.Count == 0)
+        {
+            return [];
+        }
+
+        return requirements
+            .Where(required => !HasEquipment(character, required))
+            .ToArray();
+    }
+
+    private static IReadOnlyList<string> ParseAccessoryList(string value) =>
+        value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(item => item.Length > 0)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+    private static bool HasEquipment(Character character, string required) =>
+        character.Equipment.Any(item =>
+            ItemCount(item.Count) > 0 &&
+            item.Name.Contains(required, StringComparison.OrdinalIgnoreCase));
 
     private static int FindValue(IEnumerable<NamedValue> values, string name) =>
         values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;

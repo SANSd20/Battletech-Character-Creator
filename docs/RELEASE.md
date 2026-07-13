@@ -21,14 +21,14 @@ This profile creates a framework-dependent build. Test machines need the .NET
 After publishing, build the per-user NSIS installer with:
 
 ```powershell
-makensis /DVERSION=0.1.19-preview niss\atow_setup.nsi
+makensis /DVERSION=0.1.20-preview niss\atow_setup.nsi
 ```
 
 If `makensis` is not on `PATH`, the default NSIS install location can be used
 directly:
 
 ```powershell
-& 'C:\Program Files (x86)\NSIS\makensis.exe' /DVERSION=0.1.19-preview niss\atow_setup.nsi
+& 'C:\Program Files (x86)\NSIS\makensis.exe' /DVERSION=0.1.20-preview niss\atow_setup.nsi
 ```
 
 The beta installer uses the published folder as input, installs under
@@ -123,15 +123,15 @@ notes, a GitHub release draft with the current installer hash injected, and a
 manifest to:
 
 ```text
-artifacts\release\0.1.19-preview
+artifacts\release\0.1.20-preview
 ```
 
 The packaged installer and checksum include the current short Git commit in
 their filenames, for example:
 
 ```text
-atow-character-creator-0.1.19-preview-<commit>-setup.exe
-atow-character-creator-0.1.19-preview-<commit>-setup.exe.sha256
+atow-character-creator-0.1.20-preview-<commit>-setup.exe
+atow-character-creator-0.1.20-preview-<commit>-setup.exe.sha256
 ```
 
 Validate the prepared GitHub release without publishing it:

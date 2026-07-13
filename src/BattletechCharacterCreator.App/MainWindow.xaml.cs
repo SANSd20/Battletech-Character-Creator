@@ -248,6 +248,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                         CharacterRules.AmmoPurchasesNeedingReloadReviewItems(Character));
             }
 
+            var ammoNeedingAccessories =
+                CharacterRules.AmmoModifierPurchasesNeedingAccessories(Character);
+            if (ammoNeedingAccessories > 0)
+            {
+                return $"{ammoNeedingAccessories} specialty ammo purchase(s) need support gear: " +
+                    FormatInventoryWarningItems(
+                        CharacterRules.AmmoModifierPurchasesNeedingAccessoryItems(Character));
+            }
+
             var unmountedEnhancements = CharacterRules.UnmountedProstheticEnhancements(Character);
             if (unmountedEnhancements > 0)
             {
@@ -272,6 +281,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 : CharacterRules.PatchPurchasesNeedingPrice(Character) > 0 ||
                   CharacterRules.AmmoPurchasesNeedingDetails(Character) > 0 ||
                   CharacterRules.AmmoPurchasesNeedingReloadReview(Character) > 0 ||
+                  CharacterRules.AmmoModifierPurchasesNeedingAccessories(Character) > 0 ||
                   CharacterRules.UnmountedProstheticEnhancements(Character) > 0 ||
                   CharacterRules.UnbackedVehiclePurchases(Character) > 0
                     ? Brushes.DarkGoldenrod
@@ -875,6 +885,39 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 "Ammo warnings did not clear when ammo cost, mass, and shot capacity were present.");
         }
         Character.Weapons.Clear();
+        Character.Equipment.Clear();
+        Character.Weapons.Add(new WeaponItem
+        {
+            Name = "Air-Burst rifle",
+            Cost = "100",
+            Mass = "1",
+            Shots = "10",
+            AmmoCost = "5",
+            AmmoMass = "0.1",
+            AmmoCount = "2",
+            AmmoModifier = "Air-Burst",
+            AmmoRequiredAccessories = "Guided Rifle Module"
+        });
+        Recalculate();
+        if (!InventoryStatus.Contains("support gear", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Specialty ammo support gear warnings were not shown in the editor.");
+        }
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Guided Rifle Module",
+            Cost = "1000",
+            Mass = "0.5",
+            Count = "1"
+        });
+        Recalculate();
+        if (InventoryStatus.Contains("support gear", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Specialty ammo support gear warnings did not clear when support gear was present.");
+        }
+        Character.Weapons.Clear();
         Character.Equipment.Add(new EquipmentItem
         {
             Name = "Prosthetic Enhancement - Vibroblade",
@@ -1251,6 +1294,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         weapon.AmmoModifier = modifier.Name;
         weapon.AmmoCostModifier = CalculateAmmoModifierCost(weapon, modifier);
         weapon.AmmoMassModifier = "";
+        weapon.AmmoRequiredAccessories =
+            string.Join(", ", modifier.RequiredAccessories);
         if (!weapon.Notes.Contains(modifier.Notes, StringComparison.OrdinalIgnoreCase))
         {
             weapon.Notes = string.IsNullOrWhiteSpace(weapon.Notes)
@@ -1271,6 +1316,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         weapon.AmmoModifier = "";
         weapon.AmmoCostModifier = "";
         weapon.AmmoMassModifier = "";
+        weapon.AmmoRequiredAccessories = "";
         WeaponsGrid.Items.Refresh();
         Recalculate();
     }
@@ -1315,6 +1361,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (item.ExcludedNameTerms.Count > 0)
         {
             pieces.Add("excludes " + string.Join("/", item.ExcludedNameTerms));
+        }
+        if (item.RequiredAccessories.Count > 0)
+        {
+            pieces.Add("needs " + string.Join(", ", item.RequiredAccessories));
         }
         return pieces.Count == 0 ? "" : $" | {string.Join("; ", pieces)}";
     }

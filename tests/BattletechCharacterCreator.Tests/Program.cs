@@ -21,7 +21,9 @@ character.Weapons.Add(new WeaponItem
     Range = "15/35/80/200", Cost = "1500", Mass = "1", Shots = "3 PPS",
     AmmoCost = "5", AmmoMass = "0.25", AmmoCount = "4",
     AmmoModifier = "Caseless", AmmoCostModifier = "2",
-    AmmoMassModifier = "0.05", Notes = "Burst 5", Count = "1"
+    AmmoMassModifier = "0.05",
+    AmmoRequiredAccessories = "Guided Rifle Module",
+    Notes = "Burst 5", Count = "1"
 });
 character.RealLife = "Solaris VII Games";
 character.BirthAffiliation = "Federated Suns";
@@ -55,12 +57,14 @@ Assert(loaded.Weapons.Single().AmmoCount == "4" &&
     loaded.Weapons.Single().AmmoModifier == "Caseless" &&
     loaded.Weapons.Single().AmmoCostModifier == "2" &&
     loaded.Weapons.Single().AmmoMassModifier == "0.05" &&
+    loaded.Weapons.Single().AmmoRequiredAccessories == "Guided Rifle Module" &&
     loaded.Weapons.Single().Notes == "Burst 5",
-    "All sixteen weapon fields must round-trip.");
+    "All seventeen weapon fields must round-trip.");
 var legacyWeapon = LegacyCharacterSerializer.Read(new StringReader(
     "weapon:Small Arms;Hold-Out Pistol;1B/2;3/6/12/25;75;0.2;1;10;0.1;legacy notes;2"));
 Assert(legacyWeapon.Weapons.Single().AmmoCount == "0" &&
     legacyWeapon.Weapons.Single().AmmoModifier == "" &&
+    legacyWeapon.Weapons.Single().AmmoRequiredAccessories == "" &&
     legacyWeapon.Weapons.Single().Notes == "legacy notes",
     "Older eleven-field weapon rows must load with no purchased ammo or ammo modifier.");
 Assert(loaded.RealLifeHistory.SequenceEqual(character.RealLifeHistory),
@@ -245,6 +249,31 @@ reloadReviewCharacter.Weapons.Add(new WeaponItem
 });
 Assert(CharacterRules.AmmoPurchasesNeedingReloadReview(reloadReviewCharacter) == 0,
     "Ammo reload review warnings must clear for numeric shot capacity.");
+var ammoSupportWarningCharacter = new Character();
+ammoSupportWarningCharacter.Weapons.Add(new WeaponItem
+{
+    Name = "Air-Burst rifle", Cost = "100", Mass = "1", Shots = "10",
+    AmmoCost = "5", AmmoMass = "0.1", AmmoCount = "2",
+    AmmoModifier = "Air-Burst",
+    AmmoRequiredAccessories = "Guided Rifle Module"
+});
+Assert(CharacterRules.AmmoModifierPurchasesNeedingAccessories(
+        ammoSupportWarningCharacter) == 2,
+    "Specialty ammo purchases must warn when required support gear is missing.");
+Assert(CharacterRules.AmmoModifierPurchasesNeedingAccessoryItems(
+        ammoSupportWarningCharacter)
+    .SequenceEqual(["Air-Burst rifle: Guided Rifle Module"]),
+    "Specialty ammo support warnings must identify the missing support gear.");
+ammoSupportWarningCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Weapon Accessory - Guided Rifle Module",
+    Cost = "1000",
+    Mass = "0.5",
+    Count = "1"
+});
+Assert(CharacterRules.AmmoModifierPurchasesNeedingAccessories(
+        ammoSupportWarningCharacter) == 0,
+    "Specialty ammo support warnings must clear when support gear is present.");
 var prostheticWarningCharacter = new Character();
 prostheticWarningCharacter.Equipment.Add(new EquipmentItem
 {
@@ -325,6 +354,12 @@ Assert(catalog.AmmoModifiers.Single(item =>
             .CompatibleCategories.SequenceEqual(["archrange"]) &&
         catalog.AmmoModifiers.Single(item =>
             item.Name == "Air-Burst").RequiredNameTerms.SequenceEqual(["Rifle"]) &&
+        catalog.AmmoModifiers.Single(item =>
+            item.Name == "Air-Burst").RequiredAccessories.SequenceEqual(["Guided Rifle Module"]) &&
+        catalog.AmmoModifiers.Single(item =>
+            item.Name == "Guided Gyrojet Rounds").RequiredAccessories.SequenceEqual(["Guided Rifle Module"]) &&
+        catalog.AmmoModifiers.Single(item =>
+            item.Name == "Radioactive Tracker").RequiredAccessories.SequenceEqual(["Tracker Scanner"]) &&
         catalog.AmmoModifiers.Single(item =>
             item.Name == "Shotgun Solid Slugs").RequiredNameTerms.SequenceEqual(["Shotgun"]) &&
         catalog.AmmoModifiers.Single(item =>

@@ -129,7 +129,8 @@ public static class LegacyCharacterSerializer
             WriteValue(writer, "weapon", string.Join(';', item.Category, item.Skill,
                 item.Name, item.Damage, item.Range, item.Cost, item.Mass, item.Shots,
                 item.AmmoCost, item.AmmoMass, item.AmmoCount, item.AmmoModifier,
-                item.AmmoCostModifier, item.AmmoMassModifier, item.Notes, item.Count));
+                item.AmmoCostModifier, item.AmmoMassModifier,
+                item.AmmoRequiredAccessories, item.Notes, item.Count));
         }
 
         foreach (var weapon in c.EquippedWeapons)
@@ -203,11 +204,11 @@ public static class LegacyCharacterSerializer
     private static void AddWeapon(Character c, string value)
     {
         var f = value.Split(';');
-        if (f.Length is not (11 or 12 or 15 or 16)) return;
-        var offset = f.Length == 16 ? 1 : 0;
+        if (f.Length is not (11 or 12 or 15 or 16 or 17)) return;
+        var offset = f.Length is 16 or 17 ? 1 : 0;
         var item = new WeaponItem
         {
-            Category = f.Length == 16 ? f[0] : "",
+            Category = f.Length is 16 or 17 ? f[0] : "",
             Skill = f[offset], Name = f[offset + 1], Damage = f[offset + 2],
             Range = f[offset + 3], Cost = f[offset + 4], Mass = f[offset + 5],
             Shots = f[offset + 6], AmmoCost = f[offset + 7],
@@ -215,13 +216,14 @@ public static class LegacyCharacterSerializer
             AmmoCount = f.Length == 11 ? "0" : f[offset + 9]
         };
 
-        if (f.Length is 15 or 16)
+        if (f.Length is 15 or 16 or 17)
         {
             item.AmmoModifier = f[offset + 10];
             item.AmmoCostModifier = f[offset + 11];
             item.AmmoMassModifier = f[offset + 12];
-            item.Notes = f[offset + 13];
-            item.Count = f[offset + 14];
+            item.AmmoRequiredAccessories = f.Length == 17 ? f[offset + 13] : "";
+            item.Notes = f.Length == 17 ? f[offset + 14] : f[offset + 13];
+            item.Count = f.Length == 17 ? f[offset + 15] : f[offset + 14];
         }
         else
         {

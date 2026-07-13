@@ -58,6 +58,7 @@ public sealed record AmmoModifierCatalogItem(
     IReadOnlyList<string> CompatibleCategories,
     IReadOnlyList<string> RequiredNameTerms,
     IReadOnlyList<string> ExcludedNameTerms,
+    IReadOnlyList<string> RequiredAccessories,
     string Notes,
     RulebookSource Source = RulebookSource.CoreRulebook) : ISourceCatalogItem
 {
@@ -236,13 +237,16 @@ public sealed class ResourceCatalog
         string name,
         RulebookSource source) =>
         ReadDataLines(directory, name)
-            .Select(line => line.Split(';', 10))
-            .Where(fields => fields.Length == 10)
+            .Select(line => line.Split(';', 11))
+            .Where(fields => fields.Length is 10 or 11)
             .Select(fields => new AmmoModifierCatalogItem(
                 fields[0], fields[1], fields[2], fields[3],
                 ParseDecimal(fields[4]), fields[5],
                 ParseList(fields[6]), ParseList(fields[7]),
-                ParseList(fields[8]), fields[9], source))
+                ParseList(fields[8]),
+                fields.Length == 11 ? ParseList(fields[9]) : [],
+                fields.Length == 11 ? fields[10] : fields[9],
+                source))
             .ToArray();
 
     private static IReadOnlyDictionary<string, IReadOnlyList<string>> ReadSubskills(

@@ -958,6 +958,7 @@
                                 <DataGridTextColumn Header="Ammo mod" Binding="{Binding AmmoModifier}" Width="120"/>
                                 <DataGridTextColumn Header="Ammo mod cost" Binding="{Binding AmmoCostModifier}" Width="105"/>
                                 <DataGridTextColumn Header="Ammo mod mass" Binding="{Binding AmmoMassModifier}" Width="105"/>
+                                <DataGridTextColumn Header="Ammo support" Binding="{Binding AmmoRequiredAccessories}" Width="130"/>
                                 <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="180"/>
                             </DataGrid.Columns>
                         </DataGrid>
