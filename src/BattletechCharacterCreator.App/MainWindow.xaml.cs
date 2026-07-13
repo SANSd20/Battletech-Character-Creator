@@ -1294,6 +1294,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         weapon.AmmoModifier = modifier.Name;
         weapon.AmmoDamageModifier = modifier.ApBdModifier;
         weapon.AmmoRangeModifier = modifier.RangeModifier;
+        weapon.AmmoEffectiveDamage =
+            AmmoEffectCalculator.CalculateDamage(weapon.Damage, modifier.ApBdModifier);
+        weapon.AmmoEffectiveRange =
+            AmmoEffectCalculator.CalculateRange(weapon.Range, modifier.RangeModifier);
         weapon.AmmoCostModifier = CalculateAmmoModifierCost(weapon, modifier);
         weapon.AmmoMassModifier = "";
         weapon.AmmoRequiredAccessories =
@@ -1318,6 +1322,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         weapon.AmmoModifier = "";
         weapon.AmmoDamageModifier = "";
         weapon.AmmoRangeModifier = "";
+        weapon.AmmoEffectiveDamage = "";
+        weapon.AmmoEffectiveRange = "";
         weapon.AmmoCostModifier = "";
         weapon.AmmoMassModifier = "";
         weapon.AmmoRequiredAccessories = "";

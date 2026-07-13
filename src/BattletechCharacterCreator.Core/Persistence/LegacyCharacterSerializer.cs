@@ -130,6 +130,7 @@ public static class LegacyCharacterSerializer
                 item.Name, item.Damage, item.Range, item.Cost, item.Mass, item.Shots,
                 item.AmmoCost, item.AmmoMass, item.AmmoCount, item.AmmoModifier,
                 item.AmmoDamageModifier, item.AmmoRangeModifier,
+                item.AmmoEffectiveDamage, item.AmmoEffectiveRange,
                 item.AmmoCostModifier, item.AmmoMassModifier,
                 item.AmmoRequiredAccessories, item.Notes, item.Count));
         }
@@ -205,11 +206,11 @@ public static class LegacyCharacterSerializer
     private static void AddWeapon(Character c, string value)
     {
         var f = value.Split(';');
-        if (f.Length is not (11 or 12 or 15 or 16 or 17 or 19)) return;
-        var offset = f.Length is 16 or 17 or 19 ? 1 : 0;
+        if (f.Length is not (11 or 12 or 15 or 16 or 17 or 19 or 21)) return;
+        var offset = f.Length is 16 or 17 or 19 or 21 ? 1 : 0;
         var item = new WeaponItem
         {
-            Category = f.Length is 16 or 17 or 19 ? f[0] : "",
+            Category = f.Length is 16 or 17 or 19 or 21 ? f[0] : "",
             Skill = f[offset], Name = f[offset + 1], Damage = f[offset + 2],
             Range = f[offset + 3], Cost = f[offset + 4], Mass = f[offset + 5],
             Shots = f[offset + 6], AmmoCost = f[offset + 7],
@@ -217,10 +218,22 @@ public static class LegacyCharacterSerializer
             AmmoCount = f.Length == 11 ? "0" : f[offset + 9]
         };
 
-        if (f.Length is 15 or 16 or 17 or 19)
+        if (f.Length is 15 or 16 or 17 or 19 or 21)
         {
             item.AmmoModifier = f[offset + 10];
-            if (f.Length == 19)
+            if (f.Length == 21)
+            {
+                item.AmmoDamageModifier = f[offset + 11];
+                item.AmmoRangeModifier = f[offset + 12];
+                item.AmmoEffectiveDamage = f[offset + 13];
+                item.AmmoEffectiveRange = f[offset + 14];
+                item.AmmoCostModifier = f[offset + 15];
+                item.AmmoMassModifier = f[offset + 16];
+                item.AmmoRequiredAccessories = f[offset + 17];
+                item.Notes = f[offset + 18];
+                item.Count = f[offset + 19];
+            }
+            else if (f.Length == 19)
             {
                 item.AmmoDamageModifier = f[offset + 11];
                 item.AmmoRangeModifier = f[offset + 12];

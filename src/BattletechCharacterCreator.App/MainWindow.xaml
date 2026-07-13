@@ -958,6 +958,8 @@
                                 <DataGridTextColumn Header="Ammo mod" Binding="{Binding AmmoModifier}" Width="120"/>
                                 <DataGridTextColumn Header="Ammo AP/BD" Binding="{Binding AmmoDamageModifier}" Width="95"/>
                                 <DataGridTextColumn Header="Ammo range" Binding="{Binding AmmoRangeModifier}" Width="95"/>
+                                <DataGridTextColumn Header="Effective AP/BD" Binding="{Binding AmmoEffectiveDamage}" Width="105"/>
+                                <DataGridTextColumn Header="Effective range" Binding="{Binding AmmoEffectiveRange}" Width="105"/>
                                 <DataGridTextColumn Header="Ammo mod cost" Binding="{Binding AmmoCostModifier}" Width="105"/>
                                 <DataGridTextColumn Header="Ammo mod mass" Binding="{Binding AmmoMassModifier}" Width="105"/>
                                 <DataGridTextColumn Header="Ammo support" Binding="{Binding AmmoRequiredAccessories}" Width="130"/>

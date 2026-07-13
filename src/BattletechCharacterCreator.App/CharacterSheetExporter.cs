@@ -309,14 +309,20 @@ public static class CharacterSheetExporter
         var modifier = string.IsNullOrWhiteSpace(weapon.AmmoModifier)
             ? ""
             : $" ({weapon.AmmoModifier})";
+        var damageEffect = string.IsNullOrWhiteSpace(weapon.AmmoEffectiveDamage)
+            ? weapon.AmmoDamageModifier
+            : weapon.AmmoEffectiveDamage;
+        var rangeEffect = string.IsNullOrWhiteSpace(weapon.AmmoEffectiveRange)
+            ? weapon.AmmoRangeModifier
+            : weapon.AmmoEffectiveRange;
         var effects = new[]
             {
-                string.IsNullOrWhiteSpace(weapon.AmmoDamageModifier)
+                string.IsNullOrWhiteSpace(damageEffect)
                     ? ""
-                    : $"AP/BD: {weapon.AmmoDamageModifier}",
-                string.IsNullOrWhiteSpace(weapon.AmmoRangeModifier)
+                    : $"AP/BD: {damageEffect}",
+                string.IsNullOrWhiteSpace(rangeEffect)
                     ? ""
-                    : $"Range: {weapon.AmmoRangeModifier}"
+                    : $"Range: {rangeEffect}"
             }
             .Where(value => !string.IsNullOrWhiteSpace(value));
         var effectDetails = string.Join(", ", effects);

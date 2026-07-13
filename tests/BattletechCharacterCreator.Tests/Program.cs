@@ -23,6 +23,8 @@ character.Weapons.Add(new WeaponItem
     AmmoModifier = "Caseless",
     AmmoDamageModifier = "-1B/+0",
     AmmoRangeModifier = "Half range",
+    AmmoEffectiveDamage = "2B/3B",
+    AmmoEffectiveRange = "7.5/17.5/40/100",
     AmmoCostModifier = "2",
     AmmoMassModifier = "0.05",
     AmmoRequiredAccessories = "Guided Rifle Module",
@@ -60,17 +62,21 @@ Assert(loaded.Weapons.Single().AmmoCount == "4" &&
     loaded.Weapons.Single().AmmoModifier == "Caseless" &&
     loaded.Weapons.Single().AmmoDamageModifier == "-1B/+0" &&
     loaded.Weapons.Single().AmmoRangeModifier == "Half range" &&
+    loaded.Weapons.Single().AmmoEffectiveDamage == "2B/3B" &&
+    loaded.Weapons.Single().AmmoEffectiveRange == "7.5/17.5/40/100" &&
     loaded.Weapons.Single().AmmoCostModifier == "2" &&
     loaded.Weapons.Single().AmmoMassModifier == "0.05" &&
     loaded.Weapons.Single().AmmoRequiredAccessories == "Guided Rifle Module" &&
     loaded.Weapons.Single().Notes == "Burst 5",
-    "All nineteen weapon fields must round-trip.");
+    "All twenty-one weapon fields must round-trip.");
 var legacyWeapon = LegacyCharacterSerializer.Read(new StringReader(
     "weapon:Small Arms;Hold-Out Pistol;1B/2;3/6/12/25;75;0.2;1;10;0.1;legacy notes;2"));
 Assert(legacyWeapon.Weapons.Single().AmmoCount == "0" &&
     legacyWeapon.Weapons.Single().AmmoModifier == "" &&
     legacyWeapon.Weapons.Single().AmmoDamageModifier == "" &&
     legacyWeapon.Weapons.Single().AmmoRangeModifier == "" &&
+    legacyWeapon.Weapons.Single().AmmoEffectiveDamage == "" &&
+    legacyWeapon.Weapons.Single().AmmoEffectiveRange == "" &&
     legacyWeapon.Weapons.Single().AmmoRequiredAccessories == "" &&
     legacyWeapon.Weapons.Single().Notes == "legacy notes",
     "Older eleven-field weapon rows must load with no purchased ammo or ammo modifier.");
@@ -79,6 +85,8 @@ var previousAccessoryWeapon = LegacyCharacterSerializer.Read(new StringReader(
 Assert(previousAccessoryWeapon.Weapons.Single().AmmoModifier == "Air-Burst" &&
     previousAccessoryWeapon.Weapons.Single().AmmoDamageModifier == "" &&
     previousAccessoryWeapon.Weapons.Single().AmmoRangeModifier == "" &&
+    previousAccessoryWeapon.Weapons.Single().AmmoEffectiveDamage == "" &&
+    previousAccessoryWeapon.Weapons.Single().AmmoEffectiveRange == "" &&
     previousAccessoryWeapon.Weapons.Single().AmmoCostModifier == "160" &&
     previousAccessoryWeapon.Weapons.Single().AmmoRequiredAccessories == "Guided Rifle Module",
     "Previous seventeen-field weapon rows must keep accessory data while leaving effect fields blank.");
@@ -324,6 +332,18 @@ vehicleWarningCharacter.Traits.Clear();
 vehicleWarningCharacter.Traits.Add(new NamedValue("Custom Vehicle", 100));
 Assert(CharacterRules.UnbackedVehiclePurchases(vehicleWarningCharacter) == 0,
     "Vehicle purchase warnings must clear when the Custom Vehicle trait is present.");
+Assert(AmmoEffectCalculator.CalculateDamage("2B/3", "+2B/-1") == "4B/2",
+    "Simple AP/BD specialty ammo modifiers must calculate effective damage.");
+Assert(AmmoEffectCalculator.CalculateDamage("3B/3", "+3B/-0S") == "6B/3S",
+    "Specialty ammo damage suffixes must carry into effective damage.");
+Assert(AmmoEffectCalculator.CalculateRange(
+        "15/35/80/200",
+        "Half range") == "7.5/17.5/40/100",
+    "Half-range specialty ammo modifiers must calculate effective range.");
+Assert(AmmoEffectCalculator.CalculateDamage(
+        "4B/5",
+        "Payload canister") == "Payload canister",
+    "Special specialty ammo payload text must remain visible when it cannot be calculated.");
 
 CheckSample("newchar.btcc", 3_300, 100, 6, 18, 36);
 CheckSample("test.btcc", 5_000, 5_494, 6, 18, 36);
