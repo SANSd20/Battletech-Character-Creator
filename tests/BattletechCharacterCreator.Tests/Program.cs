@@ -20,7 +20,10 @@ character.Weapons.Add(new WeaponItem
     Category = "energy", Skill = "Small Arms", Name = "Laser Pistol", Damage = "3E/3B",
     Range = "15/35/80/200", Cost = "1500", Mass = "1", Shots = "3 PPS",
     AmmoCost = "5", AmmoMass = "0.25", AmmoCount = "4",
-    AmmoModifier = "Caseless", AmmoCostModifier = "2",
+    AmmoModifier = "Caseless",
+    AmmoDamageModifier = "-1B/+0",
+    AmmoRangeModifier = "Half range",
+    AmmoCostModifier = "2",
     AmmoMassModifier = "0.05",
     AmmoRequiredAccessories = "Guided Rifle Module",
     Notes = "Burst 5", Count = "1"
@@ -55,18 +58,30 @@ Assert(legacyEquipment.Equipment.Single().PatchCount == "0" &&
 Assert(loaded.Weapons.Single().AmmoCount == "4" &&
     loaded.Weapons.Single().Category == "energy" &&
     loaded.Weapons.Single().AmmoModifier == "Caseless" &&
+    loaded.Weapons.Single().AmmoDamageModifier == "-1B/+0" &&
+    loaded.Weapons.Single().AmmoRangeModifier == "Half range" &&
     loaded.Weapons.Single().AmmoCostModifier == "2" &&
     loaded.Weapons.Single().AmmoMassModifier == "0.05" &&
     loaded.Weapons.Single().AmmoRequiredAccessories == "Guided Rifle Module" &&
     loaded.Weapons.Single().Notes == "Burst 5",
-    "All seventeen weapon fields must round-trip.");
+    "All nineteen weapon fields must round-trip.");
 var legacyWeapon = LegacyCharacterSerializer.Read(new StringReader(
     "weapon:Small Arms;Hold-Out Pistol;1B/2;3/6/12/25;75;0.2;1;10;0.1;legacy notes;2"));
 Assert(legacyWeapon.Weapons.Single().AmmoCount == "0" &&
     legacyWeapon.Weapons.Single().AmmoModifier == "" &&
+    legacyWeapon.Weapons.Single().AmmoDamageModifier == "" &&
+    legacyWeapon.Weapons.Single().AmmoRangeModifier == "" &&
     legacyWeapon.Weapons.Single().AmmoRequiredAccessories == "" &&
     legacyWeapon.Weapons.Single().Notes == "legacy notes",
     "Older eleven-field weapon rows must load with no purchased ammo or ammo modifier.");
+var previousAccessoryWeapon = LegacyCharacterSerializer.Read(new StringReader(
+    "weapon:slugrifle;Small Arms;Test Rifle;2B/3;10/20/40/80;1000;3;10;20;0.1;2;Air-Burst;160;0;Guided Rifle Module;previous notes;1"));
+Assert(previousAccessoryWeapon.Weapons.Single().AmmoModifier == "Air-Burst" &&
+    previousAccessoryWeapon.Weapons.Single().AmmoDamageModifier == "" &&
+    previousAccessoryWeapon.Weapons.Single().AmmoRangeModifier == "" &&
+    previousAccessoryWeapon.Weapons.Single().AmmoCostModifier == "160" &&
+    previousAccessoryWeapon.Weapons.Single().AmmoRequiredAccessories == "Guided Rifle Module",
+    "Previous seventeen-field weapon rows must keep accessory data while leaving effect fields blank.");
 Assert(loaded.RealLifeHistory.SequenceEqual(character.RealLifeHistory),
     "Stage 4 career history must round-trip in order.");
 Assert(loaded.BirthAffiliation == character.BirthAffiliation &&

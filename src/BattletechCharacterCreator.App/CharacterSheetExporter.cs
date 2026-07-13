@@ -309,7 +309,20 @@ public static class CharacterSheetExporter
         var modifier = string.IsNullOrWhiteSpace(weapon.AmmoModifier)
             ? ""
             : $" ({weapon.AmmoModifier})";
-        return $"{details}, Ammo packs: {ammoCount}{modifier}";
+        var effects = new[]
+            {
+                string.IsNullOrWhiteSpace(weapon.AmmoDamageModifier)
+                    ? ""
+                    : $"AP/BD: {weapon.AmmoDamageModifier}",
+                string.IsNullOrWhiteSpace(weapon.AmmoRangeModifier)
+                    ? ""
+                    : $"Range: {weapon.AmmoRangeModifier}"
+            }
+            .Where(value => !string.IsNullOrWhiteSpace(value));
+        var effectDetails = string.Join(", ", effects);
+        return string.IsNullOrWhiteSpace(effectDetails)
+            ? $"{details}, Ammo packs: {ammoCount}{modifier}"
+            : $"{details}, Ammo packs: {ammoCount}{modifier}, {effectDetails}";
     }
 
     private static string EquipmentInventoryDetails(EquipmentItem item)
