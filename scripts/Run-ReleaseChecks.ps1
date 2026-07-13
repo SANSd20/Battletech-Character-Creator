@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.1.17-preview",
+    [string]$Version = "0.1.18-preview",
     [string]$Configuration = "Release",
     [switch]$SkipInstallerBuild
 )

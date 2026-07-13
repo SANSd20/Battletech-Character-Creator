@@ -39,6 +39,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool includeCompanionContent;
     private EquipmentCatalogItem? selectedEquipmentCatalogItem;
     private WeaponCatalogItem? selectedWeaponCatalogItem;
+    private WeaponItem? selectedWeaponInventoryItem;
     private AmmoModifierCatalogItem? selectedAmmoModifier;
     private EraCharacterTemplate? selectedEraTemplate;
 
@@ -67,6 +68,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 .OrderBy(category => category)];
     public IReadOnlyList<AmmoModifierCatalogItem> AmmoModifiers =>
         Catalog.AmmoModifiers;
+    public IReadOnlyList<AmmoModifierCatalogItem> CompatibleAmmoModifiers =>
+        SelectedWeaponInventoryItem is { } weapon
+            ? Catalog.AmmoModifiers
+                .Where(item => AmmoModifierMatchesWeapon(item, weapon))
+                .ToArray()
+            : Catalog.AmmoModifiers;
 
     public MainWindow() : this(new Character())
     {
@@ -367,6 +374,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectedAmmoModifier is { } item
             ? $"{item.Category} | AP/BD {item.ApBdModifier} | Range {item.RangeModifier} | Cost x{item.CostMultiplier:0.##} | {item.Notes}"
             : "No specialty ammunition selected.";
+    public WeaponItem? SelectedWeaponInventoryItem
+    {
+        get => selectedWeaponInventoryItem;
+        set
+        {
+            selectedWeaponInventoryItem = value;
+            if (SelectedAmmoModifier is { } modifier &&
+                value is { } weapon &&
+                !AmmoModifierMatchesWeapon(modifier, weapon))
+            {
+                SelectedAmmoModifier = null;
+            }
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(CompatibleAmmoModifiers));
+        }
+    }
     public string? SelectedSkillName
     {
         get => selectedSkillName;
@@ -1184,6 +1207,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (SelectedWeaponCatalogItem is not { } item) return;
         Character.Weapons.Add(new WeaponItem
         {
+            Category = item.Category,
             Skill = item.Skill,
             Name = item.Name,
             Damage = item.Damage,
@@ -1209,9 +1233,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
+    private void WeaponsGrid_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        SelectedWeaponInventoryItem = WeaponsGrid.SelectedItem as WeaponItem;
+    }
+
     private void ApplyAmmoModifier_Click(object sender, RoutedEventArgs e)
     {
-        if (WeaponsGrid.SelectedItem is not WeaponItem weapon ||
+        if (SelectedWeaponInventoryItem is not { } weapon ||
             SelectedAmmoModifier is not { } modifier)
         {
             return;
@@ -1232,7 +1263,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ClearAmmoModifier_Click(object sender, RoutedEventArgs e)
     {
-        if (WeaponsGrid.SelectedItem is not WeaponItem weapon)
+        if (SelectedWeaponInventoryItem is not { } weapon)
         {
             return;
         }
@@ -1242,6 +1273,44 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         weapon.AmmoMassModifier = "";
         WeaponsGrid.Items.Refresh();
         Recalculate();
+    }
+
+    private static bool AmmoModifierMatchesWeapon(
+        AmmoModifierCatalogItem modifier,
+        WeaponItem weapon)
+    {
+        if (modifier.CompatibleCategories.Count == 0)
+        {
+            return true;
+        }
+
+        var category = FindWeaponCategory(weapon);
+        return category.Length == 0 ||
+            modifier.CompatibleCategories.Contains(category, StringComparer.Ordinal);
+    }
+
+    private static string FindWeaponCategory(WeaponItem weapon)
+    {
+        if (!string.IsNullOrWhiteSpace(weapon.Category))
+        {
+            return weapon.Category;
+        }
+
+        var notes = weapon.Notes;
+        var marker = "Category:";
+        var markerIndex = notes.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+        if (markerIndex >= 0)
+        {
+            var value = notes[(markerIndex + marker.Length)..]
+                .Split(';', 2)[0]
+                .Trim();
+            if (value.Length > 0)
+            {
+                return value;
+            }
+        }
+
+        return "";
     }
 
     private static string CalculateAmmoModifierCost(

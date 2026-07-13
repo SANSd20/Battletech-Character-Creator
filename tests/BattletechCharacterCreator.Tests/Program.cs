@@ -17,7 +17,7 @@ character.Equipment.Add(new EquipmentItem
 });
 character.Weapons.Add(new WeaponItem
 {
-    Skill = "Small Arms", Name = "Laser Pistol", Damage = "3E/3B",
+    Category = "energy", Skill = "Small Arms", Name = "Laser Pistol", Damage = "3E/3B",
     Range = "15/35/80/200", Cost = "1500", Mass = "1", Shots = "3 PPS",
     AmmoCost = "5", AmmoMass = "0.25", AmmoCount = "4",
     AmmoModifier = "Caseless", AmmoCostModifier = "2",
@@ -51,11 +51,12 @@ Assert(legacyEquipment.Equipment.Single().PatchCount == "0" &&
     legacyEquipment.Equipment.Single().Notes == "legacy notes",
     "Older seven-field equipment rows must load with no purchased patches.");
 Assert(loaded.Weapons.Single().AmmoCount == "4" &&
+    loaded.Weapons.Single().Category == "energy" &&
     loaded.Weapons.Single().AmmoModifier == "Caseless" &&
     loaded.Weapons.Single().AmmoCostModifier == "2" &&
     loaded.Weapons.Single().AmmoMassModifier == "0.05" &&
     loaded.Weapons.Single().Notes == "Burst 5",
-    "All fifteen weapon fields must round-trip.");
+    "All sixteen weapon fields must round-trip.");
 var legacyWeapon = LegacyCharacterSerializer.Read(new StringReader(
     "weapon:Small Arms;Hold-Out Pistol;1B/2;3/6/12/25;75;0.2;1;10;0.1;legacy notes;2"));
 Assert(legacyWeapon.Weapons.Single().AmmoCount == "0" &&
@@ -312,10 +313,16 @@ static void CheckResourceCatalog()
         "All 209 legacy weapon entries must be imported.");
     Assert(catalog.AmmoModifiers.Count == 15,
         "All 15 core specialty ammunition modifiers must be imported.");
-    Assert(catalog.AmmoModifiers.Single(item =>
+Assert(catalog.AmmoModifiers.Single(item =>
             item.Name == "Radioactive Tracker").CostMultiplier == 3.5m &&
         catalog.AmmoModifiers.Single(item =>
-            item.Name == "Flechette").ApBdModifier == "-3B/+1S",
+            item.Name == "Flechette").ApBdModifier == "-3B/+1S" &&
+        catalog.AmmoModifiers.Single(item =>
+            item.Name == "GDPC Rounds").CompatibleCategories.SequenceEqual(["gaus"]) &&
+        catalog.AmmoModifiers.Single(item =>
+            item.Name == "Explosive" &&
+            item.Category == "Bow and Arrow Specialty Ammo")
+            .CompatibleCategories.SequenceEqual(["archrange"]),
         "Specialty ammunition modifier table values must be imported.");
     Assert(companionCatalog.Equipment.Count == 286,
         "Companion-enabled equipment must include the starter Companion import.");

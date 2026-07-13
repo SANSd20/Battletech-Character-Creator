@@ -82,6 +82,7 @@ public sealed class EquipmentItem
 
 public sealed class WeaponItem
 {
+    public string Category { get; set; } = "";
     public string Skill { get; set; } = "";
     public string Name { get; set; } = "";
     public string Damage { get; set; } = "";

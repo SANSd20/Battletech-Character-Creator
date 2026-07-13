@@ -1,8 +1,58 @@
 # A Time of War Character Creator 0.1.18-preview Beta
 
-This is a beta refresh of the .NET/WPF migration. It is intended for manual
-testing, feedback, and continued rule audit work, not as the final stable
-release.
+This is a beta refresh of the .NET/WPF migration of the original BattleTech
+Character Creator. It is ready for broader manual testing and feedback, but it
+is not the final stable release.
+
+## Download
+
+Attach these files from `artifacts\release\0.1.18-preview`:
+
+- `atow-character-creator-0.1.18-preview-<commit>-setup.exe`
+- `atow-character-creator-0.1.18-preview-<commit>-setup.exe.sha256`
+- `PREVIEW_RELEASE_NOTES.md`
+- `release-manifest.txt`
+
+## Requirements
+
+- Windows
+- .NET 10 Desktop Runtime
+
+## Install Location
+
+This beta installs under `%LOCALAPPDATA%\A Time of War Character Creator Beta`
+and registers a separate beta uninstaller.
+
+## Verification
+
+See `release-manifest.txt` for the exact packaged commit.
+
+SHA-256:
+
+```text
+{{INSTALLER_SHA256}}
+```
+
+Before packaging, the automated release checks passed:
+
+- Migration tests
+- Start window smoke
+- Wizard smoke
+- Clan round-trip smoke
+- Representative life-path smoke
+- Editor allocation smoke
+- Inventory smoke
+- Character-sheet export smoke
+- Error report smokes
+- Solution build
+- Folder publish
+- NSIS installer build
+- Installer dry-run
+
+The full installer install, launch-smoke, and uninstall test passed on
+July 7, 2026.
+
+Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 
 ## Highlights
 
@@ -22,19 +72,16 @@ release.
 - Basic information uses campaign year, with age calculated from life-path choices
 - Campaign year infers the matching era from the imported `Eras.xlsx` chronology
 - Era-aware affiliation availability filters with visible source notes
-- Stage 3 education interest choices hide Clan-history options from pre-invasion
-  Inner Sphere characters
 - Era-aware Rasalhague sub-affiliation filters with visible source notes
 - Pre-invasion eras after the Golden Century show both Invading Clan and
   Homeworld Clan origins for Clan characters
 - Era quick-start templates for common campaign starts in the editor
 - All corrected-printing affiliations and 68 sub-affiliations
-- All 24 corrected-printing Stage 4 base modules, including variant paths
+- All 24 corrected-printing Stage 4 base modules, including variants
 - Two ordered Stage 4 careers with repeat and prerequisite handling
 - Stage 2, Stage 3, and Stage 4 flexible XP pools preserve user allocations
   while navigating between wizard pages
 - Flexible XP target dropdowns group Attributes first, then Traits, then Skills
-- Flexible XP target dropdowns hide targets already selected in the same pool
 - Stage 1 flexible XP target lists include cataloged Compulsion traits
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
@@ -82,7 +129,6 @@ release.
 - Release checks validate diagnostic report versions against the requested version
 - Release checks verify the app project version matches the requested version
 - Release checks verify Windows assembly/file versions match the release version
-- Preview packaging now stops immediately if release checks fail
 - Release checks verify the installer dry-run still covers installed start,
   diagnostic, sheet export, and uninstall checks
 - Release checks close repo-launched app instances around app smoke, build, and
@@ -91,9 +137,6 @@ release.
   smoke launches
 - Wizard smoke headlessly validates era-aware wizard behavior and a representative
   character path without the slower exhaustive UI selection sweep
-- Affiliation-filtered childhood, Clan round-trip, and editor allocation smokes
-  now run headlessly to avoid local WPF window/font-cache startup failures
-  during release checks
 - Start-window smoke runs headlessly before WPF startup so release automation
   validates launch choices without hanging on window construction
 - Start-window smoke validates compiled WPF start-screen resources in installed
@@ -102,9 +145,7 @@ release.
   launch-screen assets
 - Installer smoke validates diagnostic metadata from the installed app
 - Installer smoke validates character-sheet PDF export from the installed app
-- Per-user Windows installer and release package manifest/checksum output
-- Beta installer uses `%LOCALAPPDATA%\A Time of War Character Creator Beta`
-  with separate beta Start Menu and uninstall entries
+- Per-user Windows installer
 - Release packaging guard against stale installers when release checks are skipped
 - Release package filenames include the packaged build commit
 - GitHub release validation cross-checks manifest installer metadata
@@ -112,29 +153,6 @@ release.
 - GitHub release validation checks the draft notes match the requested version
 - GitHub release validation checks preview notes match the requested version
 - Manual preview test plan and generated run logs for installed-app testing
-
-## Verification
-
-Before this preview was packaged, the automated release checks passed:
-
-- Migration tests
-- Start window smoke
-- Wizard smoke
-- Clan round-trip smoke
-- Representative life-path smoke
-- Editor allocation smoke
-- Inventory smoke
-- Character-sheet export smoke
-- Error report smokes
-- Solution build
-- Folder publish
-- NSIS installer build
-- Installer dry-run
-
-The full installer install, launch-smoke, and uninstall test passed on
-June 18, 2026.
-
-Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 
 ## Known Gaps
 

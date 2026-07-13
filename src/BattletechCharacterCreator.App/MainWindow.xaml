@@ -917,7 +917,7 @@
                                        VerticalAlignment="Center"
                                        Margin="0,0,8,0"/>
                             <ComboBox Grid.Column="1"
-                                      ItemsSource="{Binding AmmoModifiers}"
+                                      ItemsSource="{Binding CompatibleAmmoModifiers}"
                                       SelectedItem="{Binding SelectedAmmoModifier}"
                                       DisplayMemberPath="DisplayName"
                                       VerticalContentAlignment="Center"
@@ -941,6 +941,7 @@
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
                                   CellEditEnding="DataGrid_CellEditEnding"
+                                  SelectionChanged="WeaponsGrid_SelectionChanged"
                                   HorizontalScrollBarVisibility="Auto">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Qty" Binding="{Binding Count}" Width="55"/>
