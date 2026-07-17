@@ -75,7 +75,11 @@ public partial class CharacterWizardWindow : Window
         public string DisplayName => $"{Category} / {Name}";
     }
 
-    private sealed record FreeXpAllocationRow(string Category, string Name, int Xp);
+    private sealed record FreeXpAllocationRow(
+        string Key,
+        string Category,
+        string Name,
+        int Xp);
 
     private static string IssueKey(PrerequisiteIssue issue) =>
         $"{issue.Category}|{issue.Name}|{issue.RequiredXp}|{issue.ActualXp}";
@@ -767,6 +771,19 @@ public partial class CharacterWizardWindow : Window
         {
             throw new InvalidOperationException(
                 "Manual Free XP spending did not apply to the selected Skill.");
+        }
+
+        var freeXpRow = BuildFreeXpAllocationRows()
+            .Single(item => item.Category == "Skill" && item.Name == "Acrobatics");
+        RemoveFreeXp_Click(new Button { Tag = freeXpRow }, new RoutedEventArgs());
+        var removedCharacter = BuildCharacter();
+        if (BuildFreeXpAllocationRows().Any(item =>
+                item.Category == "Skill" && item.Name == "Acrobatics") ||
+            CharacterRules.Calculate(removedCharacter).FreeXp !=
+            CharacterRules.Calculate(character).FreeXp)
+        {
+            throw new InvalidOperationException(
+                "Removing a Free XP allocation did not restore the spent XP.");
         }
 
         FreeXpTargetPicker.SelectedItem = FreeXpTargetPicker.Items
@@ -2794,6 +2811,17 @@ public partial class CharacterWizardWindow : Window
         UpdatePreview();
     }
 
+    private void RemoveFreeXp_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: FreeXpAllocationRow row })
+        {
+            return;
+        }
+
+        reviewFreeXpAllocations.Remove(row.Key);
+        UpdatePreview();
+    }
+
     private void RefreshFreeXpAllocationLists()
     {
         FreeXpAllocations.ItemsSource = BuildFreeXpAllocationRows();
@@ -2819,6 +2847,7 @@ public partial class CharacterWizardWindow : Window
             .Where(allocation => allocation.Parts.Length == 2 &&
                 allocation.Value != 0)
             .Select(allocation => new FreeXpAllocationRow(
+                allocation.Parts[0] + "|" + allocation.Parts[1],
                 allocation.Parts[0],
                 allocation.Parts[1],
                 allocation.Value))

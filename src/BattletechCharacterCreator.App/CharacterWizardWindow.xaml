@@ -749,6 +749,16 @@
                                         <DataGridTextColumn Header="Type" Binding="{Binding Category}" Width="82"/>
                                         <DataGridTextColumn Header="Target" Binding="{Binding Name}" Width="*"/>
                                         <DataGridTextColumn Header="XP" Binding="{Binding Xp}" Width="55"/>
+                                        <DataGridTemplateColumn Header="" Width="76">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Content="Remove"
+                                                            Padding="6,1"
+                                                            Tag="{Binding}"
+                                                            Click="RemoveFreeXp_Click"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Grid>
