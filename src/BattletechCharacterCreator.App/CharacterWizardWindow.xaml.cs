@@ -25,6 +25,7 @@ public partial class CharacterWizardWindow : Window
     private string lastRunningFreeXp = "";
     private int currentStep;
     private bool refreshing;
+    private IReadOnlyList<FreeXpTargetOption> allFreeXpTargetOptions = [];
     private readonly Dictionary<string, int> reviewFreeXpAllocations = [];
 
     private sealed record ChoiceInput(
@@ -104,9 +105,10 @@ public partial class CharacterWizardWindow : Window
         EyeColorPicker.ItemsSource = resources.EyeColors;
         SexPicker.ItemsSource = new[] { "Male", "Female" };
         SexPicker.SelectedIndex = 0;
-        FreeXpTargetPicker.ItemsSource = BuildFreeXpTargetOptions(
+        allFreeXpTargetOptions = BuildFreeXpTargetOptions(
             resources.TraitNames,
             resources.SkillNames);
+        RefreshFreeXpTargetOptions();
 
         RefreshEraAvailability();
         AffiliationPicker.ItemsSource = BirthAffiliations;
@@ -764,6 +766,14 @@ public partial class CharacterWizardWindow : Window
         FreeXpAmount.Text = "25";
         AddFreeXp_Click(this, new RoutedEventArgs());
         var manualCharacter = BuildCharacter();
+        if (FreeXpTargetPicker.Items
+            .Cast<FreeXpTargetOption>()
+            .Any(item => item.Category == "Skill" && item.Name == "Acrobatics"))
+        {
+            throw new InvalidOperationException(
+                "Manual Free XP targets did not hide an already selected Skill.");
+        }
+
         if (!manualCharacter.Skills.Any(item =>
                 item.Name == "Acrobatics" && item.Value >= 25) ||
             CharacterRules.Calculate(manualCharacter).FreeXp !=
@@ -779,6 +789,9 @@ public partial class CharacterWizardWindow : Window
         var removedCharacter = BuildCharacter();
         if (BuildFreeXpAllocationRows().Any(item =>
                 item.Category == "Skill" && item.Name == "Acrobatics") ||
+            !FreeXpTargetPicker.Items
+                .Cast<FreeXpTargetOption>()
+                .Any(item => item.Category == "Skill" && item.Name == "Acrobatics") ||
             CharacterRules.Calculate(removedCharacter).FreeXp !=
             CharacterRules.Calculate(character).FreeXp)
         {
@@ -2824,7 +2837,30 @@ public partial class CharacterWizardWindow : Window
 
     private void RefreshFreeXpAllocationLists()
     {
+        RefreshFreeXpTargetOptions();
         FreeXpAllocations.ItemsSource = BuildFreeXpAllocationRows();
+    }
+
+    private void RefreshFreeXpTargetOptions()
+    {
+        var selectedKey = FreeXpTargetPicker.SelectedItem is FreeXpTargetOption selected
+            ? ReviewAllocationKey(selected.Category, selected.Name)
+            : null;
+        var usedKeys = reviewFreeXpAllocations
+            .Where(allocation => allocation.Value != 0)
+            .Select(allocation => allocation.Key)
+            .ToHashSet(StringComparer.Ordinal);
+        var available = allFreeXpTargetOptions
+            .Where(option => !usedKeys.Contains(
+                ReviewAllocationKey(option.Category, option.Name)))
+            .ToArray();
+
+        FreeXpTargetPicker.ItemsSource = available;
+        FreeXpTargetPicker.SelectedItem =
+            selectedKey is null || usedKeys.Contains(selectedKey)
+                ? null
+                : available.FirstOrDefault(option =>
+                    ReviewAllocationKey(option.Category, option.Name) == selectedKey);
     }
 
     private static IReadOnlyList<FreeXpTargetOption> BuildFreeXpTargetOptions(

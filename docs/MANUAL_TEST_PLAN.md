@@ -6,7 +6,7 @@ pass.
 
 ## Install and Launch
 
-- Install the packaged `atow-character-creator-0.1.25-preview-<commit>-setup.exe`.
+- Install the packaged `atow-character-creator-0.1.26-preview-<commit>-setup.exe`.
 - Launch the app from the Start Menu shortcut.
 - Confirm the first window offers Character Wizard and Character Editor.
 - Open the Character Editor directly and confirm it starts without an error.
@@ -28,6 +28,8 @@ pass.
   when the required basic and advanced fields are present.
 - Confirm the Free XP page uses one target dropdown for Attributes, Traits, and
   Skills.
+- Confirm an assigned Free XP target disappears from the Free XP target dropdown,
+  then reappears after removing that allocation row.
 
 ## Editor Workflows
 
