@@ -1,5 +1,5 @@
 !ifndef VERSION
-  !define VERSION "0.1.24-preview"
+  !define VERSION "0.1.25-preview"
 !endif
 
 !ifndef PUBLISH_DIR

@@ -60,7 +60,7 @@ character editor for *A Time of War*.
 
 The current Windows beta is available from the
 [GitHub Releases page](https://github.com/SANSd20/Battletech-Character-Creator/releases).
-The current preview line is `0.1.24-preview`. This beta is intended for
+The current preview line is `0.1.25-preview`. This beta is intended for
 manual testing and feedback while the final rulebook audit, optional Companion
 coverage, and interface polish continue.
 
@@ -93,6 +93,7 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
 
 - Free XP spending uses one unified target dropdown for Attributes, Traits, and Skills
 - Free XP allocations show whether each spend targets an Attribute, Trait, or Skill
+- Free XP allocation rows can be removed individually without resetting all Free XP spending
 - Life Module flexible XP pools must be fully assigned before advancing to the next module
 - Stage 2 running Free XP visibly subtracts the selected late-childhood module cost
 - Minimum age starts at 16 after late childhood and adds selected Stage 3 education time plus Stage 4 career time
