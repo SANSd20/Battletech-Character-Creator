@@ -60,7 +60,7 @@ character editor for *A Time of War*.
 
 The current Windows beta is available from the
 [GitHub Releases page](https://github.com/SANSd20/Battletech-Character-Creator/releases).
-The current preview line is `0.1.23-preview`. This beta is intended for
+The current preview line is `0.1.24-preview`. This beta is intended for
 manual testing and feedback while the final rulebook audit, optional Companion
 coverage, and interface polish continue.
 
@@ -141,6 +141,9 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
   armor patches that need patch pricing, ammo purchases that need ammo cost or
   mass details, and prosthetic enhancements that need a prosthetic or implant host
 - Inventory status warnings for ammo purchases that need reload or power-pack review
+- Core-rulebook Power Packs and Rechargers are imported into the equipment
+  catalog, and simple power-pack weapon rows clear the warning when a power
+  pack, satchel battery, or portable power unit is present
 - Inventory status warnings for vehicle purchases that need Vehicle or Custom Vehicle
   trait support
 - Inventory status warnings now name the inventory rows that need pricing, ammo,
@@ -217,7 +220,7 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
 - Continue importing and modeling selected optional mechanics from
   *A Time of War Companion*
 - Expand era template coverage after manual preview feedback
-- Expand deeper reload behavior, deeper patch repair rules, broader specialty
+- Expand deeper mixed-reload behavior, deeper patch repair rules, broader specialty
   ammo damage/range math, and deeper vehicle purchasing details
 - Continue interface polish and usability testing
 - Continue strengthening error handling and recovery

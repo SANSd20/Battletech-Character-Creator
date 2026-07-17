@@ -221,8 +221,32 @@ weapacc;Guided Rifle Modules;2000;0.25;Weapon Accessory;-;Attach to weapons usin
 weapacc;Radioactive Tracker Scanner;2250;0.1;Weapon Accessory;-;Detects targets painted by Radioactive Tracker rounds; max range 35m; requires power pack, p.286
 
 # Power Pack - cptpower 
+cptpower;Power Pack;5;0.25;Power Pack;-;20 PP, p.306
+cptpower;Micro Power Pack;10;0.015;Power Pack;-;15 PP, p.306
+cptpower;Military Power Pack;40;4;Power Pack;-;200 PP, p.306
+cptpower;Satchel Battery;20;2;Power Pack;-;100 PP, p.306
+cptpower;Clan Power Pack;25;0.275;Power Pack;-;30 PP, quick-charge, p.306
+cptpower;Clan Micro Power Pack;50;0.015;Power Pack;-;20 PP, quick-charge, p.306
+cptpower;Clan Military Power Pack;200;5;Power Pack;-;300 PP, quick-charge, p.306
+cptpower;Clan Satchel Battery;100;2.5;Power Pack;-;150 PP, quick-charge, p.306
+cptpower;High-Capacity Power Pack;15;0.3;Power Pack;-;30 PP, p.306
+cptpower;High-Capacity Micro Power Pack;30;0.02;Power Pack;-;20 PP, p.306
+cptpower;High-Capacity Military Power Pack;120;6;Power Pack;-;300 PP, p.306
+cptpower;High-Capacity Satchel Battery;60;3;Power Pack;-;150 PP, p.306
+cptpower;Quick-Charge Power Pack;10;0.3;Power Pack;-;10 PP, quick-charge, p.306
+cptpower;Quick-Charge Micro Power Pack;20;0.02;Power Pack;-;10 PP, quick-charge, p.306
+cptpower;Quick-Charge Military Power Pack;80;6;Power Pack;-;100 PP, quick-charge, p.306
+cptpower;Quick-Charge Satchel Battery;40;3;Power Pack;-;50 PP, quick-charge, p.306
+cptpower;Portable Power Unit;10;2;Power Pack;-;80 PP, slow-charge, p.306
+cptpower;Support PPC Power Pack;750;25;Power Pack;-;1500 PP, encumbering; may power 1 Support PPC or up to 6 smaller items, p.306
  
 # RecHANrgers - recHANr 
+recHANr;Fossil Fuel Recharger;50;10;Recharger;-;15 PPH, refueling cost 2 C-Bills per hour of operation, p.307
+recHANr;Fusion Recharger;5000;40;Recharger;-;100 PPH, Clan/CS; may recharge up to 5 power packs at one time, p.307
+recHANr;Heavy-Duty Recharger;50;0.4;Recharger;-;200 PPH, plug-in; may service up to 5 power packs at once, p.307
+recHANr;Kinetic Recharger;10;2;Recharger;-;5 PPH, p.307
+recHANr;Solar Recharger;200;1.5;Recharger;-;45 PPH, p.307
+recHANr;Standard Recharger/Local Grid;10;0.15;Recharger;-;50 PPH, plug-in, p.307
  
 # Espionage Gear & Security Systems - espsec 
  

@@ -274,13 +274,13 @@ public static class CharacterRules
 
     public static int AmmoPurchasesNeedingReloadReview(Character character) =>
         character.Weapons
-            .Where(item => AmmoPurchaseNeedsReloadReview(item.Shots))
+            .Where(item => AmmoPurchaseNeedsReloadReview(character, item))
             .Sum(item => OptionalItemCount(item.AmmoCount));
 
     public static IReadOnlyList<string> AmmoPurchasesNeedingReloadReviewItems(Character character) =>
         character.Weapons
             .Where(item => OptionalItemCount(item.AmmoCount) > 0)
-            .Where(item => AmmoPurchaseNeedsReloadReview(item.Shots))
+            .Where(item => AmmoPurchaseNeedsReloadReview(character, item))
             .Select(item => item.Name)
             .ToArray();
 
@@ -401,13 +401,22 @@ public static class CharacterRules
             CatalogMass(mass) <= 0m;
     }
 
-    private static bool AmmoPurchaseNeedsReloadReview(string shots)
+    private static bool AmmoPurchaseNeedsReloadReview(Character character, WeaponItem item)
     {
+        var shots = item.Shots;
         var trimmedShots = shots.Trim();
-        return trimmedShots.Length == 0 ||
-            trimmedShots == "0" ||
-            trimmedShots.Contains(',', StringComparison.Ordinal) ||
-            trimmedShots.Contains("PPS", StringComparison.OrdinalIgnoreCase);
+        if (trimmedShots.Length == 0 || trimmedShots == "0")
+        {
+            return true;
+        }
+
+        if (trimmedShots.Contains(',', StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        return trimmedShots.Contains("PPS", StringComparison.OrdinalIgnoreCase) &&
+            !HasPowerPack(character);
     }
 
     private static bool AmmoModifierNeedsAccessories(Character character, WeaponItem item) =>
@@ -438,6 +447,13 @@ public static class CharacterRules
         character.Equipment.Any(item =>
             ItemCount(item.Count) > 0 &&
             item.Name.Contains(required, StringComparison.OrdinalIgnoreCase));
+
+    private static bool HasPowerPack(Character character) =>
+        character.Equipment.Any(item =>
+            ItemCount(item.Count) > 0 &&
+            (item.Name.Contains("Power Pack", StringComparison.OrdinalIgnoreCase) ||
+             item.Name.Contains("Satchel Battery", StringComparison.OrdinalIgnoreCase) ||
+             item.Name.Contains("Portable Power Unit", StringComparison.OrdinalIgnoreCase)));
 
     private static int FindValue(IEnumerable<NamedValue> values, string name) =>
         values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;

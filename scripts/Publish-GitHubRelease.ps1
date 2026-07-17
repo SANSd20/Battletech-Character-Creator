@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.1.23-preview",
+    [string]$Version = "0.1.24-preview",
     [string]$Repository = "SANSd20/Battletech-Character-Creator",
     [string]$TagName = "",
     [string]$Title = "",

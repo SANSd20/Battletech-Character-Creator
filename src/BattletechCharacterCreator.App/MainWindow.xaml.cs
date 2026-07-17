@@ -867,7 +867,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             throw new InvalidOperationException(
                 "Ammo reload review warnings were not shown in the editor.");
         }
+        Character.Equipment.Add(new EquipmentItem
+        {
+            Name = "Power Pack",
+            Cost = "5",
+            Mass = "0.25",
+            Count = "1"
+        });
+        Recalculate();
+        if (InventoryStatus.Contains("reload or power-pack", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Ammo reload review warnings did not clear when a power pack was present.");
+        }
         Character.Weapons.Clear();
+        Character.Equipment.Clear();
         Character.Weapons.Add(new WeaponItem
         {
             Name = "Numeric ammo weapon",

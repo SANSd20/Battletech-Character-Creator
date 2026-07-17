@@ -256,6 +256,12 @@ reloadReviewCharacter.Weapons.Add(new WeaponItem
 });
 Assert(CharacterRules.AmmoPurchasesNeedingReloadReview(reloadReviewCharacter) == 3,
     "Ammo purchases must warn when weapon shots use power-pack notation.");
+reloadReviewCharacter.Equipment.Add(new EquipmentItem
+{
+    Name = "Power Pack", Cost = "5", Mass = "0.25", Count = "1"
+});
+Assert(CharacterRules.AmmoPurchasesNeedingReloadReview(reloadReviewCharacter) == 0,
+    "Power-pack ammo warnings must clear when a character owns a power pack.");
 reloadReviewCharacter.Weapons.Clear();
 reloadReviewCharacter.Weapons.Add(new WeaponItem
 {
@@ -371,8 +377,8 @@ static void CheckResourceCatalog()
     var companionCatalog = ResourceCatalog.Load(
         resources,
         new ResourceCatalogOptions(IncludeCompanion: true));
-    Assert(catalog.Equipment.Count == 189,
-        "All 189 core equipment entries must be imported.");
+    Assert(catalog.Equipment.Count == 213,
+        "All 213 core equipment entries must be imported.");
     Assert(catalog.Equipment.Single(item =>
             item.Name == "Guided Rifle Modules").Cost == "2000" &&
         catalog.Equipment.Single(item =>
@@ -382,6 +388,15 @@ static void CheckResourceCatalog()
         catalog.Equipment.Single(item =>
             item.Name == "Radioactive Tracker Scanner").Mass == "0.1",
         "Specialty ammunition support accessories must be imported as equipment.");
+    Assert(catalog.Equipment.Single(item =>
+            item.Name == "Power Pack").Cost == "5" &&
+        catalog.Equipment.Single(item =>
+            item.Name == "Power Pack").Mass == "0.25" &&
+        catalog.Equipment.Single(item =>
+            item.Name == "Military Power Pack").Notes.Contains("200 PP") &&
+        catalog.Equipment.Single(item =>
+            item.Name == "Solar Recharger").Notes.Contains("45 PPH"),
+        "Power packs and rechargers must be imported as equipment.");
     Assert(catalog.Weapons.Count == 209,
         "All 209 legacy weapon entries must be imported.");
     Assert(catalog.AmmoModifiers.Count == 15,
@@ -409,7 +424,7 @@ Assert(catalog.AmmoModifiers.Single(item =>
         catalog.AmmoModifiers.Single(item =>
             item.Name == "GDPC Rounds").ExcludedNameTerms.SequenceEqual(["Pistol", "Submaschine"]),
         "Specialty ammunition modifier table values and compatibility rules must be imported.");
-    Assert(companionCatalog.Equipment.Count == 288,
+    Assert(companionCatalog.Equipment.Count == 312,
         "Companion-enabled equipment must include the starter Companion import.");
     Assert(companionCatalog.Weapons.Count == 225,
         "Companion-enabled weapons must include the starter Companion import.");
