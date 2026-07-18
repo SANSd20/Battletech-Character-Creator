@@ -771,7 +771,11 @@
                                 <RowDefinition Height="8"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="8"/>
-                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="1*"/>
                             </Grid.RowDefinitions>
                             <TextBlock x:Name="ReviewRuleStatus"
                                        FontWeight="SemiBold"
@@ -801,6 +805,34 @@
                                                 <Button Content="{Binding ActionText}"
                                                         Tag="{Binding}"
                                                         Click="SpendReviewFreeXp_Click"
+                                                        IsEnabled="{Binding CanSpendFreeXp}"
+                                                        Padding="7,2"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <TextBlock Grid.Row="6"
+                                       x:Name="CareerPrerequisiteStatus"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"/>
+                            <DataGrid Grid.Row="8"
+                                      x:Name="CareerPrerequisiteIssues"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Career" Binding="{Binding Career}" Width="1.25*"/>
+                                    <DataGridTextColumn Header="Type" Binding="{Binding Category}" Width="72"/>
+                                    <DataGridTextColumn Header="Requirement" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTextColumn Header="Gap" Binding="{Binding MissingXp}" Width="44"/>
+                                    <DataGridTemplateColumn Header="Fix" Width="82">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="{Binding ActionText}"
+                                                        Tag="{Binding}"
+                                                        Click="SpendCareerPrerequisiteFreeXp_Click"
                                                         IsEnabled="{Binding CanSpendFreeXp}"
                                                         Padding="7,2"/>
                                             </DataTemplate>
