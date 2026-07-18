@@ -2385,6 +2385,30 @@ static void CheckRealLifeModules()
         "Ne'er-Do-Well flexible XP may not target Traits.");
     Assert(!neerDoWell.AwardFlexibleXpOnRepeat,
         "Ne'er-Do-Well must not award flexible XP when repeated.");
+    var incompleteNeerChoices = neerDoWell.Choices
+        .Where(choice => choice.Target != EffectTarget.Flexible)
+        .ToDictionary(
+            choice => choice.Id,
+            choice => (IReadOnlyList<string>)choice.Options
+                .Take(choice.Count).ToArray());
+    var incompleteNeerStrictRejected = false;
+    try
+    {
+        LifePathEngine.ApplyStage4(new Character(),
+            new ModuleSelection(neerDoWell, incompleteNeerChoices));
+    }
+    catch (InvalidOperationException)
+    {
+        incompleteNeerStrictRejected = true;
+    }
+    var incompleteNeerPreview = new Character();
+    LifePathEngine.ApplyStage4Preview(incompleteNeerPreview,
+        new ModuleSelection(neerDoWell, incompleteNeerChoices));
+    Assert(incompleteNeerStrictRejected &&
+        incompleteNeerPreview.Attributes.Single(item => item.Name == "EDG").Value == 175 &&
+        incompleteNeerPreview.Traits.Any(item => item.Name == "Extra Income") &&
+        incompleteNeerPreview.Skills.Any(item => item.Name == "Acting"),
+        "Stage 4 preview must show selected career totals before Flexible XP is complete.");
     var repeatedNeerDoWell = new Character();
     repeatedNeerDoWell.RealLifeHistory.Add(neerDoWell.Name);
     var repeatedNeerChoices = neerDoWell.Choices

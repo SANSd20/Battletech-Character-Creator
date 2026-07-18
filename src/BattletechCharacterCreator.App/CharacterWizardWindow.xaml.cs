@@ -2652,7 +2652,9 @@ public partial class CharacterWizardWindow : Window
         UpdateFlexibleChoiceDisplays();
         try
         {
-            var character = BuildCharacter(currentStep);
+            var character = BuildCharacter(
+                currentStep,
+                allowIncompleteStage4Preview: currentStep == Stage4Step);
             var summary = CharacterRules.Calculate(character);
             var moduleCost = LifePathEngine.CalculateModuleCost(
                 character, SelectedModules(currentStep));
@@ -3094,7 +3096,9 @@ public partial class CharacterWizardWindow : Window
 
     private Character BuildCharacter() => BuildCharacter(pages.Length - 1);
 
-    private Character BuildCharacter(int throughStep)
+    private Character BuildCharacter(
+        int throughStep,
+        bool allowIncompleteStage4Preview = false)
     {
         var affiliation = SelectedAffiliation ??
             throw new InvalidOperationException("Choose an affiliation.");
@@ -3208,7 +3212,14 @@ public partial class CharacterWizardWindow : Window
             var selection = CreateSelection(selectedModule);
             if (selectedModule.IsStage4)
             {
-                LifePathEngine.ApplyStage4(character, selection);
+                if (allowIncompleteStage4Preview)
+                {
+                    LifePathEngine.ApplyStage4Preview(character, selection);
+                }
+                else
+                {
+                    LifePathEngine.ApplyStage4(character, selection);
+                }
                 ApplyCareerState(character, module.Name);
             }
             else

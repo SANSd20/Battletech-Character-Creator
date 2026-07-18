@@ -145,6 +145,23 @@ public static class LifePathEngine
         character.RealLifeHistory.Add(selection.Module.Name);
     }
 
+    public static void ApplyStage4Preview(
+        Character character,
+        ModuleSelection selection)
+    {
+        var priorSelections = character.RealLifeHistory.Count(name =>
+            name == selection.Module.Name);
+        if (priorSelections > 0 && !selection.Module.Repeatable)
+        {
+            throw new InvalidOperationException(
+                $"{selection.Module.Name} may not be repeated.");
+        }
+
+        ApplyPreview(character, selection, repeated: priorSelections > 0);
+        character.RealLife = selection.Module.Name;
+        character.RealLifeHistory.Add(selection.Module.Name);
+    }
+
     public static void Apply(
         Character character,
         ModuleSelection selection,
@@ -246,6 +263,85 @@ public static class LifePathEngine
                 {
                     throw new InvalidOperationException(
                         $"{selection.Module.Name}: '{name}' is not valid for '{choice.Label}'.");
+                }
+                var target = choice.Target == EffectTarget.Flexible
+                    ? ClassifyFlexibleTarget(name)
+                    : choice.Target;
+                ApplyEffect(character, target, name, choice.Xp);
+                if (choice.OptionEffects?.TryGetValue(name, out var optionEffects) == true)
+                {
+                    foreach (var optionEffect in optionEffects)
+                    {
+                        if (repeated &&
+                            optionEffect.Target != EffectTarget.Skill)
+                        {
+                            continue;
+                        }
+                        ApplyEffect(character, optionEffect.Target, optionEffect.Name, optionEffect.Xp);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void ApplyPreview(
+        Character character,
+        ModuleSelection selection,
+        bool repeated)
+    {
+        if (repeated && selection.Module.RepeatEffects is not null)
+        {
+            foreach (var effect in selection.Module.RepeatEffects)
+            {
+                ApplyEffect(character, effect.Target, effect.Name, effect.Xp);
+            }
+        }
+
+        foreach (var effect in selection.Module.Effects)
+        {
+            if (repeated && effect.Target != EffectTarget.Skill)
+            {
+                continue;
+            }
+            ApplyEffect(character, effect.Target, effect.Name, effect.Xp);
+        }
+
+        foreach (var choice in selection.Module.Choices)
+        {
+            if (repeated &&
+                choice.Target is not (EffectTarget.Skill or EffectTarget.Flexible))
+            {
+                continue;
+            }
+            if (repeated &&
+                choice.Target == EffectTarget.Flexible &&
+                !selection.Module.AwardFlexibleXpOnRepeat)
+            {
+                continue;
+            }
+            if (choice.Target == EffectTarget.Flexible &&
+                selection.Allocations?.TryGetValue(choice.Id, out var allocations) == true)
+            {
+                ApplyFlexibleAllocationsPreview(character, choice, allocations);
+                continue;
+            }
+
+            if (!selection.Choices.TryGetValue(choice.Id, out var selected) ||
+                selected.Count == 0)
+            {
+                continue;
+            }
+            if (choice.Distinct && selected.Distinct(StringComparer.Ordinal).Count() != selected.Count)
+            {
+                continue;
+            }
+
+            foreach (var name in selected)
+            {
+                var validOptions = ResolveChoiceOptions(character, choice);
+                if (!validOptions.Contains(name, StringComparer.Ordinal))
+                {
+                    continue;
                 }
                 var target = choice.Target == EffectTarget.Flexible
                     ? ClassifyFlexibleTarget(name)
@@ -371,6 +467,83 @@ public static class LifePathEngine
                 allocation.Name,
                 allocation.Xp);
         }
+    }
+
+    private static void ApplyFlexibleAllocationsPreview(
+        Character character,
+        ModuleChoice choice,
+        IReadOnlyList<ChoiceAllocation> allocations)
+    {
+        var active = allocations
+            .Where(allocation => allocation.Xp > 0 && !string.IsNullOrWhiteSpace(allocation.Name))
+            .ToArray();
+        if (active.Length == 0)
+        {
+            return;
+        }
+
+        var validOptions = ResolveChoiceOptions(character, choice);
+        foreach (var allocation in active)
+        {
+            if (!validOptions.Contains(allocation.Name, StringComparer.Ordinal))
+            {
+                continue;
+            }
+            ApplyEffect(
+                character,
+                ClassifyFlexibleTarget(allocation.Name),
+                allocation.Name,
+                allocation.Xp);
+        }
+    }
+
+    private static IReadOnlyList<string> ResolveChoiceOptions(
+        Character character,
+        ModuleChoice choice)
+    {
+        var educationFieldOptions = choice.EducationFieldNames is null
+            ? []
+            : LifePathCatalog.ResolveEducationFieldSkills(
+                character, choice.EducationFieldNames);
+        if (choice.EducationFieldNames is not null &&
+            educationFieldOptions.Count == 0)
+        {
+            educationFieldOptions =
+                LifePathCatalog.ResolveEducationFieldSkillPool(
+                    character, choice.EducationFieldNames);
+        }
+
+        var validOptions = LifePathCatalog.FilterEraAvailableSkillOptions(
+                character,
+                choice.Options)
+            .Concat(educationFieldOptions)
+            .Concat(choice.ClanWarriorFieldSkillsOnly
+                ? LifePathCatalog.ResolveClanWarriorFieldSkills(character)
+                : [])
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        if (choice.SelectedEducationFieldSkillsOnly)
+        {
+            var selectedFieldSkills =
+                LifePathCatalog.ResolveSelectedEducationFieldSkills(character);
+            validOptions = selectedFieldSkills.Count == 0
+                ? LifePathCatalog.FilterEraAvailableSkillOptions(
+                    character,
+                    choice.Options).ToArray()
+                : selectedFieldSkills.ToArray();
+        }
+        if (choice.SolarisInternshipFieldSkillsOnly)
+        {
+            var internshipSkills =
+                LifePathCatalog.ResolveSolarisInternshipFieldSkills(character);
+            validOptions = internshipSkills.Count == 0
+                ? LifePathCatalog.FilterEraAvailableSkillOptions(
+                    character,
+                    choice.Options).ToArray()
+                : internshipSkills.ToArray();
+        }
+
+        return validOptions;
     }
 
     private static int Find(IEnumerable<NamedValue> values, string name) =>
