@@ -95,6 +95,8 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
 - Free XP allocations show whether each spend targets an Attribute, Trait, or Skill
 - Free XP allocation rows can be removed individually without resetting all Free XP spending
 - Free XP target choices hide targets already assigned on the Free XP step and restore them after removal
+- Free XP target choices include current character Traits and Skills even when
+  they come from generated, imported, or life-module-specific names
 - Free XP rule-check rows spend XP for Attribute, Trait, and Skill gaps and
   navigate back to the relevant wizard stage for non-XP prerequisites
 - Life Module flexible XP pools must be fully assigned before advancing to the next module

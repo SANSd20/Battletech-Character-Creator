@@ -10,6 +10,8 @@ release.
 - The Free XP allocation list now shows the target type alongside each spend
 - Free XP allocation rows can now be removed individually without resetting all Free XP spending
 - Free XP target choices now hide targets already assigned on the Free XP step and restore them after removal
+- Free XP target choices now include current character Traits and Skills even
+  when they come from generated, imported, or life-module-specific names
 - Free XP rule-check fixes now navigate back to the relevant wizard stage for
   non-XP prerequisites, including Education issues returning to Stage 3
 - Module flexible XP must now be fully assigned before advancing to the next Life Module, matching the page 61 spending rule
@@ -50,7 +52,7 @@ release.
 - Review Character keeps the last valid totals during temporary wizard refreshes
 - Review Character can spend remaining Free XP to fix Attribute, Trait, and Skill prerequisite gaps
 - Wizard now has a dedicated Free XP step before final Review, with rule-check fixes moved there
-- Free XP step can manually spend remaining XP on selected Traits and Skills
+- Free XP step can manually spend remaining XP on selected Attributes, Traits, and Skills
 - Character editor with XP controls for attributes, skills, and traits, including
   5 XP and 10 XP adjustment buttons
 - Legacy `.btcc` save/load compatibility

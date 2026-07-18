@@ -1,6 +1,6 @@
 # Imported GitHub Issue Audit
 
-Generated: 2026-07-17 20:46:26 -05:00
+Generated: 2026-07-17 20:55:56 -05:00
 
 Source: `issues\issues.json`
 
@@ -25,6 +25,7 @@ still needs manual testing or GitHub-side closure.
   - The wizard has a dedicated Free XP step before final review.
   - The Free XP step can spend remaining XP from one grouped target dropdown.
   - Free XP allocation rows can be removed individually without resetting all spending.
+  - Free XP targets include current character Traits and Skills even when they come from generated, imported, or life-module-specific names.
   - Rule-check fixes moved to the Free XP step; Attribute, Trait, and Skill gaps can spend Free XP directly.
   - Non-XP rule-check issues navigate back to the relevant wizard stage, including Education issues returning to Stage 3.
 - Next step: Confirm the workflow in the packaged app, then close the GitHub issue.

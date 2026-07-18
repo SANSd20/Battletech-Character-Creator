@@ -29,7 +29,7 @@ public partial class CharacterWizardWindow : Window
     private string lastRunningFreeXp = "";
     private int currentStep;
     private bool refreshing;
-    private IReadOnlyList<FreeXpTargetOption> allFreeXpTargetOptions = [];
+    private IReadOnlyList<FreeXpTargetOption> catalogFreeXpTargetOptions = [];
     private readonly Dictionary<string, int> reviewFreeXpAllocations = [];
 
     private sealed record ChoiceInput(
@@ -119,7 +119,7 @@ public partial class CharacterWizardWindow : Window
         EyeColorPicker.ItemsSource = resources.EyeColors;
         SexPicker.ItemsSource = new[] { "Male", "Female" };
         SexPicker.SelectedIndex = 0;
-        allFreeXpTargetOptions = BuildFreeXpTargetOptions(
+        catalogFreeXpTargetOptions = BuildFreeXpTargetOptions(
             resources.TraitNames,
             resources.SkillNames);
         RefreshFreeXpTargetOptions();
@@ -890,6 +890,25 @@ public partial class CharacterWizardWindow : Window
         }
 
         ShowStep(FreeXpStep);
+
+        var generatedTargetCharacter = BuildCharacter();
+        generatedTargetCharacter.Traits.Add(
+            new NamedValue("Natural Aptitude/Generated Smoke Trait", 75));
+        generatedTargetCharacter.Skills.Add(
+            new NamedValue("Generated Smoke Skill", 15));
+        var dynamicTargets = BuildFreeXpTargetOptions(
+            catalogFreeXpTargetOptions,
+            generatedTargetCharacter);
+        if (!dynamicTargets.Any(item =>
+                item.Category == "Trait" &&
+                item.Name == "Natural Aptitude/Generated Smoke Trait") ||
+            !dynamicTargets.Any(item =>
+                item.Category == "Skill" &&
+                item.Name == "Generated Smoke Skill"))
+        {
+            throw new InvalidOperationException(
+                "Free XP targets did not include existing generated character Trait and Skill rows.");
+        }
 
         FreeXpTargetPicker.SelectedItem = FreeXpTargetPicker.Items
             .Cast<FreeXpTargetOption>()
@@ -3136,11 +3155,23 @@ public partial class CharacterWizardWindow : Window
         var selectedKey = FreeXpTargetPicker.SelectedItem is FreeXpTargetOption selected
             ? ReviewAllocationKey(selected.Category, selected.Name)
             : null;
+        Character? character = null;
+        try
+        {
+            character = BuildCharacter();
+        }
+        catch (InvalidOperationException)
+        {
+            // Earlier wizard stages can be incomplete while the page resets.
+        }
+
         var usedKeys = reviewFreeXpAllocations
             .Where(allocation => allocation.Value != 0)
             .Select(allocation => allocation.Key)
             .ToHashSet(StringComparer.Ordinal);
-        var available = allFreeXpTargetOptions
+        var available = BuildFreeXpTargetOptions(
+                catalogFreeXpTargetOptions,
+                character)
             .Where(option => !usedKeys.Contains(
                 ReviewAllocationKey(option.Category, option.Name)))
             .ToArray();
@@ -3162,6 +3193,51 @@ public partial class CharacterWizardWindow : Window
         .. traitNames.Select(name => new FreeXpTargetOption("Trait", name)),
         .. skillNames.Select(name => new FreeXpTargetOption("Skill", name))
     ];
+
+    private static IReadOnlyList<FreeXpTargetOption> BuildFreeXpTargetOptions(
+        IReadOnlyList<FreeXpTargetOption> catalogOptions,
+        Character? character)
+    {
+        var dynamicOptions = character is null
+            ? []
+            : character.Traits
+                .Where(item => !string.IsNullOrWhiteSpace(item.Name))
+                .Select(item => new FreeXpTargetOption("Trait", item.Name))
+                .Concat(character.Skills
+                    .Where(item => !string.IsNullOrWhiteSpace(item.Name))
+                    .Select(item => new FreeXpTargetOption("Skill", item.Name)));
+
+        return catalogOptions
+            .Concat(dynamicOptions)
+            .DistinctBy(option => ReviewAllocationKey(option.Category, option.Name))
+            .OrderBy(option => FreeXpCategoryOrder(option.Category))
+            .ThenBy(option => AttributeOrder(option.Name))
+            .ThenBy(option => option.Name, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static int FreeXpCategoryOrder(string category) =>
+        category switch
+        {
+            "Attribute" => 0,
+            "Trait" => 1,
+            "Skill" => 2,
+            _ => 3
+        };
+
+    private static int AttributeOrder(string name) =>
+        name switch
+        {
+            "STR" => 0,
+            "BOD" => 1,
+            "RFL" => 2,
+            "DEX" => 3,
+            "INT" => 4,
+            "WIL" => 5,
+            "CHA" => 6,
+            "EDG" => 7,
+            _ => 100
+        };
 
     private IReadOnlyList<FreeXpAllocationRow> BuildFreeXpAllocationRows() =>
         reviewFreeXpAllocations

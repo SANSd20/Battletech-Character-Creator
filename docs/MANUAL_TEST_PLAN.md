@@ -41,6 +41,9 @@ pass.
   Skills.
 - Confirm an assigned Free XP target disappears from the Free XP target dropdown,
   then reappears after removing that allocation row.
+- Confirm Free XP target choices include current character Traits and Skills
+  with generated or life-module-specific names, such as Natural Aptitude
+  variants.
 - Confirm Free XP Rule Check can spend remaining Free XP for Attribute, Trait,
   and Skill gaps, and that non-XP prerequisite rows navigate back to the
   relevant wizard stage, including Education rows returning to Stage 3.
