@@ -27,13 +27,14 @@ $issues = Get-Content -LiteralPath $issuesFullPath -Raw |
     ConvertFrom-Json
 
 $localStatus = @{
-    "6" = @{
+    "7" = @{
         Status = "Implemented locally; ready for manual confirmation and GitHub closure"
         Evidence = @(
-            "Stage 3 supports second and third education selections, including additional advanced fields.",
-            "Officer Candidate School can be selected after a different education path when prerequisites are met.",
-            "Equipment and weapon catalogs include category filters, grouped result lists, search, and visible result counts.",
-            "Release notes and README document repeated education and catalog filtering as completed beta features."
+            "The wizard has a dedicated Free XP step before final review.",
+            "The Free XP step can spend remaining XP from one grouped target dropdown.",
+            "Free XP allocation rows can be removed individually without resetting all spending.",
+            "Rule-check fixes moved to the Free XP step; Attribute, Trait, and Skill gaps can spend Free XP directly.",
+            "Non-XP rule-check issues navigate back to the relevant wizard stage, including Education issues returning to Stage 3."
         )
         NextStep = "Confirm the workflow in the packaged app, then close the GitHub issue."
     }

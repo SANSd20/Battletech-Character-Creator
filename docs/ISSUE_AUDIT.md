@@ -1,6 +1,6 @@
 # Imported GitHub Issue Audit
 
-Generated: 2026-07-12 19:19:44 -05:00
+Generated: 2026-07-17 20:46:26 -05:00
 
 Source: `issues\issues.json`
 
@@ -12,19 +12,20 @@ still needs manual testing or GitHub-side closure.
 
 | Issue | GitHub state | Local status | Next step |
 | --- | --- | --- | --- |
-| #6: Education and Equipment Lists | OPEN | Implemented locally; ready for manual confirmation and GitHub closure | Confirm the workflow in the packaged app, then close the GitHub issue. |
+| #7: Add a new Free XP section before final review. | OPEN | Implemented locally; ready for manual confirmation and GitHub closure | Confirm the workflow in the packaged app, then close the GitHub issue. |
 
 ## Details
 
-### #6 Education and Equipment Lists
+### #7 Add a new Free XP section before final review.
 
 - GitHub state: OPEN
-- URL: https://github.com/SANSd20/Battletech-Character-Creator/issues/6
+- URL: https://github.com/SANSd20/Battletech-Character-Creator/issues/7
 - Local status: Implemented locally; ready for manual confirmation and GitHub closure
 - Evidence:
-  - Stage 3 supports second and third education selections, including additional advanced fields.
-  - Officer Candidate School can be selected after a different education path when prerequisites are met.
-  - Equipment and weapon catalogs include category filters, grouped result lists, search, and visible result counts.
-  - Release notes and README document repeated education and catalog filtering as completed beta features.
+  - The wizard has a dedicated Free XP step before final review.
+  - The Free XP step can spend remaining XP from one grouped target dropdown.
+  - Free XP allocation rows can be removed individually without resetting all spending.
+  - Rule-check fixes moved to the Free XP step; Attribute, Trait, and Skill gaps can spend Free XP directly.
+  - Non-XP rule-check issues navigate back to the relevant wizard stage, including Education issues returning to Stage 3.
 - Next step: Confirm the workflow in the packaged app, then close the GitHub issue.
 

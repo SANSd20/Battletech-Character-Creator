@@ -11,6 +11,9 @@ namespace BattletechCharacterCreator.App;
 
 public partial class CharacterWizardWindow : Window
 {
+    private const int Stage0Step = 1;
+    private const int Stage1Step = 2;
+    private const int Stage2Step = 3;
     private const int Stage3Step = 4;
     private const int Stage4Step = 5;
     private const int FreeXpStep = 6;
@@ -850,6 +853,40 @@ public partial class CharacterWizardWindow : Window
         {
             throw new InvalidOperationException(
                 "Review rule-check Education fix did not navigate to Stage 3.");
+        }
+
+        foreach (var (category, expectedStep) in new[]
+                 {
+                     ("Affiliation", Stage0Step),
+                     ("Caste", Stage0Step),
+                     ("Phenotype", Stage0Step),
+                     ("Early childhood", Stage1Step),
+                     ("Choice", Stage1Step),
+                     ("Background", Stage2Step),
+                     ("Training", Stage4Step)
+                 })
+        {
+            var navigationRow = BuildReviewIssueRows(
+                    [new PrerequisiteIssue(category, "Test prerequisite", 1, 0)],
+                    CharacterRules.Calculate(character).FreeXp)
+                .Single();
+            if (navigationRow.CanSpendFreeXp ||
+                !navigationRow.CanUseAction ||
+                navigationRow.TargetStep != expectedStep ||
+                navigationRow.ActionText != $"Stage {expectedStep - 1}")
+            {
+                throw new InvalidOperationException(
+                    $"Review rule-check {category} fix did not offer Stage {expectedStep - 1} navigation.");
+            }
+
+            SpendReviewFreeXp_Click(
+                new Button { Tag = navigationRow },
+                new RoutedEventArgs());
+            if (currentStep != expectedStep)
+            {
+                throw new InvalidOperationException(
+                    $"Review rule-check {category} fix did not navigate to Stage {expectedStep - 1}.");
+            }
         }
 
         ShowStep(FreeXpStep);
@@ -2961,7 +2998,15 @@ public partial class CharacterWizardWindow : Window
         issue.Category is "Attribute" or "Skill" or "Trait";
 
     private static int? ReviewIssueTargetStep(PrerequisiteIssue issue) =>
-        issue.Category == "Education" ? Stage3Step : null;
+        issue.Category switch
+        {
+            "Affiliation" or "Caste" or "Phenotype" => Stage0Step,
+            "Early childhood" or "Choice" => Stage1Step,
+            "Background" => Stage2Step,
+            "Education" => Stage3Step,
+            "Training" => Stage4Step,
+            _ => null
+        };
 
     private static string ReviewAllocationKey(string category, string name) =>
         $"{category}|{name}";

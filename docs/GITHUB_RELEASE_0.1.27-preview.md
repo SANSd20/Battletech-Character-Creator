@@ -61,6 +61,8 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - The Free XP allocation list now shows the target type alongside each spend
 - Free XP allocation rows can now be removed individually without resetting all Free XP spending
 - Free XP target choices now hide targets already assigned on the Free XP step and restore them after removal
+- Free XP rule-check fixes now navigate back to the relevant wizard stage for
+  non-XP prerequisites, including Education issues returning to Stage 3
 - Module flexible XP must now be fully assigned before advancing to the next Life Module, matching the page 61 spending rule
 - Stage 2 running Free XP now visibly subtracts the selected late-childhood module cost
 - Wizard age calculation now starts from age 16 after late childhood and adds only selected Stage 3 education time and Stage 4 career time
