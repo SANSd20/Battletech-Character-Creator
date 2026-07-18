@@ -28,6 +28,9 @@ pass.
   when the required basic and advanced fields are present.
 - Confirm Stage 4 shows the full first-career candidate list and summarizes
   unmet prerequisites without hiding those careers.
+- Confirm Covert Operations and other Stage 4 field-skill choices show
+  nonblank dropdown options even when prerequisites are being fixed through
+  alternate routes.
 - Confirm the Free XP page uses one target dropdown for Attributes, Traits, and
   Skills.
 - Confirm an assigned Free XP target disappears from the Free XP target dropdown,

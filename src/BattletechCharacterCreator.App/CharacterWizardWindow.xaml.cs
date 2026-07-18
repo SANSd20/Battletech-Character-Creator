@@ -2514,9 +2514,15 @@ public partial class CharacterWizardWindow : Window
     private IReadOnlyList<string> ResolveEducationFieldOptions(ModuleChoice choice)
     {
         if (choice.EducationFieldNames is null) return [];
-        return LifePathCatalog.ResolveEducationFieldSkills(
-            BuildEducationContextCharacter(),
+        var context = BuildEducationContextCharacter();
+        var selectedFieldSkills = LifePathCatalog.ResolveEducationFieldSkills(
+            context,
             choice.EducationFieldNames);
+        return selectedFieldSkills.Count > 0
+            ? selectedFieldSkills
+            : LifePathCatalog.ResolveEducationFieldSkillPool(
+                context,
+                choice.EducationFieldNames);
     }
 
     private Character BuildEducationContextCharacter()

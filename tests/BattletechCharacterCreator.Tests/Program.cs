@@ -1632,6 +1632,21 @@ static void CheckRealLifeModules()
     Assert(!PrerequisiteRules.Evaluate(underqualifiedVeteran)
             .Any(issue => issue.Category == "Education"),
         "A prior Tour of Duty and 150 pre-module Connections XP must satisfy Covert Operations.");
+    var covertFieldPool = LifePathCatalog.ResolveEducationFieldSkillPool(
+        underqualifiedVeteran,
+        fedSunsCovert.Choices.Single(choice => choice.Id == "field-skills").EducationFieldNames!);
+    Assert(covertFieldPool.Contains("Acting") && covertFieldPool.Contains("Tracking/Urban"),
+        "Covert Operations must expose a fallback field-skill pool when no matching education field is selected.");
+    var veteranCovertChoices = fedSunsCovert.Choices.ToDictionary(
+        choice => choice.Id,
+        choice => (IReadOnlyList<string>)(choice.Id == "field-skills"
+            ? Enumerable.Repeat(covertFieldPool[0], choice.Count).ToArray()
+            : choice.Options.Take(choice.Count).ToArray()));
+    LifePathEngine.Apply(underqualifiedVeteran,
+        new ModuleSelection(fedSunsCovert, veteranCovertChoices));
+    Assert(underqualifiedVeteran.Skills.Any(skill =>
+            skill.Name == covertFieldPool[0] && skill.Value >= 150),
+        "Covert Operations fallback field-skill choices must apply successfully.");
     var covertAgent = new Character
     {
         Affiliation = "Federated Suns",

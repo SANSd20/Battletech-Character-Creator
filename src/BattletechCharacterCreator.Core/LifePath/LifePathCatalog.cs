@@ -1243,6 +1243,45 @@ public static class LifePathCatalog
         return skills.OrderBy(name => name).ToArray();
     }
 
+    public static IReadOnlyList<string> ResolveEducationFieldSkillPool(
+        Character character,
+        IReadOnlyList<string> allowedFieldNames)
+    {
+        var allowed = allowedFieldNames.ToHashSet(StringComparer.Ordinal);
+        var skills = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var field in EducationSchools
+                     .SelectMany(school =>
+                         (school.BasicFields ?? [])
+                         .Concat(school.AdvancedFields ?? [])
+                         .Concat(school.SpecialistFields ?? []))
+                     .Where(field => allowed.Contains(field.Name)))
+        {
+            foreach (var effect in field.Effects.Where(effect =>
+                         effect.Target == EffectTarget.Skill))
+            {
+                skills.Add(effect.Name);
+            }
+            foreach (var option in FilterEraAvailableSkillOptions(
+                         character,
+                         field.Choices.SelectMany(choice => choice.Options)))
+            {
+                skills.Add(option);
+            }
+            var affiliation = Affiliations.FirstOrDefault(module =>
+                module.Name == character.Affiliation);
+            if (field.AffiliationProtocolXp != 0 && affiliation?.ProtocolSkill is not null)
+            {
+                skills.Add(affiliation.ProtocolSkill);
+            }
+            if (field.AffiliationStreetwiseXp != 0 &&
+                affiliation?.StreetwiseSkill is not null)
+            {
+                skills.Add(affiliation.StreetwiseSkill);
+            }
+        }
+        return skills.OrderBy(name => name).ToArray();
+    }
+
     public static IReadOnlyList<string> FilterEraAvailableSkillOptions(
         Character character,
         IEnumerable<string> options) =>

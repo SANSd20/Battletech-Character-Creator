@@ -201,13 +201,22 @@ public static class LifePathEngine
 
             foreach (var name in selected)
             {
+                var educationFieldOptions = choice.EducationFieldNames is null
+                    ? []
+                    : LifePathCatalog.ResolveEducationFieldSkills(
+                        character, choice.EducationFieldNames);
+                if (choice.EducationFieldNames is not null &&
+                    educationFieldOptions.Count == 0)
+                {
+                    educationFieldOptions =
+                        LifePathCatalog.ResolveEducationFieldSkillPool(
+                            character, choice.EducationFieldNames);
+                }
+
                 var validOptions = LifePathCatalog.FilterEraAvailableSkillOptions(
                         character,
                         choice.Options)
-                    .Concat(choice.EducationFieldNames is null
-                        ? []
-                        : LifePathCatalog.ResolveEducationFieldSkills(
-                            character, choice.EducationFieldNames))
+                    .Concat(educationFieldOptions)
                     .Concat(choice.ClanWarriorFieldSkillsOnly
                         ? LifePathCatalog.ResolveClanWarriorFieldSkills(character)
                         : [])

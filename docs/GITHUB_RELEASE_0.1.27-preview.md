@@ -83,6 +83,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - All 24 corrected-printing Stage 4 base modules, including variants
 - Two ordered Stage 4 careers with repeat and prerequisite handling
 - Stage 4 career dropdowns show candidate careers while prerequisite gaps are summarized and handled through the Free XP career planner
+- Stage 4 career field-skill dropdowns now fall back to the allowed field-skill pool instead of appearing blank when the character qualifies through an alternate prerequisite route
 - Stage 2, Stage 3, and Stage 4 flexible XP pools preserve user allocations
   while navigating between wizard pages
 - Flexible XP target dropdowns group Attributes first, then Traits, then Skills
