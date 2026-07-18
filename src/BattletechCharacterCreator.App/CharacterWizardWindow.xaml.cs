@@ -862,6 +862,47 @@ public partial class CharacterWizardWindow : Window
         ResetReviewXp_Click(this, new RoutedEventArgs());
     }
 
+    public void SmokeStage4CareerTotalsRefresh()
+    {
+        SelectAffiliationForCapture("lyran");
+        ChildhoodPicker.SelectedItem = LifePathCatalog.Childhoods
+            .First(module => module.Id == "street");
+        LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
+            .First(module => module.Id == "late-street");
+        RefreshModules();
+        FirstCareerCheck.IsChecked = true;
+        RefreshCareerOptions();
+        RealLifePicker.SelectedItem = LifePathCatalog.RealLifeModules
+            .First(module => module.Id == "real-agitator");
+        RefreshCareerOptions();
+        BuildChoiceControls();
+        var agitator = BuildCharacter(Stage4Step);
+        if (!agitator.Traits.Any(item =>
+                item.Name == "Gregarious" && item.Value > 0))
+        {
+            throw new InvalidOperationException(
+                "Stage 4 Agitator totals did not include Gregarious.");
+        }
+
+        RealLifePicker.SelectedItem = LifePathCatalog.RealLifeModules
+            .First(module => module.Id == "real-explorer");
+        RefreshCareerOptions();
+        BuildChoiceControls();
+        var explorer = BuildCharacter(Stage4Step);
+        if (explorer.Traits.Any(item =>
+                item.Name == "Gregarious" && item.Value > 0))
+        {
+            throw new InvalidOperationException(
+                "Stage 4 career totals retained Agitator traits after switching careers.");
+        }
+        if (!explorer.Skills.Any(item =>
+                item.Name == "Sensor Operations" && item.Value > 0))
+        {
+            throw new InvalidOperationException(
+                "Stage 4 Explorer totals did not apply the replacement career.");
+        }
+    }
+
     public IReadOnlyList<Character> SmokeRepresentativeLifePaths()
     {
         var characters = new List<Character>
@@ -2642,7 +2683,9 @@ public partial class CharacterWizardWindow : Window
         catch (InvalidOperationException)
         {
             var restoredReview = false;
-            if (TotalsHost.Visibility == Visibility.Visible &&
+            var canRestoreTotals = currentStep != Stage4Step;
+            if (canRestoreTotals &&
+                TotalsHost.Visibility == Visibility.Visible &&
                 lastTotalsCharacter is not null)
             {
                 PreviewAttributes.ItemsSource = lastTotalsCharacter.Attributes;
@@ -2663,7 +2706,7 @@ public partial class CharacterWizardWindow : Window
                 UpdateReview(lastTotalsCharacter);
                 restoredReview = true;
             }
-            if (TotalsHost.Visibility != Visibility.Visible)
+            if (TotalsHost.Visibility != Visibility.Visible || !canRestoreTotals)
             {
                 PreviewAttributes.ItemsSource = null;
                 PreviewSkills.ItemsSource = null;

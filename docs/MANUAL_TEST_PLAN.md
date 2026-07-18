@@ -28,6 +28,8 @@ pass.
   when the required basic and advanced fields are present.
 - Confirm Stage 4 shows the full first-career candidate list and summarizes
   unmet prerequisites without hiding those careers.
+- Confirm changing Stage 4 careers removes the previous career's unique
+  Attribute, Trait, and Skill awards from the character totals.
 - Confirm Covert Operations and other Stage 4 field-skill choices show
   nonblank dropdown options even when prerequisites are being fixed through
   alternate routes.

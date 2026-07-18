@@ -139,6 +139,7 @@ public partial class App : Application
                         try
                         {
                             wizard.SmokeStageLimitedPreview();
+                            wizard.SmokeStage4CareerTotalsRefresh();
                             wizard.Close();
                             ShutdownSmoke(0);
                         }
