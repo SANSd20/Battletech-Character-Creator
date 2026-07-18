@@ -741,6 +741,14 @@ public partial class CharacterWizardWindow : Window
     public void SmokeReviewFreeXpFix()
     {
         reviewFreeXpAllocations.Clear();
+        FirstCareerCheck.IsChecked = true;
+        RefreshCareerOptions();
+        if (RealLifePicker.Items.Count <= 1)
+        {
+            throw new InvalidOperationException(
+                "Stage 4 career filtering collapsed the first career list to one option.");
+        }
+
         var character = BuildCharacter();
         var bod = character.Attributes.Single(item => item.Name == "BOD");
         var issue = new PrerequisiteIssue("Attribute", "BOD", bod.Value + 100, bod.Value);
@@ -1325,7 +1333,8 @@ public partial class CharacterWizardWindow : Window
     private void RefreshCareerOptions()
     {
         var firstPreviousId = (RealLifePicker.SelectedItem as LifePathModule)?.Id;
-        var firstAvailability = EvaluateCareerAvailability(null, out var message);
+        var firstAvailability = EvaluateCareerAvailability(
+            null, includeFreeXpAllocations: false, out var message);
         var firstOptions = (message is null
                 ? firstAvailability
                     .Where(item => item.Issues.Count == 0)
@@ -1350,7 +1359,7 @@ public partial class CharacterWizardWindow : Window
         var previousId = (SecondRealLifePicker.SelectedItem as LifePathModule)?.Id;
         var firstCareer = SelectedRealLife;
         var secondAvailability = EvaluateCareerAvailability(
-            firstCareer, out var message);
+            firstCareer, includeFreeXpAllocations: false, out var message);
         var options = (message is null
                 ? secondAvailability
                     .Where(item => item.Issues.Count == 0)
@@ -1364,6 +1373,7 @@ public partial class CharacterWizardWindow : Window
 
     private IReadOnlyList<CareerAvailability> EvaluateCareerAvailability(
         LifePathModule? firstCareer,
+        bool includeFreeXpAllocations,
         out string? message)
     {
         var candidates = LifePathCatalog.RealLifeModules
@@ -1374,7 +1384,10 @@ public partial class CharacterWizardWindow : Window
         try
         {
             var baseCharacter = BuildCharacter(4);
-            ApplyReviewFreeXp(baseCharacter);
+            if (includeFreeXpAllocations)
+            {
+                ApplyReviewFreeXp(baseCharacter);
+            }
             if (firstCareer is not null)
             {
                 ApplyCareerForAvailability(baseCharacter, firstCareer);
@@ -2769,7 +2782,8 @@ public partial class CharacterWizardWindow : Window
     private IReadOnlyList<CareerPrerequisiteRow> BuildCareerPrerequisiteRows(
         int freeXp)
     {
-        var availability = EvaluateCareerAvailability(null, out var message);
+        var availability = EvaluateCareerAvailability(
+            null, includeFreeXpAllocations: true, out var message);
         if (message is not null)
         {
             return [];
