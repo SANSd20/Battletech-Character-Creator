@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.1.27-preview",
+    [string]$Version = "0.1.28-preview",
     [switch]$SkipReleaseChecks,
     [switch]$AllowDirty,
     [switch]$AllowStaleInstaller

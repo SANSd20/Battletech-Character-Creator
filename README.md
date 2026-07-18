@@ -60,7 +60,7 @@ character editor for *A Time of War*.
 
 The current Windows beta is available from the
 [GitHub Releases page](https://github.com/SANSd20/Battletech-Character-Creator/releases).
-The current preview line is `0.1.27-preview`. This beta is intended for
+The current preview line is `0.1.28-preview`. This beta is intended for
 manual testing and feedback while the final rulebook audit, optional Companion
 coverage, and interface polish continue.
 
