@@ -30,6 +30,8 @@ pass.
   unmet prerequisites without hiding those careers.
 - Confirm changing Stage 4 careers removes the previous career's unique
   Attribute, Trait, and Skill awards from the character totals.
+- Confirm selecting a Stage 4 career with unassigned Flexible XP still shows
+  the newly selected career's Attribute, Trait, and Skill totals.
 - Confirm Covert Operations and other Stage 4 field-skill choices show
   nonblank dropdown options even when prerequisites are being fixed through
   alternate routes.

@@ -38,6 +38,7 @@ Before packaging, the automated release checks passed:
 - Migration tests
 - Start window smoke
 - Wizard smoke
+- Stage preview smoke
 - Clan round-trip smoke
 - Representative life-path smoke
 - Editor allocation smoke
@@ -85,6 +86,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Stage 4 career dropdowns show candidate careers while prerequisite gaps are summarized and handled through the Free XP career planner
 - Stage 4 career field-skill dropdowns now fall back to the allowed field-skill pool instead of appearing blank when the character qualifies through an alternate prerequisite route
 - Stage 4 character totals no longer reuse the previous career totals during career-switch refreshes
+- Stage 4 character totals stay visible for the newly selected career while that career's flexible XP is still being assigned
 - Stage 2, Stage 3, and Stage 4 flexible XP pools preserve user allocations
   while navigating between wizard pages
 - Flexible XP target dropdowns group Attributes first, then Traits, then Skills

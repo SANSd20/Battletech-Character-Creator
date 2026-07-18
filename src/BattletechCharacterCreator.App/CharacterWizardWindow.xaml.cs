@@ -375,6 +375,11 @@ public partial class CharacterWizardWindow : Window
         RefreshEraAvailability();
         SelectAffiliationForCapture("fed-suns");
         SelectSubAffiliationForCapture("Capellan March");
+        ChildhoodPicker.SelectedItem = LifePathCatalog.Childhoods
+            .First(module => module.Id == "back-woods");
+        LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
+            .First(module => module.Id == "late-back-woods");
+        RefreshModules();
         BuildChoiceControls();
         ShowStep(1);
         var stage0Attributes = Stage0Attributes.ItemsSource
@@ -392,16 +397,21 @@ public partial class CharacterWizardWindow : Window
         var stage1Attributes = PreviewAttributes.ItemsSource
             .Cast<NamedValue>()
             .ToDictionary(item => item.Name, item => item.Value);
-        if (stage1Attributes["STR"] != 200 ||
-            stage1Attributes["BOD"] != 200 ||
-            stage1Attributes["WIL"] != 140)
+        var expectedStage1Attributes = BuildCharacter(
+                2,
+                allowIncompleteCurrentStepPreview: true)
+            .Attributes
+            .ToDictionary(item => item.Name, item => item.Value);
+        if (!stage1Attributes.SequenceEqual(expectedStage1Attributes))
         {
             throw new InvalidOperationException(
-                "Stage 1 preview must add early-childhood attributes after Stage 0.");
+                "Stage 1 preview must match the stage-limited character totals.");
         }
 
         ShowStep(3);
-        var stage2Character = BuildCharacter(3);
+        var stage2Character = BuildCharacter(
+            3,
+            allowIncompleteCurrentStepPreview: true);
         var stage2ModuleCost = LifePathEngine.CalculateModuleCost(
             stage2Character, SelectedModules(3));
         var expectedStage2FreeXp = LifePathEngine.StartingXp - stage2ModuleCost;
@@ -417,9 +427,12 @@ public partial class CharacterWizardWindow : Window
                 "Stage 2 preview must show the late-childhood module cost and remove it from running Free XP.");
         }
 
+        CompleteFlexibleChoicesForSmoke(3);
         SelectEducationForCapture("trade-school");
         ShowStep(4);
-        var stage3Character = BuildCharacter(4);
+        var stage3Character = BuildCharacter(
+            4,
+            allowIncompleteCurrentStepPreview: true);
         var expectedStage3Age = LateChildhoodCompletionAge +
             SelectedEducationFields().Sum(module => module.TimeYears);
         if (stage3Character.Age != expectedStage3Age)
@@ -427,6 +440,40 @@ public partial class CharacterWizardWindow : Window
             throw new InvalidOperationException(
                 "Stage 3 preview must add only selected education time to the age 16 baseline.");
         }
+    }
+
+    private void CompleteFlexibleChoicesForSmoke(int step)
+    {
+        foreach (var input in choiceControls.Values)
+        {
+            if (input.Step != step ||
+                input.Choice?.Target != EffectTarget.Flexible ||
+                input.Choice.FixedFlexibleSelections ||
+                input.Amounts is null ||
+                input.Options is null ||
+                input.Pickers.Count == 0)
+            {
+                continue;
+            }
+
+            var target = input.Options.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(target))
+            {
+                continue;
+            }
+
+            input.Pickers[0].SelectedItem = target;
+            input.Amounts[0].Text =
+                (input.Choice.Xp * input.Choice.Count).ToString();
+            for (var i = 1; i < input.Pickers.Count; i++)
+            {
+                input.Pickers[i].SelectedItem = null;
+                input.Amounts[i].Text = "0";
+            }
+        }
+        CaptureFlexibleAllocations();
+        UpdateFlexibleChoiceDisplays();
+        UpdatePreview();
     }
 
     public void SmokeAffiliationFilteredChildhoods()
@@ -865,18 +912,28 @@ public partial class CharacterWizardWindow : Window
     public void SmokeStage4CareerTotalsRefresh()
     {
         SelectAffiliationForCapture("lyran");
+        EducationCheck.IsChecked = false;
+        SchoolPicker.SelectedIndex = -1;
+        SecondEducationCheck.IsChecked = false;
+        SecondSchoolPicker.SelectedIndex = -1;
+        ThirdEducationCheck.IsChecked = false;
+        ThirdSchoolPicker.SelectedIndex = -1;
         ChildhoodPicker.SelectedItem = LifePathCatalog.Childhoods
             .First(module => module.Id == "street");
         LateChildhoodPicker.SelectedItem = LifePathCatalog.LateChildhoods
             .First(module => module.Id == "late-street");
         RefreshModules();
+        BuildChoiceControls();
+        CompleteFlexibleChoicesForSmoke(3);
         FirstCareerCheck.IsChecked = true;
         RefreshCareerOptions();
         RealLifePicker.SelectedItem = LifePathCatalog.RealLifeModules
             .First(module => module.Id == "real-agitator");
         RefreshCareerOptions();
         BuildChoiceControls();
-        var agitator = BuildCharacter(Stage4Step);
+        var agitator = BuildCharacter(
+            Stage4Step,
+            allowIncompleteCurrentStepPreview: true);
         if (!agitator.Traits.Any(item =>
                 item.Name == "Gregarious" && item.Value > 0))
         {
@@ -888,7 +945,9 @@ public partial class CharacterWizardWindow : Window
             .First(module => module.Id == "real-explorer");
         RefreshCareerOptions();
         BuildChoiceControls();
-        var explorer = BuildCharacter(Stage4Step);
+        var explorer = BuildCharacter(
+            Stage4Step,
+            allowIncompleteCurrentStepPreview: true);
         if (explorer.Traits.Any(item =>
                 item.Name == "Gregarious" && item.Value > 0))
         {
@@ -900,6 +959,29 @@ public partial class CharacterWizardWindow : Window
         {
             throw new InvalidOperationException(
                 "Stage 4 Explorer totals did not apply the replacement career.");
+        }
+
+        RealLifePicker.SelectedItem = LifePathCatalog.RealLifeModules
+            .First(module => module.Id == "real-neer-do-well");
+        RefreshCareerOptions();
+        BuildChoiceControls();
+        UpdatePreview();
+        var previewAttributes = PreviewAttributes.ItemsSource?
+            .Cast<NamedValue>()
+            .ToArray() ?? [];
+        var previewTraits = PreviewTraits.ItemsSource?
+            .Cast<NamedValue>()
+            .ToArray() ?? [];
+        var previewSkills = PreviewSkills.ItemsSource?
+            .Cast<NamedValue>()
+            .ToArray() ?? [];
+        if (!previewAttributes.Any(item =>
+                item.Name == "EDG" && item.Value > 100) ||
+            !previewTraits.Any(item => item.Name == "Extra Income") ||
+            !previewSkills.Any(item => item.Name == "Acting"))
+        {
+            throw new InvalidOperationException(
+                "Stage 4 preview totals disappeared before career Flexible XP was fully assigned.");
         }
     }
 
@@ -2654,7 +2736,7 @@ public partial class CharacterWizardWindow : Window
         {
             var character = BuildCharacter(
                 currentStep,
-                allowIncompleteStage4Preview: currentStep == Stage4Step);
+                allowIncompleteCurrentStepPreview: true);
             var summary = CharacterRules.Calculate(character);
             var moduleCost = LifePathEngine.CalculateModuleCost(
                 character, SelectedModules(currentStep));
@@ -3098,7 +3180,7 @@ public partial class CharacterWizardWindow : Window
 
     private Character BuildCharacter(
         int throughStep,
-        bool allowIncompleteStage4Preview = false)
+        bool allowIncompleteCurrentStepPreview = false)
     {
         var affiliation = SelectedAffiliation ??
             throw new InvalidOperationException("Choose an affiliation.");
@@ -3212,7 +3294,8 @@ public partial class CharacterWizardWindow : Window
             var selection = CreateSelection(selectedModule);
             if (selectedModule.IsStage4)
             {
-                if (allowIncompleteStage4Preview)
+                if (allowIncompleteCurrentStepPreview &&
+                    ChoiceStep(selectedModule) == throughStep)
                 {
                     LifePathEngine.ApplyStage4Preview(character, selection);
                 }
@@ -3224,7 +3307,15 @@ public partial class CharacterWizardWindow : Window
             }
             else
             {
-                LifePathEngine.Apply(character, selection);
+                if (allowIncompleteCurrentStepPreview &&
+                    ChoiceStep(selectedModule) == throughStep)
+                {
+                    LifePathEngine.ApplyPreview(character, selection);
+                }
+                else
+                {
+                    LifePathEngine.Apply(character, selection);
+                }
             }
         }
         if (childhood is not null)

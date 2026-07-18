@@ -142,6 +142,8 @@ Invoke-AppSmoke "Start window smoke" @("--smoke-start")
 
 Invoke-AppSmoke "Wizard smoke" @("--smoke-wizard")
 
+Invoke-AppSmoke "Stage preview smoke" @("--smoke-stage-preview")
+
 Invoke-AppSmoke "Affiliation-filtered childhood smoke" @("--smoke-affiliation-filtered-childhoods")
 
 Invoke-AppSmoke "Clan round-trip smoke" @("--smoke-clan-roundtrip")

@@ -284,10 +284,10 @@ public static class LifePathEngine
         }
     }
 
-    private static void ApplyPreview(
+    public static void ApplyPreview(
         Character character,
         ModuleSelection selection,
-        bool repeated)
+        bool repeated = false)
     {
         if (repeated && selection.Module.RepeatEffects is not null)
         {
