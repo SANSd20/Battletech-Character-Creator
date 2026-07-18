@@ -54,6 +54,8 @@ pass.
 - Load at least one legacy `.btcc` character.
 - Increase and decrease one Attribute, one Trait, and one Skill.
 - Confirm prerequisite warnings are visible when a required XP target is short.
+- Confirm editor Rule Check rows show the missing XP gap next to required and
+  current XP.
 - Search/filter Skills and confirm unrelated rows are hidden.
 
 ## Inventory and Companion Content

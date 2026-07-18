@@ -385,6 +385,7 @@
                                         <DataGridTextColumn Header="Requirement" Binding="{Binding Name}" Width="*"/>
                                         <DataGridTextColumn Header="Required XP" Binding="{Binding RequiredXp}" Width="110"/>
                                         <DataGridTextColumn Header="Current XP" Binding="{Binding ActualXp}" Width="110"/>
+                                        <DataGridTextColumn Header="Gap" Binding="{Binding MissingXp}" Width="70"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Grid>

@@ -136,6 +136,8 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
 - Character editor with guided Attribute, Trait, and Skill XP controls
+- Character editor Rule Check shows each prerequisite's missing XP gap alongside
+  required and current XP
 - Searchable equipment and weapon catalogs with visible quantity-aware
   base-price totals, purchased patch and ammo totals, and unresolved-price counts
 - Equipment and weapon catalog filters for faster core and Companion inventory

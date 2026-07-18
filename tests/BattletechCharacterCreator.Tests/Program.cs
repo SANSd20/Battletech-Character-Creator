@@ -128,6 +128,9 @@ Assert(CharacterRules.TraitLevel("Mutation", 450) == 3 &&
     CharacterRules.TraitLevel("Mutation", -650) == -5,
     "Companion Mutation trait XP must clamp to its printed range.");
 Assert(CharacterRules.StartingCBills(3) == 10_000, "Wealth level determines starting C-Bills.");
+Assert(new PrerequisiteIssue("Skill", "Acrobatics", 120, 75).MissingXp == 45 &&
+    new PrerequisiteIssue("Education", "Military Field", 0, 30).MissingXp == 0,
+    "Prerequisite issues must expose a non-negative missing XP gap.");
 Assert(CharacterRules.BasePurchaseCost("500/100") == 500,
     "Slash-separated catalog costs must expose the base purchase price.");
 Assert(CharacterRules.SecondaryPurchaseCost("500/100") == 100,

@@ -103,6 +103,8 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - Free XP step can manually spend remaining XP on selected Attributes, Traits, and Skills
 - Character editor with XP controls for attributes, skills, and traits, including
   5 XP and 10 XP adjustment buttons
+- Character editor Rule Check now shows each prerequisite's missing XP gap
+  alongside required and current XP
 - Legacy `.btcc` save/load compatibility
 - Searchable equipment and weapon catalogs with C-Bill and mass summaries
 - Equipment and weapon catalog filters for faster inventory selection

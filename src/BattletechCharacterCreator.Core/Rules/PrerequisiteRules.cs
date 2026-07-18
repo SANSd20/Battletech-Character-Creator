@@ -639,4 +639,7 @@ public static class PrerequisiteRules
         values.FirstOrDefault(item => item.Name == name)?.Value ?? 0;
 }
 
-public sealed record PrerequisiteIssue(string Category, string Name, int RequiredXp, int ActualXp);
+public sealed record PrerequisiteIssue(string Category, string Name, int RequiredXp, int ActualXp)
+{
+    public int MissingXp => Math.Max(0, RequiredXp - ActualXp);
+}

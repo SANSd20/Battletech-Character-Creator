@@ -2986,7 +2986,7 @@ public partial class CharacterWizardWindow : Window
         return issues
             .Select(issue =>
             {
-                var missing = Math.Max(0, issue.RequiredXp - issue.ActualXp);
+                var missing = issue.MissingXp;
                 var isFreeXpIssue = IsReviewFreeXpIssue(issue);
                 var targetStep = ReviewIssueTargetStep(issue);
                 var canSpend = isFreeXpIssue &&
