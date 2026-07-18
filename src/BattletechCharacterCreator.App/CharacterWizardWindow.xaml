@@ -614,7 +614,7 @@
                                    LineHeight="16"/>
                         <ItemsControl x:Name="CareerAvailabilityDetails"
                                       Grid.Row="6"
-                                      MaxHeight="72">
+                                      MaxHeight="48">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding DisplayText}"

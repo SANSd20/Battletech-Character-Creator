@@ -904,6 +904,16 @@ public partial class CharacterWizardWindow : Window
         RefreshModules();
         BuildChoiceControls();
         CompleteFlexibleChoicesForSmoke(3);
+        FirstCareerCheck.IsChecked = false;
+        RefreshCareerOptions();
+        if (RealLifePicker.SelectedItem is not null ||
+            CareerAvailabilityDetails.Visibility == Visibility.Visible ||
+            !CareerAvailabilitySummary.Text.Contains(
+                "Enable a career slot", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Stage 4 career prerequisite details remained visible with no career slot enabled.");
+        }
         FirstCareerCheck.IsChecked = true;
         RefreshCareerOptions();
         RealLifePicker.SelectedItem = LifePathCatalog.RealLifeModules
@@ -1419,6 +1429,12 @@ public partial class CharacterWizardWindow : Window
         if (FirstCareerCheck.IsChecked != true)
         {
             SecondCareerCheck.IsChecked = false;
+            RealLifePicker.SelectedItem = null;
+            SecondRealLifePicker.SelectedItem = null;
+        }
+        else if (SecondCareerCheck.IsChecked != true)
+        {
+            SecondRealLifePicker.SelectedItem = null;
         }
         RefreshCareerOptions();
         if (SecondCareerCheck.IsChecked == true &&
@@ -1698,11 +1714,22 @@ public partial class CharacterWizardWindow : Window
         IReadOnlyList<CareerAvailability> availability,
         string? message)
     {
+        if (FirstCareerCheck.IsChecked != true)
+        {
+            CareerAvailabilitySummary.Text =
+                "Enable a career slot to review career prerequisites.";
+            CareerAvailabilitySummary.ToolTip = null;
+            CareerAvailabilityDetails.ItemsSource = null;
+            CareerAvailabilityDetails.Visibility = Visibility.Collapsed;
+            return;
+        }
+        CareerAvailabilityDetails.Visibility = Visibility.Visible;
         if (message is not null)
         {
             CareerAvailabilitySummary.Text = message;
             CareerAvailabilitySummary.ToolTip = null;
             CareerAvailabilityDetails.ItemsSource = null;
+            CareerAvailabilityDetails.Visibility = Visibility.Collapsed;
             return;
         }
         var availableCount = availability.Count(item => item.Issues.Count == 0);
@@ -1713,6 +1740,7 @@ public partial class CharacterWizardWindow : Window
                 $"{availableCount} career module(s) available.";
             CareerAvailabilitySummary.ToolTip = null;
             CareerAvailabilityDetails.ItemsSource = null;
+            CareerAvailabilityDetails.Visibility = Visibility.Collapsed;
             return;
         }
         var blockers = blocked
@@ -1738,7 +1766,7 @@ public partial class CharacterWizardWindow : Window
                     issue.Name)))
             .GroupBy(row => row.DisplayText, StringComparer.Ordinal)
             .Select(group => group.First())
-            .Take(5)
+            .Take(3)
             .ToArray();
     }
 

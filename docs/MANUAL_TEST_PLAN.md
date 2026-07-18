@@ -29,7 +29,7 @@ pass.
 - Confirm Stage 4 shows the full first-career candidate list and summarizes
   unmet prerequisites without hiding those careers.
 - Confirm Stage 4 shows visible unmet-prerequisite detail rows under the career
-  summary.
+  summary only after a career slot is enabled.
 - Confirm changing Stage 4 careers removes the previous career's unique
   Attribute, Trait, and Skill awards from the character totals.
 - Confirm selecting a Stage 4 career with unassigned Flexible XP still shows

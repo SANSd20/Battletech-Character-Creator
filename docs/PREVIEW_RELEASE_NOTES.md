@@ -34,7 +34,7 @@ release.
 - All 24 corrected-printing Stage 4 base modules, including variant paths
 - Two ordered Stage 4 careers with repeat and prerequisite handling
 - Stage 4 career dropdowns show candidate careers while prerequisite gaps are summarized on the Stage 4 screen
-- Stage 4 now shows a compact visible list of unmet career prerequisite details
+- Stage 4 now shows a compact visible list of unmet career prerequisite details once a career slot is enabled
 - Stage 4 career field-skill dropdowns now fall back to the allowed field-skill pool instead of appearing blank when the character qualifies through an alternate prerequisite route
 - Stage 4 character totals no longer reuse the previous career totals during career-switch refreshes
 - Stage 4 character totals stay visible for the newly selected career while that career's flexible XP is still being assigned
