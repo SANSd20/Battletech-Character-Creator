@@ -127,6 +127,8 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
   across added targets with per-target limits
 - Stage 4 career lists show candidate careers and summarize unmet Attribute,
   Trait, Skill, affiliation, caste, education, and background requirements
+- Stage 4 shows a compact visible list of unmet career prerequisites instead of
+  relying only on tooltip details
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
 - Character editor with guided Attribute, Trait, and Skill XP controls

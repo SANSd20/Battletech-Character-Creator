@@ -59,6 +59,14 @@ public partial class CharacterWizardWindow : Window
         LifePathModule Module,
         IReadOnlyList<PrerequisiteIssue> Issues);
 
+    private sealed record CareerAvailabilityDetailRow(
+        string Career,
+        string Category,
+        string Name)
+    {
+        public string DisplayText => $"{Career}: {Category} {Name}";
+    }
+
     private sealed record ReviewIssueRow(
         PrerequisiteIssue Issue,
         int MissingXp,
@@ -781,6 +789,12 @@ public partial class CharacterWizardWindow : Window
         {
             throw new InvalidOperationException(
                 "Stage 4 career filtering did not show the full first career list.");
+        }
+        if (CareerAvailabilityDetails.ItemsSource is not IEnumerable<CareerAvailabilityDetailRow> rows ||
+            !rows.Any())
+        {
+            throw new InvalidOperationException(
+                "Stage 4 career prerequisites were not shown on the Stage 4 screen.");
         }
 
         var character = BuildCharacter();
@@ -1687,6 +1701,8 @@ public partial class CharacterWizardWindow : Window
         if (message is not null)
         {
             CareerAvailabilitySummary.Text = message;
+            CareerAvailabilitySummary.ToolTip = null;
+            CareerAvailabilityDetails.ItemsSource = null;
             return;
         }
         var availableCount = availability.Count(item => item.Issues.Count == 0);
@@ -1696,6 +1712,7 @@ public partial class CharacterWizardWindow : Window
             CareerAvailabilitySummary.Text =
                 $"{availableCount} career module(s) available.";
             CareerAvailabilitySummary.ToolTip = null;
+            CareerAvailabilityDetails.ItemsSource = null;
             return;
         }
         var blockers = blocked
@@ -1713,6 +1730,16 @@ public partial class CharacterWizardWindow : Window
                     $"{item.Module.Name}: {issue.Category} {issue.Name}"))
                 .Distinct(StringComparer.Ordinal)
                 .Take(12));
+        CareerAvailabilityDetails.ItemsSource = blocked
+            .SelectMany(item => item.Issues.Select(issue =>
+                new CareerAvailabilityDetailRow(
+                    item.Module.Name,
+                    issue.Category,
+                    issue.Name)))
+            .GroupBy(row => row.DisplayText, StringComparer.Ordinal)
+            .Select(group => group.First())
+            .Take(5)
+            .ToArray();
     }
 
     private void UpdateCareerSummary()
