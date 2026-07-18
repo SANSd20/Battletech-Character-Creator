@@ -743,10 +743,10 @@ public partial class CharacterWizardWindow : Window
         reviewFreeXpAllocations.Clear();
         FirstCareerCheck.IsChecked = true;
         RefreshCareerOptions();
-        if (RealLifePicker.Items.Count <= 1)
+        if (RealLifePicker.Items.Count != LifePathCatalog.RealLifeModules.Count)
         {
             throw new InvalidOperationException(
-                "Stage 4 career filtering collapsed the first career list to one option.");
+                "Stage 4 career filtering did not show the full first career list.");
         }
 
         var character = BuildCharacter();
@@ -1335,11 +1335,8 @@ public partial class CharacterWizardWindow : Window
         var firstPreviousId = (RealLifePicker.SelectedItem as LifePathModule)?.Id;
         var firstAvailability = EvaluateCareerAvailability(
             null, includeFreeXpAllocations: false, out var message);
-        var firstOptions = (message is null
-                ? firstAvailability
-                    .Where(item => item.Issues.Count == 0)
-                    .Select(item => item.Module)
-                : firstAvailability.Select(item => item.Module))
+        var firstOptions = firstAvailability
+            .Select(item => item.Module)
             .ToArray();
         RealLifePicker.ItemsSource = firstOptions;
         RealLifePicker.SelectedItem = firstOptions
@@ -1360,11 +1357,8 @@ public partial class CharacterWizardWindow : Window
         var firstCareer = SelectedRealLife;
         var secondAvailability = EvaluateCareerAvailability(
             firstCareer, includeFreeXpAllocations: false, out var message);
-        var options = (message is null
-                ? secondAvailability
-                    .Where(item => item.Issues.Count == 0)
-                    .Select(item => item.Module)
-                : secondAvailability.Select(item => item.Module))
+        var options = secondAvailability
+            .Select(item => item.Module)
             .ToArray();
         SecondRealLifePicker.ItemsSource = options;
         SecondRealLifePicker.SelectedItem = options
@@ -1608,25 +1602,25 @@ public partial class CharacterWizardWindow : Window
             return;
         }
         var availableCount = availability.Count(item => item.Issues.Count == 0);
-        var hidden = availability.Where(item => item.Issues.Count > 0).ToArray();
-        if (hidden.Length == 0)
+        var blocked = availability.Where(item => item.Issues.Count > 0).ToArray();
+        if (blocked.Length == 0)
         {
             CareerAvailabilitySummary.Text =
                 $"{availableCount} career module(s) available.";
             CareerAvailabilitySummary.ToolTip = null;
             return;
         }
-        var blockers = hidden
+        var blockers = blocked
             .SelectMany(item => item.Issues.Select(issue =>
                 $"{issue.Category}: {issue.Name}"))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
         CareerAvailabilitySummary.Text =
             $"{availableCount} career module(s) available; " +
-            $"{hidden.Length} hidden by unmet prerequisites. " +
+            $"{blocked.Length} need prerequisites. " +
             $"First unmet: {blockers.FirstOrDefault() ?? "None"}.";
         CareerAvailabilitySummary.ToolTip = string.Join(Environment.NewLine,
-            hidden
+            blocked
                 .SelectMany(item => item.Issues.Select(issue =>
                     $"{item.Module.Name}: {issue.Category} {issue.Name}"))
                 .Distinct(StringComparer.Ordinal)

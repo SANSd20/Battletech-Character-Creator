@@ -128,9 +128,8 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
   the listed XP amount without split controls
 - Stage 2, Stage 3, and Stage 4 flexible XP pools start unassigned and can be split
   across added targets with per-target limits
-- Stage 4 career lists hide modules whose prerequisites are not currently met
-  and summarize hidden Attribute, Trait, Skill, affiliation, caste, education,
-  and background requirements
+- Stage 4 career lists show candidate careers and summarize unmet Attribute,
+  Trait, Skill, affiliation, caste, education, and background requirements
 - Wizard character totals remain visible while flexible XP pools still have
   unallocated or overallocated XP
 - Character editor with guided Attribute, Trait, and Skill XP controls

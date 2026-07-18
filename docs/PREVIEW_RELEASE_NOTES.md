@@ -34,6 +34,7 @@ release.
 - All corrected-printing affiliations and 68 sub-affiliations
 - All 24 corrected-printing Stage 4 base modules, including variant paths
 - Two ordered Stage 4 careers with repeat and prerequisite handling
+- Stage 4 career dropdowns show candidate careers while prerequisite gaps are summarized and handled through the Free XP career planner
 - Stage 2, Stage 3, and Stage 4 flexible XP pools preserve user allocations
   while navigating between wizard pages
 - Flexible XP target dropdowns group Attributes first, then Traits, then Skills

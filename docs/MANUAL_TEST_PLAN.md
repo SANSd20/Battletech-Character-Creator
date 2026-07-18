@@ -26,6 +26,8 @@ pass.
 - Confirm Stage 3 can add a second or third education entry.
 - Confirm Officer Candidate School can be selected after another education path
   when the required basic and advanced fields are present.
+- Confirm Stage 4 shows the full first-career candidate list and summarizes
+  unmet prerequisites without hiding those careers.
 - Confirm the Free XP page uses one target dropdown for Attributes, Traits, and
   Skills.
 - Confirm an assigned Free XP target disappears from the Free XP target dropdown,
