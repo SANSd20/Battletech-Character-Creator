@@ -39,8 +39,6 @@ pass.
   Skills.
 - Confirm an assigned Free XP target disappears from the Free XP target dropdown,
   then reappears after removing that allocation row.
-- Confirm the Free XP page lists hidden Stage 4 career prerequisites and can
-  spend remaining Free XP on fixable Attribute, Trait, and Skill gaps.
 
 ## Editor Workflows
 

@@ -71,19 +71,6 @@ public partial class CharacterWizardWindow : Window
         public int ActualXp => Issue.ActualXp;
     }
 
-    private sealed record CareerPrerequisiteRow(
-        string Career,
-        PrerequisiteIssue Issue,
-        int MissingXp,
-        bool CanSpendFreeXp,
-        string ActionText)
-    {
-        public string Category => Issue.Category;
-        public string Name => Issue.Name;
-        public int RequiredXp => Issue.RequiredXp;
-        public int ActualXp => Issue.ActualXp;
-    }
-
     private sealed record FreeXpTargetOption(string Category, string Name)
     {
         public string DisplayName => $"{Category} / {Name}";
@@ -827,28 +814,6 @@ public partial class CharacterWizardWindow : Window
             throw new InvalidOperationException(
                 "Reset Review XP did not remove Review-screen XP allocations.");
         }
-
-        var careerRows = BuildCareerPrerequisiteRows(
-            CharacterRules.Calculate(BuildCharacter()).FreeXp);
-        var careerRow = careerRows.FirstOrDefault(item => item.CanSpendFreeXp);
-        if (careerRow is null)
-        {
-            throw new InvalidOperationException(
-                "Free XP career planner did not expose any spendable career prerequisite gaps.");
-        }
-
-        SpendCareerPrerequisiteFreeXp_Click(
-            new Button { Tag = careerRow }, new RoutedEventArgs());
-        if (!BuildFreeXpAllocationRows().Any(item =>
-                item.Category == careerRow.Category &&
-                item.Name == careerRow.Name &&
-                item.Xp >= careerRow.MissingXp))
-        {
-            throw new InvalidOperationException(
-                "Free XP career planner did not allocate XP to the selected prerequisite gap.");
-        }
-
-        ResetReviewXp_Click(this, new RoutedEventArgs());
 
         FreeXpTargetPicker.SelectedItem = FreeXpTargetPicker.Items
             .Cast<FreeXpTargetOption>()
@@ -2808,11 +2773,9 @@ public partial class CharacterWizardWindow : Window
                 ReviewSkills.ItemsSource = null;
                 ReviewTraits.ItemsSource = null;
                 ReviewIssues.ItemsSource = null;
-                CareerPrerequisiteIssues.ItemsSource = null;
                 ReviewCharacterSummary.Text = "";
                 ReviewLifePath.Text = "";
                 ReviewRuleStatus.Text = "Complete the earlier stages to review this character.";
-                CareerPrerequisiteStatus.Text = "";
                 ReviewFinalStatus.Text = "";
                 FreeXpModuleCost.Text = "";
                 FreeXpSpentXp.Text = "";
@@ -2833,9 +2796,6 @@ public partial class CharacterWizardWindow : Window
         var summary = CharacterRules.Calculate(character);
         var blockingCount = issues.Count(issue => issue.Category == "Affiliation");
         ReviewIssues.ItemsSource = BuildReviewIssueRows(issues, summary.FreeXp);
-        var careerRows = BuildCareerPrerequisiteRows(summary.FreeXp);
-        CareerPrerequisiteIssues.ItemsSource = careerRows;
-        UpdateCareerPrerequisiteStatus(careerRows);
         var reviewXp = reviewFreeXpAllocations.Values.Sum();
         ReviewRuleStatus.Text = blockingCount > 0
             ? $"{blockingCount} blocking conflict(s) must be corrected."
@@ -2906,69 +2866,6 @@ public partial class CharacterWizardWindow : Window
             .ToArray();
     }
 
-    private IReadOnlyList<CareerPrerequisiteRow> BuildCareerPrerequisiteRows(
-        int freeXp)
-    {
-        var availability = EvaluateCareerAvailability(
-            null, includeFreeXpAllocations: true, out var message);
-        if (message is not null)
-        {
-            return [];
-        }
-
-        return availability
-            .Where(item => item.Issues.Count > 0)
-            .SelectMany(item => item.Issues.Select(issue =>
-            {
-                var missing = Math.Max(0, issue.RequiredXp - issue.ActualXp);
-                var canSpend = IsReviewFreeXpIssue(issue) &&
-                    missing > 0 &&
-                    missing <= freeXp;
-                var action = IsReviewFreeXpIssue(issue)
-                    ? canSpend
-                        ? $"Spend {missing}"
-                        : missing > 0
-                            ? "Need XP"
-                            : "Fixed"
-                    : "Edit stage";
-                return new CareerPrerequisiteRow(
-                    item.Module.Name,
-                    issue,
-                    missing,
-                    canSpend,
-                    action);
-            }))
-            .OrderBy(row => row.Career)
-            .ThenBy(row => row.Category)
-            .ThenBy(row => row.Name)
-            .ToArray();
-    }
-
-    private void UpdateCareerPrerequisiteStatus(
-        IReadOnlyList<CareerPrerequisiteRow> rows)
-    {
-        if (rows.Count == 0)
-        {
-            CareerPrerequisiteStatus.Text =
-                "Career planner: all currently available careers meet prerequisites.";
-            CareerPrerequisiteStatus.Foreground =
-                System.Windows.Media.Brushes.DarkGreen;
-            return;
-        }
-
-        var careers = rows
-            .Select(row => row.Career)
-            .Distinct(StringComparer.Ordinal)
-            .Count();
-        var fixable = rows.Count(row => row.CanSpendFreeXp);
-        CareerPrerequisiteStatus.Text =
-            $"Career planner: {careers} hidden career(s) have unmet prerequisites; " +
-            $"{fixable} gap(s) can be filled with current Free XP.";
-        CareerPrerequisiteStatus.Foreground = fixable > 0
-            ? System.Windows.Media.Brushes.DarkGoldenrod
-            : System.Windows.Media.Brushes.Firebrick;
-    }
-
     private static bool IsReviewFreeXpIssue(PrerequisiteIssue issue) =>
         issue.Category is "Attribute" or "Skill" or "Trait";
 
@@ -3000,17 +2897,6 @@ public partial class CharacterWizardWindow : Window
         reviewFreeXpAllocations[key] =
             reviewFreeXpAllocations.GetValueOrDefault(key) + row.MissingXp;
         UpdatePreview();
-    }
-
-    private void SpendCareerPrerequisiteFreeXp_Click(object sender, RoutedEventArgs e)
-    {
-        if ((sender as FrameworkElement)?.Tag is not CareerPrerequisiteRow row ||
-            !row.CanSpendFreeXp)
-        {
-            return;
-        }
-
-        SpendFreeXpOnRequirement(row.Category, row.Name, row.MissingXp);
     }
 
     private void AddFreeXp_Click(object sender, RoutedEventArgs e)
@@ -3070,27 +2956,6 @@ public partial class CharacterWizardWindow : Window
         reviewFreeXpAllocations[key] =
             reviewFreeXpAllocations.GetValueOrDefault(key) + xp;
         amountBox.Text = "0";
-        UpdatePreview();
-    }
-
-    private void SpendFreeXpOnRequirement(string category, string name, int xp)
-    {
-        var character = BuildCharacter();
-        var freeXp = CharacterRules.Calculate(character).FreeXp;
-        if (xp > freeXp)
-        {
-            MessageBox.Show(
-                $"This fix needs {xp} XP, but only {freeXp} Free XP remains.",
-                "Not enough Free XP",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-            UpdatePreview();
-            return;
-        }
-
-        var key = ReviewAllocationKey(category, name);
-        reviewFreeXpAllocations[key] =
-            reviewFreeXpAllocations.GetValueOrDefault(key) + xp;
         UpdatePreview();
     }
 

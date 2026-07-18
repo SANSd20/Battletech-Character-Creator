@@ -61,7 +61,6 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - The Free XP allocation list now shows the target type alongside each spend
 - Free XP allocation rows can now be removed individually without resetting all Free XP spending
 - Free XP target choices now hide targets already assigned on the Free XP step and restore them after removal
-- The Free XP step now includes a career prerequisite planner for hidden Stage 4 careers, with one-click fixes for Attribute, Trait, and Skill gaps that can be covered by remaining Free XP
 - Module flexible XP must now be fully assigned before advancing to the next Life Module, matching the page 61 spending rule
 - Stage 2 running Free XP now visibly subtracts the selected late-childhood module cost
 - Wizard age calculation now starts from age 16 after late childhood and adds only selected Stage 3 education time and Stage 4 career time
@@ -83,7 +82,7 @@ Manual installed-app testing should follow `docs/MANUAL_TEST_PLAN.md`.
 - All corrected-printing affiliations and 68 sub-affiliations
 - All 24 corrected-printing Stage 4 base modules, including variants
 - Two ordered Stage 4 careers with repeat and prerequisite handling
-- Stage 4 career dropdowns show candidate careers while prerequisite gaps are summarized and handled through the Free XP career planner
+- Stage 4 career dropdowns show candidate careers while prerequisite gaps are summarized on the Stage 4 screen
 - Stage 4 career field-skill dropdowns now fall back to the allowed field-skill pool instead of appearing blank when the character qualifies through an alternate prerequisite route
 - Stage 4 character totals no longer reuse the previous career totals during career-switch refreshes
 - Stage 4 character totals stay visible for the newly selected career while that career's flexible XP is still being assigned

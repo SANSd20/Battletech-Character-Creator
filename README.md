@@ -95,9 +95,6 @@ summary with `scripts\Update-IssueAudit.ps1` after refreshing `issues/issues.jso
 - Free XP allocations show whether each spend targets an Attribute, Trait, or Skill
 - Free XP allocation rows can be removed individually without resetting all Free XP spending
 - Free XP target choices hide targets already assigned on the Free XP step and restore them after removal
-- Free XP step includes a career prerequisite planner for hidden Stage 4 careers,
-  with one-click fixes for Attribute, Trait, and Skill gaps that can be covered
-  by remaining Free XP
 - Life Module flexible XP pools must be fully assigned before advancing to the next module
 - Stage 2 running Free XP visibly subtracts the selected late-childhood module cost
 - Minimum age starts at 16 after late childhood and adds selected Stage 3 education time plus Stage 4 career time
