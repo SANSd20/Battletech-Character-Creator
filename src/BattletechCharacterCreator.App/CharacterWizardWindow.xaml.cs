@@ -11,6 +11,7 @@ namespace BattletechCharacterCreator.App;
 
 public partial class CharacterWizardWindow : Window
 {
+    private const int Stage3Step = 4;
     private const int Stage4Step = 5;
     private const int FreeXpStep = 6;
     private const int LateChildhoodCompletionAge = 16;
@@ -71,6 +72,8 @@ public partial class CharacterWizardWindow : Window
         PrerequisiteIssue Issue,
         int MissingXp,
         bool CanSpendFreeXp,
+        bool CanUseAction,
+        int? TargetStep,
         string ActionText)
     {
         public string Category => Issue.Category;
@@ -828,6 +831,28 @@ public partial class CharacterWizardWindow : Window
             throw new InvalidOperationException(
                 "Reset Review XP did not remove Review-screen XP allocations.");
         }
+
+        var educationRow = BuildReviewIssueRows(
+                [new PrerequisiteIssue("Education", "Test education prerequisite", 1, 0)],
+                CharacterRules.Calculate(character).FreeXp)
+            .Single();
+        if (educationRow.CanSpendFreeXp ||
+            !educationRow.CanUseAction ||
+            educationRow.TargetStep != Stage3Step ||
+            educationRow.ActionText != "Stage 3")
+        {
+            throw new InvalidOperationException(
+                "Review rule-check Education fix did not offer Stage 3 navigation.");
+        }
+
+        SpendReviewFreeXp_Click(new Button { Tag = educationRow }, new RoutedEventArgs());
+        if (currentStep != Stage3Step)
+        {
+            throw new InvalidOperationException(
+                "Review rule-check Education fix did not navigate to Stage 3.");
+        }
+
+        ShowStep(FreeXpStep);
 
         FreeXpTargetPicker.SelectedItem = FreeXpTargetPicker.Items
             .Cast<FreeXpTargetOption>()
@@ -2906,17 +2931,28 @@ public partial class CharacterWizardWindow : Window
             .Select(issue =>
             {
                 var missing = Math.Max(0, issue.RequiredXp - issue.ActualXp);
-                var canSpend = IsReviewFreeXpIssue(issue) &&
+                var isFreeXpIssue = IsReviewFreeXpIssue(issue);
+                var targetStep = ReviewIssueTargetStep(issue);
+                var canSpend = isFreeXpIssue &&
                     missing > 0 &&
                     missing <= freeXp;
-                var action = IsReviewFreeXpIssue(issue)
+                var canNavigate = targetStep.HasValue;
+                var action = isFreeXpIssue
                     ? canSpend
                         ? $"Spend {missing}"
                         : missing > 0
                             ? "Need XP"
                             : "Fixed"
-                    : "Edit stage";
-                return new ReviewIssueRow(issue, missing, canSpend, action);
+                    : canNavigate
+                        ? $"Stage {targetStep.GetValueOrDefault() - 1}"
+                        : "Edit stage";
+                return new ReviewIssueRow(
+                    issue,
+                    missing,
+                    canSpend,
+                    canSpend || canNavigate,
+                    targetStep,
+                    action);
             })
             .ToArray();
     }
@@ -2924,14 +2960,27 @@ public partial class CharacterWizardWindow : Window
     private static bool IsReviewFreeXpIssue(PrerequisiteIssue issue) =>
         issue.Category is "Attribute" or "Skill" or "Trait";
 
+    private static int? ReviewIssueTargetStep(PrerequisiteIssue issue) =>
+        issue.Category == "Education" ? Stage3Step : null;
+
     private static string ReviewAllocationKey(string category, string name) =>
         $"{category}|{name}";
 
     private void SpendReviewFreeXp_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.Tag is not ReviewIssueRow row ||
-            !row.CanSpendFreeXp)
+            !row.CanUseAction)
         {
+            return;
+        }
+
+        if (!row.CanSpendFreeXp)
+        {
+            if (row.TargetStep is int targetStep)
+            {
+                ShowStep(targetStep);
+            }
+
             return;
         }
 

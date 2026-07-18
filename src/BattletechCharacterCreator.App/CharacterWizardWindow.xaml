@@ -818,7 +818,7 @@
                                                 <Button Content="{Binding ActionText}"
                                                         Tag="{Binding}"
                                                         Click="SpendReviewFreeXp_Click"
-                                                        IsEnabled="{Binding CanSpendFreeXp}"
+                                                        IsEnabled="{Binding CanUseAction}"
                                                         Padding="7,2"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
